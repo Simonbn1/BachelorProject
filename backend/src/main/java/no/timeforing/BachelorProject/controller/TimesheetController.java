@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/timesheets")
 public class TimesheetController {
 
-    private final TimesheetService timesheetService;
+  private final TimesheetService timesheetService;
 
-    public TimesheetController(TimesheetService timesheetService) {
-        this.timesheetService = timesheetService;
-    }
+  public TimesheetController(TimesheetService timesheetService) {
+    this.timesheetService = timesheetService;
+  }
 
-    @PostMapping("/submit")
-    public Timesheet submit(@RequestBody SubmitTimesheetRequest req) {
-        return timesheetService.submitTimesheet(req.userId, req.weekStart);
-    }
+  @PostMapping("/submit")
+  public Timesheet submit(@RequestBody SubmitTimesheetRequest req) {
+    return timesheetService.submitTimesheet(req.userId, req.weekStart);
+  }
 }

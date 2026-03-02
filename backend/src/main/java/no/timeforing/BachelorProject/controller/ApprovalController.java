@@ -9,19 +9,19 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/approvals")
 public class ApprovalController {
 
-    private final ApprovalService approvalService;
+  private final ApprovalService approvalService;
 
-    public ApprovalController(ApprovalService approvalService) {
-        this.approvalService = approvalService;
-    }
+  public ApprovalController(ApprovalService approvalService) {
+    this.approvalService = approvalService;
+  }
 
-    @PostMapping("/approve")
-    public Timesheet approve(@RequestBody DecisionTimesheetRequest req) {
-        return approvalService.approve(req.userId, req.weekStart);
-    }
+  @PostMapping("/approve")
+  public Timesheet approve(@RequestBody DecisionTimesheetRequest req) {
+    return approvalService.approve(req.userId, req.weekStart);
+  }
 
-    @PostMapping("/reject")
-    public Timesheet reject(@RequestBody DecisionTimesheetRequest req) {
-        return approvalService.reject(req.userId, req.weekStart, req.comment);
-    }
+  @PostMapping("/reject")
+  public Timesheet reject(@RequestBody DecisionTimesheetRequest req) {
+    return approvalService.reject(req.userId, req.weekStart, req.comment);
+  }
 }

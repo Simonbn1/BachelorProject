@@ -1,10 +1,10 @@
 package no.timeforing.BachelorProject.service;
 
+import java.util.List;
 import no.timeforing.BachelorProject.domain.Project;
 
-import java.util.List;
-
 public interface ProjectService {
-    List<Project> listProjects();
-    Project createProject(String name);
+  List<Project> listProjects();
+
+  Project createProject(String name);
 }

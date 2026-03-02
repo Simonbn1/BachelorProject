@@ -6,22 +6,39 @@ import jakarta.persistence.*;
 @Table(name = "projects")
 public class Project {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(nullable=false)
-    private String name;
+  @Column(nullable = false)
+  private String name;
 
-    // valgfritt: kunde/avdeling/land etc.
-    private String customer;
+  // valgfritt: kunde/avdeling/land etc.
+  private String customer;
 
-    public Project() {}
+  public Project() {}
 
-    public Project(String name) { this.name = name; }
+  public Project(String name) {
+    this.name = name;
+  }
 
-    public Long getId() { return id; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getCustomer() { return customer; }
-    public void setCustomer(String customer) { this.customer = customer; }
+  public Long getId() {
+    return id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getCustomer() {
+    return customer;
+  }
+
+  public void setCustomer(String customer) {
+    this.customer = customer;
+  }
 }
