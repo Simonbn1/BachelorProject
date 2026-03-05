@@ -4,6 +4,19 @@ services:
       context: ./backend
     ports:
       - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://timesheet-postgres.postgres.database.azure.com:5432/postgres?sslmode=require"
+      SPRING_DATASOURCE_USERNAME: "timesheetadmin"
+      SPRING_DATASOURCE_PASSWORD: "Siluan2026!"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "5"
+      APP_JWT_ISSUER: "mock-auth"
+      APP_JWT_AUDIENCE: "timesheet-app"
+      APP_JWT_SECRET: "superlang-tilfeldig-secret-minst-32-tegn-1234567890"
+      APP_AUTH_ADMIN_EMAILS: "admin@example.com"
+
+    depends_on: []
 
   frontend:
     build:

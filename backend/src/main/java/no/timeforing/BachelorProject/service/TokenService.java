@@ -4,8 +4,11 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+
 import no.timeforing.BachelorProject.domain.User;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -49,7 +52,13 @@ public class TokenService {
                 .claim("jti", UUID.randomUUID().toString())
                 .build();
 
-        String token = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+        // Viktig for HS256/HMAC: angi algoritmen i header
+        JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
+
+        String token = jwtEncoder
+                .encode(JwtEncoderParameters.from(header, claims))
+                .getTokenValue();
+
         return new IssuedToken(token, accessTtl.getSeconds());
     }
 }

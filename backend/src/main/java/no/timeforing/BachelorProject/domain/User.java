@@ -6,51 +6,42 @@ import jakarta.persistence.*;
 @Table(name = "users")
 public class User {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @Column(nullable = false)
-  private String displayName;
+    @Column(nullable = false)
+    private String displayName;
 
-  @Column(unique = true)
-  private String email;
+    @Column(unique = true, nullable = false)
+    private String email;
 
-  // Entra ID object id (kan brukes senere)
-  private String entraObjectId;
+    @Column(nullable = false)
+    private String passwordHash;
 
-  public User() {}
+    @Column(nullable = false)
+    private String role; // f.eks. EMPLOYEE / ADMIN
 
-  public User(String displayName, String email) {
-    this.displayName = displayName;
-    this.email = email;
-  }
+    private String entraObjectId;
 
-  public Long getId() {
-    return id;
-  }
+    public User() {}
 
-  public String getDisplayName() {
-    return displayName;
-  }
+    public User(String displayName, String email, String passwordHash, String role) {
+        this.displayName = displayName;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.role = role;
+    }
 
-  public void setDisplayName(String displayName) {
-    this.displayName = displayName;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
-  }
-
-  public String getEntraObjectId() {
-    return entraObjectId;
-  }
-
-  public void setEntraObjectId(String entraObjectId) {
-    this.entraObjectId = entraObjectId;
-  }
+    public Long getId() { return id; }
+    public String getDisplayName() { return displayName; }
+    public void setDisplayName(String displayName) { this.displayName = displayName; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getPasswordHash() { return passwordHash; }
+    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+    public String getEntraObjectId() { return entraObjectId; }
+    public void setEntraObjectId(String entraObjectId) { this.entraObjectId = entraObjectId; }
 }

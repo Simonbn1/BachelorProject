@@ -3,6 +3,7 @@ package no.timeforing.BachelorProject.controller;
 import jakarta.validation.Valid;
 import no.timeforing.BachelorProject.auth.dto.LoginRequest;
 import no.timeforing.BachelorProject.auth.dto.LoginResponse;
+import no.timeforing.BachelorProject.auth.dto.RegisterRequest;
 import no.timeforing.BachelorProject.service.AuthService;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,11 @@ public class AuthController {
     @GetMapping
     public String ping() {
         return "Auth OK";
+    }
+
+    @PostMapping("/register")
+    public LoginResponse register(@Valid @RequestBody RegisterRequest req) {
+        return authService.register(req.displayName, req.email, req.password);
     }
 
     @PostMapping("/login")
