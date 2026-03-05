@@ -1,0 +1,292 @@
+
+.timesheet-card{
+    background: rgba(30,35,70,0.85);
+    border-radius: 12px;
+    padding: 25px;
+    backdrop-filter: blur(10px);
+    max-width: 2000px;
+    margin: auto;
+
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+.timesheet-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 25px;
+}
+
+.progress-bar{
+    height: 4px;
+    background: #2b2f55;
+    margin-top: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill{
+    width: 80%;
+    height: 100%;
+    background: linear-gradient(90deg, #c600ff, #6a5cff);
+}
+
+.timesheet-columns,
+.project-row {
+    display: grid;
+    grid-template-columns: 250px repeat(5, 1fr) 80px;
+    gap: 15px;
+    align-items: center;
+}
+
+.timesheet-columns{
+    color:rgba(255,255,255,0.6);
+    font-size: 14px;
+    margin-bottom: 10px;
+    padding: 0 5px;
+}
+
+.project-name strong {
+    color:white;
+    font-weight:600;
+}
+
+.project-name span {
+    color:rgba(255,255,255,0.5);
+    font-size:12px;
+}
+
+
+.project-name strong{
+    white-space: nowrap;
+}
+
+.project-name span{
+    display: block;
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+.project-row input{
+    width: 100%;
+    background: #2e335a;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    text-align: center;
+    padding: 10px 5px;
+    color: white;
+    box-sizing: border-box;
+
+}
+
+.project-row{
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.total {
+    text-align: center;
+    color: rgba(255,255,255,0.8);
+    font-weight: 600;
+}
+
+.add-project{
+    margin-top: 20px;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+}
+
+.add-project:hover{
+    background: linear-gradient(90deg, #c600ff, #6a5cff);
+    border-color: transparent;
+}
+
+.add-project:active{
+    transform: scale(0.97);
+}
+
+.timesheet-header h5{
+    color: white;
+    margin: 0;
+}
+
+.timesheet-header .progress-text{
+    color: white;
+
+}
+
+/** Overlay for registering of hours **/
+
+.wireframe-modal{
+    position: fixed;
+    top: 0;
+    left: 200px;
+    width: 1500px;
+    max-width: 90vw;
+    margin: 0 auto;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(3px);
+
+    background: rgba(30, 35, 70, 0.95);
+    z-index: 1000;
+}
+
+
+.modal-content{
+    background: rgba(30, 35, 70, 0.95);
+    padding: 30px;
+    border-radius: 12px;
+    width: 700px;
+
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    color: white;
+}
+
+.input-group-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 20px;
+}
+
+.input-group-row label {
+    color: white;
+    width: 140px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.dark-input{
+    background: #2e335a;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 10px 15px;
+    color: white;
+    flex-grow: 0;
+    width: 300px;
+}
+
+.timer-section {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.timer-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.timer-label {
+    width: 150px;
+    flex-shrink: 0;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.timer-inputs {
+    display: flex;
+    gap: 8px;
+}
+
+.timer-inputs input {
+    width: 58px;
+    height: 44px;
+    background: #2e335a;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    text-align: center;
+
+    color: rgba(255,255,255,0.8);
+    font-size: 14px;
+}
+
+.timer-inputs input::placeholder {
+    color: rgba(255,255,255,0.55);
+    font-size: 13px;
+}
+
+.timer-grid input {
+    width: 65px;
+    height: 45px;
+    background: #2e335a;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    text-align: center;
+    color: white;
+}
+
+.total-box {
+    background: #2e335a;
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 0 20px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    border-radius: 6px;
+    color: rgba(255,255,255,0.6);
+    margin-left: 20px;
+    font-size: 14px;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px;
+}
+
+.save-btn {
+    margin-top: 20px;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+}
+
+
+.save-btn:hover {
+    background: linear-gradient(90deg, #c600ff, #6a5cff);
+    border-color: transparent;
+}
+
+.save-btn:active{
+    transform: scale(0.97);
+}
+
+.cancel-link {
+    background: none;
+    border: none;
+    color: #ff6b6b;
+    margin-top: 15px;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.modal-divider {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin: 20px 0;
+}
+
+.timer-label{
+    color: white;
+}
+
+
+
+
+
