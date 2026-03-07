@@ -69,6 +69,9 @@ function Timeforing() {
       {isAdding && (
         <div className="wireframe-modal">
           <div className="modal-content">
+            <button className="close-btn" onClick={() => setIsAdding(false)}>
+              X
+            </button>
             <div className="input-group-row">
               <label>Prosjekt</label>
               <select className="dark-input">
@@ -111,6 +114,11 @@ function Timeforing() {
                 <label>Beskrivelse: </label>
                 <textarea className="dark-input description-input" />
               </div>
+            </div>
+            <div className="action-buttons">
+              <button className="save-btn" onClick={() => setIsAdding(false)}>
+                Lagre
+              </button>
             </div>
           </div>
         </div>

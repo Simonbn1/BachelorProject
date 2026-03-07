@@ -123,18 +123,19 @@
 
 .wireframe-modal{
     position: fixed;
-    top: 0;
+    top: 80px;
     left: 200px;
     width: 1500px;
     max-width: 90vw;
     margin: 0 auto;
-    height: 100%;
+    height: auto;
 
     display: flex;
     justify-content: center;
     align-items: center;
     backdrop-filter: blur(3px);
 
+    padding: 0;
     background: rgba(30, 35, 70, 0.95);
     z-index: 1000;
 }
@@ -177,6 +178,7 @@
 
 .timer-section {
     margin-top: 30px;
+    margin-bottom: 30px;
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -242,9 +244,37 @@
 
 .action-buttons {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 20px;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
     align-items: center;
-    margin-top: 40px;
+    justify-content: center;
+
+}
+
+.close-btn:hover {
+    background: linear-gradient(90deg, #c600ff, #6a5cff);
+    border-color: transparent;
+}
+
+.close-btn:active{
+    transform: scale(0.97);
 }
 
 .save-btn {
