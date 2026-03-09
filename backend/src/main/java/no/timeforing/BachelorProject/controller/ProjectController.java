@@ -2,6 +2,7 @@ package no.timeforing.BachelorProject.controller;
 
 import java.util.List;
 import no.timeforing.BachelorProject.domain.Project;
+import no.timeforing.BachelorProject.domain.WorkItem;
 import no.timeforing.BachelorProject.service.ProjectService;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,5 +24,13 @@ public class ProjectController {
   @PostMapping
   public Project create(@RequestParam String name) {
     return projectService.createProject(name);
+  }
+
+  @PostMapping("/{projectId}/work-items")
+    public WorkItem createWorkItem(
+            @PathVariable Long projectId,
+            @RequestParam String externalId,
+            @RequestParam(required = false) String title) {
+      return projectService.createWorkItem(projectId, externalId, title);
   }
 }
