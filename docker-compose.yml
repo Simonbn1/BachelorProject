@@ -34,11 +34,3 @@ services:
       APP_JWT_AUDIENCE: timesheet-app
       APP_JWT_SECRET: ${APP_JWT_SECRET}
       APP_AUTH_ADMIN_EMAILS: admin@example.com
-
-  frontend:
-    build:
-      context: ./frontend
-    ports:
-      - "5173:80"
-    depends_on:
-      - backend
