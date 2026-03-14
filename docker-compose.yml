@@ -8,7 +8,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sa -d timeforing"]
+      test: [ "CMD-SHELL", "pg_isready -U timeforing_user -d timeforing" ]
       interval: 5s
       timeout: 5s
       retries: 5
