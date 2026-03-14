@@ -28,6 +28,7 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: "true"
       SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "5"
+      SPRING_PROFILES_ACTIVE: dev
 
       APP_JWT_ISSUER: mock-auth
       APP_JWT_AUDIENCE: timesheet-app
