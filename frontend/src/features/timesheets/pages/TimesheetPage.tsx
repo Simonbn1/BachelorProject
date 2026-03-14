@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { fetchProjects } from "../../projects/api/projectsApi";
 import type { Project } from "../../projects/types/projects";
 import TopBar from "../../../shared/components/TopBar";
@@ -40,9 +40,10 @@ export default function TimesheetPage() {
         return days.reduce((sum, day) => sum + getNumericValue(projectId, day), 0);
     }
 
-    const weekTotal = useMemo(() => {
-        return visibleProjects.reduce((sum, project) => sum + getRowTotal(project.id), 0);
-    }, [visibleProjects, hours]);
+    const weekTotal = visibleProjects.reduce(
+        (sum, project) => sum + getRowTotal(project.id),
+        0
+    );
 
     const weeklyTarget = 37.5;
     const progressPercent = Math.min((weekTotal / weeklyTarget) * 100, 100);
