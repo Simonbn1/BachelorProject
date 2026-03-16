@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { fetchProjects } from "../../projects/api/projectsApi";
 import type { Project } from "../../projects/types/projects";
 import TopBar from "../../../shared/components/TopBar";
+import { saveTimeEntries } from "../api/timesheetsApi.ts";
 
 type HoursState = Record<string, string>;
 
@@ -75,6 +76,22 @@ export default function TimesheetPage() {
     setVisibleProjects((prev) => [...prev, projectToAdd]);
     setIsAddModalOpen(false);
     setSelectedProjectId("");
+  }
+
+  // Save the project to the database
+  async function handleSave() {
+    const weekStart = "2026-03-16";
+    const userId = 1;
+
+    try {
+      for (const project of visibleProjects) {
+        await saveTimeEntries(userId, weekStart, project.id, hours);
+      }
+      alert("Timer lagret!");
+    } catch (error) {
+      console.error("Feil ved lagring:", error);
+      alert("Noe gikk galt ved lagring. Sjekk konsollen.");
+    }
   }
 
   return (
@@ -177,13 +194,18 @@ export default function TimesheetPage() {
             </div>
           ))}
 
-          <button
-            className="add-project"
-            type="button"
-            onClick={() => setIsAddModalOpen(true)}
-          >
-            + Legg til nytt prosjekt
-          </button>
+          <div className="timesheet-actions">
+            <button
+              className="add-project"
+              type="button"
+              onClick={() => setIsAddModalOpen(true)}
+            >
+              + Legg til nytt prosjekt
+            </button>
+            <button className="save-btn" type="button" onClick={handleSave}>
+              Lagre
+            </button>
+          </div>
         </section>
       </div>
 
