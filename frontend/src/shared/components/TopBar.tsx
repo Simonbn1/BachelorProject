@@ -36,7 +36,7 @@ export default function TopBar({ userName }: TopBarProps) {
       </nav>
       <div className={`slide-menu ${isMenuOpen ? "slide-menu--open" : ""}`}>
         <ul className="slide-menu-list">
-          <li className="slide-menu-item" onClick={() => navigate("")}>
+          <li className="slide-menu-item" onClick={() => navigate("/")}>
             <Clock size={18} /> Timeføring
           </li>
           <li className="slide-menu-item" onClick={() => navigate("/absence")}>

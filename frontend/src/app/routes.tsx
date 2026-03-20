@@ -4,7 +4,7 @@ import AbsencePage from "../features/absence/pages/AbsencePage.tsx";
 
 export const router = createBrowserRouter([
   {
-    path: "",
+    path: "/",
     element: <TimesheetPage />,
   },
   {

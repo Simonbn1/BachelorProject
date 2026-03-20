@@ -61,48 +61,48 @@
 
 /*Top bar overlay*/
 
-.slide-menu{
-    position: absolute;
-    top: 90px;
-    left: 280px;
-    right: 0;
-    max-width: 400px;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-    background: rgba(30, 35, 79, 0.97);
-    border-bottem: 1px solid rgba(255, 255, 255, 0.08);
-    z-index: 999;
-    border-radius: 10px;
+.slide-menu {
+  position: absolute;
+  top: 90px;
+  left: 280px;
+  right: 0;
+  max-width: 400px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  background: rgba(30, 35, 79, 0.97);
+  border-bottem: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 999;
+  border-radius: 10px;
 }
 
 .menu-icon {
-    width: 24px;
-    text-align: center;
-    flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
 }
 
 .slide-menu--open {
-    max-height: 300px;
+  max-height: 300px;
 }
 
 .slide-menu-list {
-    list-style: none;
-    margin: 0;
-    padding: 8px 0;
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
 }
 
 .slide-menu-item {
-    padding: 12px 24px;
-    color: white;
-    cursor: pointer;
-    font-size: 0.95rem;
-    transition: background 0.15s ease;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  padding: 12px 24px;
+  color: white;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .slide-menu-item:hover {
-    background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.06);
 }
