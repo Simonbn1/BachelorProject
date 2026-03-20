@@ -1,14 +1,15 @@
-import TimesheetPage from "../features/timesheets/pages/TimesheetPage";
 import "../features/timesheets/styles/TimesheetPage.css";
 import { useEffect } from "react";
+import { RouterProvider } from "react-router-dom";
 import { devAutoLogin } from "../features/auth/api/authApi.ts";
+import { router } from "./routes.tsx";
 
 function App() {
   useEffect(() => {
     devAutoLogin();
   }, []);
 
-  return <TimesheetPage />;
+  return <RouterProvider router={router} />;
 }
 
 export default App;

@@ -293,3 +293,9 @@ textarea.dark-input {
   background: linear-gradient(90deg, #c600ff, #6a5cff);
   border-color: transparent;
 }
+
+.modal-divider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    margin: 16px 0;
+}
