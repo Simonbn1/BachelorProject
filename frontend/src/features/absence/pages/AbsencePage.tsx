@@ -1,83 +1,82 @@
 import TopBar from "../../../shared/components/TopBar.tsx";
 import "../../../features/timesheets/styles/TimesheetPage.css";
+import AbsenceForm from "../components/AbsenceForm.tsx";
+import { useEffect, useState } from "react";
+import { saveAbsences } from "../api/absenceApi.ts";
+import { api } from "../../../shared/api/client.ts";
+import type { Project } from "../../projects/types/projects.ts";
 
 export default function AbsencePage() {
+  const [hours, setHours] = useState<Record<string, string>>({});
+  const [absenceType, setAbsenceType] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [projectId, setProjectId] = useState<number | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    async function fetchProjects() {
+      try {
+        const response = await api.get("api/projects");
+        setProjects(response.data);
+      } catch (error) {
+        console.error("Kunne ikke hente prosjekter:", error);
+      }
+    }
+    fetchProjects();
+  }, []);
+
+  function handleHoursChange(updated: Record<string, string>) {
+    setHours(updated);
+  }
+
+  async function handleSave() {
+    if (!projectId) {
+      alert("Velg et prosjekt først.");
+      return;
+    }
+
+    if (!absenceType) {
+      alert("Velg årsak til fravær først.");
+      return;
+    }
+
+    const weekStart = "2026-03-16";
+    const userId = Number(localStorage.getItem("userId") ?? "1");
+
+    try {
+      await saveAbsences(
+        userId,
+        weekStart,
+        absenceType,
+        description,
+        hours,
+        projectId,
+      );
+      alert("Fravær lagret!");
+    } catch (error) {
+      console.error("Feil ved lagring av fravær:", error);
+      alert("Noe gikk galt. Sjekk konsollen.");
+    }
+  }
+
   return (
     <div className="page">
       <div className="timesheet-shell">
         <TopBar userName="Kari Nordmann" />
 
         <section className="timesheet-card">
-          <div className="input-group-row">
-            <label>Prosjekt:</label>
-            <select className="dark-input">
-              <option value="">Velg prosjekt...</option>
-            </select>
-          </div>
-
-          <div className="input-group-row">
-            <label>Oppgave/Ticket:</label>
-            <input className="dark-input" placeholder="Oppgave/ticket" />
-          </div>
-
-          <hr className="modal-divider" />
-
-          <div className="input-group-row">
-            <label>Timer denne uka:</label>
-            <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-              {["Man", "Tir", "Ons", "Tor", "Fre"].map((day) => (
-                <input
-                  key={day}
-                  className="dark-input"
-                  placeholder={day}
-                  style={{ width: "70px", textAlign: "center" }}
-                />
-              ))}
-              <input
-                className="dark-input"
-                placeholder="Totalt"
-                readOnly
-                style={{ width: "100px", textAlign: "center" }}
-              />
-            </div>
-          </div>
-
-          <hr className="modal-divider" />
-
-          <div style={{ display: "flex", gap: "40px", marginTop: "16px" }}>
-            <div className="input-group-row">
-              <label>Arbeidstype:</label>
-              <select className="dark-input">
-                <option value="">Velg kategori...</option>
-              </select>
-            </div>
-
-            <div className="input-group-row">
-              <label>Beskrivelse</label>
-              <textarea
-                className="dark-input"
-                placeholder="Beskrivelse..."
-              ></textarea>
-            </div>
-          </div>
-
-          <div className="input-group-row">
-            <label>Årsak til fravær:</label>
-            <select className="dark-input">
-              <option value="">Velg type...</option>
-              <option value="syk">Sykdom</option>
-              <option value="ferie">Ferie</option>
-              <option value="permisjon">Permisjon</option>
-              <option value="other">Annet</option>
-            </select>
-          </div>
-
-          <div className="timesheet-actions">
-            <div />
-            <button className="save-btn" type="button">
-              Lagre Fravær
-            </button>
-          </div>
+          <AbsenceForm
+            hours={hours}
+            absenceType={absenceType}
+            description={description}
+            projectId={projectId}
+            projects={projects}
+            onHoursChange={handleHoursChange}
+            onTypeChange={(type) => setAbsenceType(type)}
+            onDescriptionChange={(desc) => setDescription(desc)}
+            onProjectChange={(id) => setProjectId(id)}
+            onSave={handleSave}
+          />
         </section>
       </div>
     </div>

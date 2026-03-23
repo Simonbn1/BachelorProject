@@ -25,7 +25,7 @@ public class AbsenceServiceImpl implements AbsenceService {
 
   @Override
   public Absence upsertAbsence(
-      Long userId, LocalDate weekStart, LocalDate absenceDate, AbsenceType type, double hours) {
+      Long userId, LocalDate weekStart, LocalDate absenceDate, AbsenceType type, String description, double hours, Long projectId) {
     if (hours < 0) throw new IllegalArgumentException("Hours cannot be negative.");
 
     Timesheet ts =
@@ -37,9 +37,14 @@ public class AbsenceServiceImpl implements AbsenceService {
       throw new IllegalStateException("Timesheet is sent/approved and cannot be edited.");
     }
 
-    // enkel versjon: alltid opprett ny
-    // (kan senere forbedres til "per day + type" upsert)
-    Absence absence = new Absence(ts, absenceDate, type, hours);
+    Absence absence = absenceRepository
+            .findByTimesheetIdAndAbsenceDateAndType(ts.getId(), absenceDate, type)
+            .orElse(new Absence(ts, absenceDate, type, description, hours, projectId));
+
+    absence.setHours(hours);
+    absence.setDescription(description);
+    absence.setProjectId(projectId);
+
     return absenceRepository.save(absence);
   }
 

@@ -269,6 +269,11 @@ textarea.dark-input:focus {
   box-sizing: border-box;
 }
 
+.dark-input option {
+    background: #2e335a;
+    border-radius: 10px;
+}
+
 textarea.dark-input {
   min-height: 96px;
   resize: vertical;

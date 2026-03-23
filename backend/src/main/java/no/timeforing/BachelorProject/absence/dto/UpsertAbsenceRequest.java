@@ -8,5 +8,7 @@ public class UpsertAbsenceRequest {
   public LocalDate weekStart;
   public LocalDate absenceDate;
   public AbsenceType type;
+  public String description;
   public double hours;
+  public long projectId;
 }
