@@ -60,6 +60,7 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/projects/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/time-entries**").permitAll()
                         .requestMatchers("/api/approvals/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
