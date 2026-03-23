@@ -270,8 +270,8 @@ textarea.dark-input:focus {
 }
 
 .dark-input option {
-    background: #2e335a;
-    border-radius: 10px;
+  background: #2e335a;
+  border-radius: 10px;
 }
 
 textarea.dark-input {
