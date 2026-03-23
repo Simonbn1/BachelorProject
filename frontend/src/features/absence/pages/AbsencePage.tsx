@@ -68,6 +68,7 @@ export default function AbsencePage() {
               <option value="syk">Sykdom</option>
               <option value="ferie">Ferie</option>
               <option value="permisjon">Permisjon</option>
+              <option value="other">Annet</option>
             </select>
           </div>
 
