@@ -6,40 +6,40 @@ import RegisterPage from "../features/auth/pages/RegisterPage.tsx";
 import ProtectedRoute from "../features/auth/components/ProtectedRoute.tsx";
 
 function getDefaultRoute() {
-    return localStorage.getItem("accessToken") ? "/timesheet" : "/login";
+  return localStorage.getItem("accessToken") ? "/timesheet" : "/login";
 }
 
 export const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <Navigate to={getDefaultRoute()} replace />,
-    },
-    {
-        path: "/login",
-        element: <LoginPage />,
-    },
-    {
-        path: "/register",
-        element: <RegisterPage />,
-    },
-    {
-        path: "/timesheet",
-        element: (
-            <ProtectedRoute>
-                <TimesheetPage />
-            </ProtectedRoute>
-        ),
-    },
-    {
-        path: "/absence",
-        element: (
-            <ProtectedRoute>
-                <AbsencePage />
-            </ProtectedRoute>
-        ),
-    },
-    {
-        path: "*",
-        element: <Navigate to={getDefaultRoute()} replace />,
-    },
+  {
+    path: "/",
+    element: <Navigate to={getDefaultRoute()} replace />,
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />,
+  },
+  {
+    path: "/timesheet",
+    element: (
+      <ProtectedRoute>
+        <TimesheetPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/absence",
+    element: (
+      <ProtectedRoute>
+        <AbsencePage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "*",
+    element: <Navigate to={getDefaultRoute()} replace />,
+  },
 ]);

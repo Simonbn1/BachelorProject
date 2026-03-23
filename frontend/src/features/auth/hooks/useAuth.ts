@@ -5,34 +5,34 @@ const ACCESS_TOKEN_KEY = "accessToken";
 const AUTH_USER_KEY = "authUser";
 
 export function getAccessToken(): string | null {
-    return localStorage.getItem(ACCESS_TOKEN_KEY);
+  return localStorage.getItem(ACCESS_TOKEN_KEY);
 }
 
 export function getAuthUser(): AuthUser | null {
-    const raw = localStorage.getItem(AUTH_USER_KEY);
-    if (!raw) return null;
+  const raw = localStorage.getItem(AUTH_USER_KEY);
+  if (!raw) return null;
 
-    try {
-        return JSON.parse(raw) as AuthUser;
-    } catch {
-        return null;
-    }
+  try {
+    return JSON.parse(raw) as AuthUser;
+  } catch {
+    return null;
+  }
 }
 
 export function isAuthenticated(): boolean {
-    return !!getAccessToken();
+  return !!getAccessToken();
 }
 
 export async function login(email: string, password: string) {
-    const data = await loginRequest(email, password);
+  const data = await loginRequest(email, password);
 
-    localStorage.setItem(ACCESS_TOKEN_KEY, data.accessToken);
-    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
+  localStorage.setItem(ACCESS_TOKEN_KEY, data.accessToken);
+  localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
 
-    return data;
+  return data;
 }
 
 export function logout() {
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
-    localStorage.removeItem(AUTH_USER_KEY);
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
+  localStorage.removeItem(AUTH_USER_KEY);
 }

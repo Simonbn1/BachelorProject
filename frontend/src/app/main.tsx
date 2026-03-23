@@ -5,9 +5,9 @@ import "./../shared/styles/globals.css";
 import Providers from "./providers";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-    <MantineProvider>
-        <React.StrictMode>
-            <Providers />
-        </React.StrictMode>
-    </MantineProvider>,
+  <MantineProvider>
+    <React.StrictMode>
+      <Providers />
+    </React.StrictMode>
+  </MantineProvider>,
 );
