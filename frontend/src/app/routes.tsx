@@ -5,20 +5,14 @@ import LoginPage from "../features/auth/pages/LoginPage.tsx";
 import RegisterPage from "../features/auth/pages/RegisterPage.tsx";
 import ProtectedRoute from "../features/auth/components/ProtectedRoute.tsx";
 
-function RootRedirect() {
-    const token = localStorage.getItem("accessToken");
-    return <Navigate to={token ? "/timesheet" : "/login"} replace />;
-}
-
-function FallbackRedirect() {
-    const token = localStorage.getItem("accessToken");
-    return <Navigate to={token ? "/timesheet" : "/login"} replace />;
+function getDefaultRoute() {
+    return localStorage.getItem("accessToken") ? "/timesheet" : "/login";
 }
 
 export const router = createBrowserRouter([
     {
         path: "/",
-        element: <RootRedirect />,
+        element: <Navigate to={getDefaultRoute()} replace />,
     },
     {
         path: "/login",
@@ -46,6 +40,6 @@ export const router = createBrowserRouter([
     },
     {
         path: "*",
-        element: <FallbackRedirect />,
+        element: <Navigate to={getDefaultRoute()} replace />,
     },
 ]);
