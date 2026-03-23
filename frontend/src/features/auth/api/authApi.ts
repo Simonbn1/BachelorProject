@@ -1,22 +1,23 @@
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
+import { api } from "../../../shared/api/client";
+import type { LoginResponse } from "../types/auth";
 
-export async function login(email: string, password: string): Promise<void> {
-  const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
+type AuthRequest = {
+    email: string;
+    password: string;
+    displayName: string;
+};
 
-  if (!res.ok) throw new Error("Login failed");
+export const login = async (
+    email: string,
+    password: string
+): Promise<LoginResponse> => {
+    const res = await api.post("/api/auth/login", { email, password });
+    return res.data;
+};
 
-  const data = await res.json();
-  localStorage.setItem("accessToken", data.accessToken);
-  localStorage.setItem("userId", String(data.user.id));
-}
-
-export async function devAutoLogin(): Promise<void> {
-  if (!import.meta.env.DEV) return;
-  if (localStorage.getItem("accessToken")) return;
-  await login("test@test.com", "password123");
-}
+export const register = async (
+    payload: AuthRequest
+): Promise<LoginResponse> => {
+    const res = await api.post("/api/auth/register", payload);
+    return res.data;
+};

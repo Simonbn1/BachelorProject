@@ -1,27 +1,40 @@
 import "./LoginPage.css";
 import { useState } from "react";
-import { login } from "../api/authApi";
+import { register } from "../api/authApi";
 import { Link } from "react-router-dom";
 
-export default function LoginPage() {
+export default function RegisterPage() {
+    const [displayName, setDisplayName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleLogin = async () => {
+    const handleRegister = async () => {
         try {
-            const res = await login(email, password);
+            const res = await register({
+                displayName,
+                email,
+                password,
+            });
+
             localStorage.setItem("accessToken", res.accessToken);
             window.location.href = "/";
         } catch (err) {
             console.error(err);
-            alert("Login failed");
+            alert("Register failed");
         }
     };
 
     return (
         <div className="login-page">
             <div className="login-card">
-                <h2>Login</h2>
+                <h2>Create account</h2>
+
+                <input
+                    type="text"
+                    placeholder="Name"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                />
 
                 <input
                     type="email"
@@ -36,12 +49,12 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
+
                 <p style={{ marginTop: "1rem", textAlign: "center" }}>
-                    No account? <Link to="/register">Create one</Link>
+                    Already have an account? <Link to="/login">Login</Link>
                 </p>
 
-
-                <button onClick={handleLogin}>Login</button>
+                <button onClick={handleRegister}>Register</button>
             </div>
         </div>
     );

@@ -8,12 +8,6 @@ const DAY_OFFSET: Record<string, number> = {
   fri: 4,
 };
 
-/*async function getFirstWorkItemId(projectId: number): Promise<number | null> {
-  const res = await api.get(`/api/projects/${projectId}/work-items`);
-  const items = res.data;
-  return items.length > 0 ? items[0].id : null;
-}
-*/
 export async function saveTimeEntries(
   userId: number,
   weekStart: string,

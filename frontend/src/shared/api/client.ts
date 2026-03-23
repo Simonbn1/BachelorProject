@@ -1,31 +1,31 @@
 import axios from "axios";
-import { devAutoLogin } from "../../features/auth/api/authApi.ts";
+import { getAccessToken, logout } from "../../features/auth/hooks/useAuth";
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "",
-  withCredentials: true,
+    baseURL: import.meta.env.VITE_API_BASE_URL || "",
+    withCredentials: false,
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");
+    const token = getAccessToken();
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+    if (token) {
+        config.headers = config.headers ?? {};
+        config.headers.Authorization = `Bearer ${token}`;
+    }
 
-  return config;
+    return config;
 });
 
 api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    if (error.response?.status === 401 && !error.config._retry) {
-      error.config._retry = true;
-      localStorage.removeItem("accessToken");
-      await devAutoLogin();
-      error.config.headers.Authorization = `Bearer ${localStorage.getItem("accessToken")}`;
-      return api(error.config);
-    }
-    return Promise.reject(error);
-  },
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            logout();
+            if (window.location.pathname !== "/login") {
+                window.location.href = "/login";
+            }
+        }
+        return Promise.reject(error);
+    },
 );
