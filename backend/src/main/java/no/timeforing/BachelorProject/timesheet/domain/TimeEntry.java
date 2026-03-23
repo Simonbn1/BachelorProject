@@ -1,8 +1,15 @@
 package no.timeforing.BachelorProject.timesheet.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDate;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(
     name = "time_entries",
@@ -28,8 +35,6 @@ public class TimeEntry {
 
   private String description;
 
-  public TimeEntry() {}
-
   public TimeEntry(
       Timesheet timesheet,
       WorkItem workItem,
@@ -43,39 +48,4 @@ public class TimeEntry {
     this.description = description;
   }
 
-  public Long getId() {
-    return id;
-  }
-
-  public Timesheet getTimesheet() {
-    return timesheet;
-  }
-
-  public WorkItem getWorkItem() {
-    return workItem;
-  }
-
-  public LocalDate getEntryDate() {
-    return entryDate;
-  }
-
-  public void setEntryDate(LocalDate entryDate) {
-    this.entryDate = entryDate;
-  }
-
-  public double getHours() {
-    return hours;
-  }
-
-  public void setHours(double hours) {
-    this.hours = hours;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
 }

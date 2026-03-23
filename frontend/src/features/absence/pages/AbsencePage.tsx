@@ -75,7 +75,7 @@ export default function AbsencePage() {
           <div className="timesheet-actions">
             <div />
             <button className="save-btn" type="button">
-              Lagre Timer
+              Lagre Fravær
             </button>
           </div>
         </section>
