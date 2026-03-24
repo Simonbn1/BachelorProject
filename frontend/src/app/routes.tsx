@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import TimesheetPage from "../features/timesheets/pages/TimesheetPage.tsx";
+import { TimesheetPage } from "../features/timesheets/pages/TimesheetPage.tsx";
 import AbsencePage from "../features/absence/pages/AbsencePage.tsx";
 import LoginPage from "../features/auth/pages/LoginPage.tsx";
 import RegisterPage from "../features/auth/pages/RegisterPage.tsx";

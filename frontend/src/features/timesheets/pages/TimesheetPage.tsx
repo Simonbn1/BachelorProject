@@ -6,7 +6,7 @@ import { saveTimeEntries } from "../api/timesheetsApi.ts";
 
 type HoursState = Record<string, string>;
 
-export default function TimesheetPage() {
+export function TimesheetPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [visibleProjects, setVisibleProjects] = useState<Project[]>([]);
   const [hours, setHours] = useState<HoursState>({});
@@ -14,9 +14,15 @@ export default function TimesheetPage() {
   const [selectedProjectId, setSelectedProjectId] = useState("");
 
   useEffect(() => {
-    fetchProjects().then((data) => {
-      setProjects(data);
-    });
+    async function load() {
+      try {
+        const data = await fetchProjects();
+        setProjects(data);
+      } catch (error) {
+        console.error("Kunne ikke hente prosjekter:", error);
+      }
+    }
+    load();
   }, []);
 
   function handleChange(projectId: number, day: string, value: string) {

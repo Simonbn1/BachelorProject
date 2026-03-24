@@ -1,7 +1,7 @@
 import TopBar from "../../../shared/components/TopBar.tsx";
 import "../../../features/timesheets/styles/TimesheetPage.css";
 import AbsenceForm from "../components/AbsenceForm.tsx";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { saveAbsences } from "../api/absenceApi.ts";
 import { api } from "../../../shared/api/client.ts";
 import type { Project } from "../../projects/types/projects.ts";
@@ -25,9 +25,9 @@ export default function AbsencePage() {
     fetchProjects();
   }, []);
 
-  function handleHoursChange(updated: Record<string, string>) {
+  const handleHoursChange = useCallback((updated: Record<string, string>) => {
     setHours(updated);
-  }
+  }, []);
 
   async function handleSave() {
     if (!projectId) {

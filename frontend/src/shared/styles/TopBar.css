@@ -63,17 +63,22 @@
 
 .slide-menu {
   position: absolute;
-  top: 90px;
-  left: 280px;
-  right: 0;
-  max-width: 400px;
+  top: 72px;
+  left: 0;
+  width: 420px;
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease;
-  background: rgba(30, 35, 79, 0.97);
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+  background: rgba(30, 35, 79, 1);
   border-bottem: 1px solid rgba(255, 255, 255, 0.08);
   z-index: 999;
   border-radius: 10px;
+}
+
+.slide-menu--open {
+    max-height: 300px;
+    opacity: 1;
 }
 
 .menu-icon {
@@ -82,9 +87,6 @@
   flex-shrink: 0;
 }
 
-.slide-menu--open {
-  max-height: 300px;
-}
 
 .slide-menu-list {
   list-style: none;
