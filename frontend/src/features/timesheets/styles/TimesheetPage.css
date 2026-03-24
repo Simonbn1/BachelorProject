@@ -17,9 +17,9 @@
 }
 
 .timesheet-shell {
-    max-width: 1360px;
-    margin: 0 auto;
-    position: relative;
+  max-width: 1360px;
+  margin: 0 auto;
+  position: relative;
 }
 
 .timesheet-card {
@@ -305,4 +305,3 @@ textarea.dark-input {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   margin: 16px 0;
 }
-

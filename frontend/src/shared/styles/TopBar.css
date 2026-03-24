@@ -68,7 +68,9 @@
   width: 420px;
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease, opacity 0.3s ease;
+  transition:
+    max-height 0.3s ease,
+    opacity 0.3s ease;
   opacity: 0;
   background: rgba(30, 35, 79, 1);
   border-bottem: 1px solid rgba(255, 255, 255, 0.08);
@@ -77,8 +79,8 @@
 }
 
 .slide-menu--open {
-    max-height: 300px;
-    opacity: 1;
+  max-height: 300px;
+  opacity: 1;
 }
 
 .menu-icon {
@@ -86,7 +88,6 @@
   text-align: center;
   flex-shrink: 0;
 }
-
 
 .slide-menu-list {
   list-style: none;
