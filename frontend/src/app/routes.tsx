@@ -6,36 +6,36 @@ import RegisterPage from "../features/auth/pages/RegisterPage.tsx";
 import ProtectedRoute from "../features/auth/components/ProtectedRoute.tsx";
 
 export const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <Navigate to="/login" replace />,
-    },
-    {
-        path: "/login",
-        element: <LoginPage />,
-    },
-    {
-        path: "/register",
-        element: <RegisterPage />,
-    },
-    {
-        path: "/timesheet",
-        element: (
-            <ProtectedRoute>
-                <TimesheetPage />
-            </ProtectedRoute>
-        ),
-    },
-    {
-        path: "/absence",
-        element: (
-            <ProtectedRoute>
-                <AbsencePage />
-            </ProtectedRoute>
-        ),
-    },
-    {
-        path: "*",
-        element: <Navigate to="/login" replace />,
-    },
+  {
+    path: "/",
+    element: <Navigate to="/login" replace />,
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />,
+  },
+  {
+    path: "/timesheet",
+    element: (
+      <ProtectedRoute>
+        <TimesheetPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/absence",
+    element: (
+      <ProtectedRoute>
+        <AbsencePage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "*",
+    element: <Navigate to="/login" replace />,
+  },
 ]);
