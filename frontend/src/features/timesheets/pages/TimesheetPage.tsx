@@ -3,6 +3,10 @@ import { fetchProjects } from "../../projects/api/projectsApi";
 import type { Project } from "../../projects/types/projects";
 import TopBar from "../../../shared/components/TopBar";
 import { saveTimeEntries } from "../api/timesheetsApi.ts";
+import { useTimesheetWeek, parseLocalDate } from "../hooks/useTimesheetWeek.ts";
+import "../styles/TimesheetHeader.css";
+import { DatePicker, type DatesRangeValue } from "@mantine/dates";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type HoursState = Record<string, string>;
 
@@ -12,6 +16,19 @@ export function TimesheetPage() {
   const [hours, setHours] = useState<HoursState>({});
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState("");
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
+  const { weekStart, weekLabel, weekNumber, goToPreviousWeek, goToNextWeek } =
+    useTimesheetWeek();
+
+  const startDate = parseLocalDate(weekStart);
+  const endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 4);
+
+  useEffect(() => {
+    setHours({});
+    setVisibleProjects([]);
+  }, [weekStart]);
 
   useEffect(() => {
     async function load() {
@@ -86,7 +103,6 @@ export function TimesheetPage() {
 
   // Save the project to the database
   async function handleSave() {
-    const weekStart = "2026-03-16";
     const userId = 1;
 
     try {
@@ -108,25 +124,47 @@ export function TimesheetPage() {
         <section className="timesheet-card">
           <div className="timesheet-header">
             <div className="timesheet-header-left">
-              <div className="week-icon">🗓</div>
-
+              <button
+                className="week-icon"
+                type="button"
+                onClick={() => setIsCalendarOpen(true)}
+              >
+                🗓
+              </button>
               <div>
-                <h5>Uke 12</h5>
-                <div className="week-subtitle">16. mars - 22. mars</div>
+                <div className="week-nav">
+                  <button
+                    className="add-project week-nav-btn"
+                    type="button"
+                    onClick={goToPreviousWeek}
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <h5>Uke {weekNumber}</h5>
+                  <button
+                    className="add-project week-nav-btn"
+                    type="button"
+                    onClick={goToNextWeek}
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+                <div className="week-subtitle">{weekLabel}</div>
               </div>
             </div>
 
-            <div className="timesheet-progress">
-              <div className="progress-text">
-                {weekTotal.toFixed(1).replace(".", ",")} /{" "}
-                {weeklyTarget.toFixed(1).replace(".", ",")}
-              </div>
-
-              <div className="progress-bar">
-                <div
-                  className="progress-fill"
-                  style={{ width: `${progressPercent}%` }}
-                />
+            <div className="timesheet-progress-wrap">
+              <div className="timesheet-progress">
+                <div className="progress-text">
+                  {weekTotal.toFixed(1).replace(".", ",")} /{""}
+                  {weeklyTarget.toFixed(1).replace(".", ",")}
+                </div>
+                <div className="progress-bar">
+                  <div
+                    className="progress-fill"
+                    style={{ width: `${progressPercent}%` }}
+                  ></div>
+                </div>
               </div>
             </div>
           </div>
@@ -214,6 +252,35 @@ export function TimesheetPage() {
           </div>
         </section>
       </div>
+
+      {isCalendarOpen && (
+        <div
+          className="wireframe-modal"
+          onClick={() => setIsCalendarOpen(false)}
+        >
+          <div
+            className="modal-content"
+            style={{ width: "fit-content" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="close-btn"
+              type="button"
+              onClick={() => setIsCalendarOpen(false)}
+            >
+              x
+            </button>
+            <h5 style={{ margin: "0 0 16px" }}>Uke {weekNumber}</h5>
+            <DatePicker
+              type="range"
+              value={[startDate, endDate] as DatesRangeValue}
+              onChange={() => {}}
+              locale="nb"
+              firstDayOfWeek={1}
+            />
+          </div>
+        </div>
+      )}
 
       {isAddModalOpen && (
         <div className="wireframe-modal">

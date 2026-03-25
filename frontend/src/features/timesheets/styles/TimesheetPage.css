@@ -47,8 +47,8 @@
 }
 
 .week-icon {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: 12px;
   background: rgba(130, 150, 255, 0.16);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -56,6 +56,13 @@
   align-items: center;
   justify-content: center;
   font-size: 1.2rem;
+}
+
+.week-icon:hover {
+  background: linear-gradient(135deg, #c600ff, #6a5cff);
+  border-color: transparent;
+  transform: scale(1.05);
+  cursor: pointer;
 }
 
 .timesheet-header h5 {
@@ -211,8 +218,8 @@ textarea.dark-input:focus {
   z-index: 1000;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding: 60px 20px;
+  align-items: center;
+  padding: 20px;
   box-sizing: border-box;
 }
 

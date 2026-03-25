@@ -1,7 +1,5 @@
 import type { Project } from "../../projects/types/projects.ts";
 import { useEffect } from "react";
-import "@mantine/core/styles.css";
-import "@mantine/dates/styles.css";
 import "../styles/calendar.css";
 import DateRangeInput from "./DateRangeInput.tsx";
 import DayHoursInput from "./DayHoursInput.tsx";

@@ -1,0 +1,20 @@
+.week-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.week-nav-btn {
+  padding: 4px 10px;
+  font-size: 1rem;
+}
+
+.week-subtitle {
+  text-align: center;
+}
+
+.timesheet-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}

@@ -1,0 +1,13 @@
+.mantine-Popover-dropdown {
+  background-color: rgba(30, 35, 70, 0.97) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 18px !important;
+}
+
+.project-row input:focus,
+.dark-input:focus,
+textarea.dark-input:focus {
+  border-color: #c600ff !important;
+  box-shadow: 0 0 0 3px rgba(198, 0, 255, 0.15);
+  outline: none;
+}
