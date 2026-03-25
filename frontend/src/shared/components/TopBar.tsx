@@ -1,52 +1,95 @@
 import "../styles/TopBar.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CalendarOff, Clock, Settings } from "lucide-react";
+import { CalendarOff, Clock, LogOut, Settings, X } from "lucide-react";
+import { clearAuth, getAuthUser } from "../../features/auth/types/auth";
 
-type TopBarProps = {
-  userName: string;
-};
+export default function TopBar() {
+    const navigate = useNavigate();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-export default function TopBar({ userName }: TopBarProps) {
-  const initial = userName.charAt(0).toUpperCase();
-  const navigate = useNavigate();
+    const user = getAuthUser();
+    const userName = user?.displayName || "User";
+    const initial = userName.charAt(0).toUpperCase();
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const closeMenu = () => setIsMenuOpen(false);
 
-  return (
-    <>
-      <nav className="topbar">
-        <div className="topbar-brand-wrap">
-          <button
-            className="menu-btn"
-            type="button"
-            aria-label="Åpne meny"
-            onClick={() => setIsMenuOpen((prev) => !prev)}
-          >
-            ☰
-          </button>
+    const handleLogout = () => {
+        clearAuth();
+        closeMenu();
+        navigate("/login", { replace: true });
+    };
 
-          <div className="topbar-brand">accenture</div>
-        </div>
+    const goTo = (path: string) => {
+        closeMenu();
+        navigate(path);
+    };
 
-        <div className="topbar-user">
-          <span>{userName}</span>
-          <span className="avatar">{initial}</span>
-        </div>
-      </nav>
-      <div className={`slide-menu ${isMenuOpen ? "slide-menu--open" : ""}`}>
-        <ul className="slide-menu-list">
-          <li className="slide-menu-item" onClick={() => navigate("/")}>
-            <Clock size={18} /> Timeføring
-          </li>
-          <li className="slide-menu-item" onClick={() => navigate("/absence")}>
-            <CalendarOff size={18} /> Fravær
-          </li>
-          <li className="slide-menu-item" onClick={() => navigate("/settings")}>
-            <Settings size={18} /> Instillinger
-          </li>
-        </ul>
-      </div>
-    </>
-  );
+    return (
+        <>
+            <nav className="topbar">
+                <div className="topbar-left">
+                    <button
+                        className="menu-btn"
+                        type="button"
+                        aria-label={isMenuOpen ? "Lukk meny" : "Åpne meny"}
+                        onClick={() => setIsMenuOpen((prev) => !prev)}
+                    >
+                        ☰
+                    </button>
+
+                    <div className="topbar-brand">accenture</div>
+                </div>
+
+                <div className="topbar-right">
+                    <div className="topbar-user-chip">
+                        <span className="topbar-user-name">{userName}</span>
+                        <span className="avatar">{initial}</span>
+                    </div>
+                </div>
+            </nav>
+
+            {isMenuOpen && <div className="sidebar-overlay" onClick={closeMenu} />}
+
+            <aside className={`sidebar ${isMenuOpen ? "sidebar--open" : ""}`}>
+                <div className="sidebar-header">
+                    <div className="sidebar-title">Navigasjon</div>
+
+                    <button
+                        className="sidebar-close-btn"
+                        type="button"
+                        aria-label="Lukk meny"
+                        onClick={closeMenu}
+                    >
+                        <X size={18} />
+                    </button>
+                </div>
+
+                <ul className="sidebar-list">
+                    <li className="sidebar-item" onClick={() => goTo("/timesheet")}>
+                        <Clock size={18} />
+                        <span>Timeføring</span>
+                    </li>
+
+                    <li className="sidebar-item" onClick={() => goTo("/absence")}>
+                        <CalendarOff size={18} />
+                        <span>Fravær</span>
+                    </li>
+
+                    <li className="sidebar-item" onClick={() => goTo("/settings")}>
+                        <Settings size={18} />
+                        <span>Innstillinger</span>
+                    </li>
+
+                    <li
+                        className="sidebar-item sidebar-item--logout"
+                        onClick={handleLogout}
+                    >
+                        <LogOut size={18} />
+                        <span>Logg ut</span>
+                    </li>
+                </ul>
+            </aside>
+        </>
+    );
 }

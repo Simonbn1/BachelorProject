@@ -124,7 +124,7 @@ export function TimesheetPage() {
   return (
     <div className="page">
       <div className="timesheet-shell">
-        <TopBar userName="Kari Nordmann" />
+          <TopBar />
 
         <section className="timesheet-card">
           <div className="timesheet-header">

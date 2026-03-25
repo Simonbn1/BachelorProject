@@ -1,61 +1,62 @@
-import "./LoginPage.css";
+import "./RegisterPage.css";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { register } from "../api/authApi";
-import { Link } from "react-router-dom";
+import { saveAuth } from "../types/auth";
 
 export default function RegisterPage() {
-  const [displayName, setDisplayName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+    const navigate = useNavigate();
+    const [displayName, setDisplayName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
-  const handleRegister = async () => {
-    try {
-      const res = await register({
-        displayName,
-        email,
-        password,
-      });
+    const handleRegister = async (e: React.FormEvent) => {
+        e.preventDefault();
 
-      localStorage.setItem("accessToken", res.accessToken);
-      window.location.href = "/";
-    } catch (err) {
-      console.error(err);
-      alert("Register failed");
-    }
-  };
+        try {
+            const res = await register(displayName, email, password);
+            saveAuth(res);
+            navigate("/timesheet", { replace: true });
+        } catch (err) {
+            console.error(err);
+            alert("Register failed");
+        }
+    };
 
-  return (
-    <div className="login-page">
-      <div className="login-card">
-        <h2>Create account</h2>
+    return (
+        <div className="register-page">
+            <div className="register-card">
+                <h2>Create account</h2>
 
-        <input
-          type="text"
-          placeholder="Name"
-          value={displayName}
-          onChange={(e) => setDisplayName(e.target.value)}
-        />
+                <form onSubmit={handleRegister}>
+                    <input
+                        type="text"
+                        placeholder="Name"
+                        value={displayName}
+                        onChange={(e) => setDisplayName(e.target.value)}
+                    />
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+                    <input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
 
-        <p style={{ marginTop: "1rem", textAlign: "center" }}>
-          Already have an account? <Link to="/login">Login</Link>
-        </p>
+                    <p>
+                        Already have an account? <Link to="/login">Login</Link>
+                    </p>
 
-        <button onClick={handleRegister}>Register</button>
-      </div>
-    </div>
-  );
+                    <button type="submit">Register</button>
+                </form>
+            </div>
+        </div>
+    );
 }
