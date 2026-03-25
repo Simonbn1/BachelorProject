@@ -1,7 +1,7 @@
 INSERT INTO projects (customer, name)
 VALUES
     ('Bertel O. Steen', 'Vedlikehold'),
-    ('Accenture', 'Inter Utvikling'),
+    ('Accenture', 'Intern Utvikling'),
     ('Accenture', 'Kundestøtte'),
     ('Telenor', 'Systemintegrasjon'),
     ('Telenor', 'Infrastruktur'),

@@ -177,13 +177,13 @@ textarea.dark-input:focus {
 .delete-btn {
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 80, 80, 0.7);
   cursor: pointer;
   font-size: 1.1rem;
 }
 
 .delete-btn:hover {
-  color: white;
+  color: #ff4444;
 }
 
 .timesheet-actions {

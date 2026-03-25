@@ -6,7 +6,7 @@ import { saveTimeEntries } from "../api/timesheetsApi.ts";
 import { useTimesheetWeek, parseLocalDate } from "../hooks/useTimesheetWeek.ts";
 import "../styles/TimesheetHeader.css";
 import { DatePicker, type DatesRangeValue } from "@mantine/dates";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 
 type HoursState = Record<string, string>;
 
@@ -233,7 +233,7 @@ export function TimesheetPage() {
                 aria-label="Slett rad"
                 onClick={() => removeProject(project.id)}
               >
-                🗑
+                <Trash2 size={22} />
               </button>
             </div>
           ))}
