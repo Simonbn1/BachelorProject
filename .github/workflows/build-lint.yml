@@ -1,4 +1,4 @@
-name: CI
+name: Build & Lint
 
 on:
   push:
@@ -36,6 +36,23 @@ jobs:
         working-directory: ./backend
         run: mvn clean verify -DskipTests
 
+      - name: Build Docker image
+        run: docker build -t bachelor-backend:ci backend
+
+      - name: Compose smoke test
+        env:
+          COMPOSE_PROJECT_NAME: ci
+        run: |
+          docker compose -f backend/docker-compose.yml up -d
+          bash -c 'for i in {1..60}; do curl -fsS http://localhost:8080/actuator/health && exit 0; sleep 2; done; exit 1'
+          docker compose -f backend/docker-compose.yml down
+
+      - name: Dump compose state on failure
+        if: failure()
+        run: |
+          docker compose -f backend/docker-compose.yml ps || true
+          docker compose -f backend/docker-compose.yml logs --no-color || true
+
       # ----------------------------
       # Frontend
       # ----------------------------
@@ -46,7 +63,7 @@ jobs:
 
       - name: Install frontend dependencies
         working-directory: ./frontend
-        run: npm install
+        run: npm ci
 
       - name: Run ESLint
         working-directory: ./frontend
@@ -55,4 +72,8 @@ jobs:
       - name: Check Prettier formatting
         working-directory: ./frontend
         run: npm run format:check
+
+      - name: Check for Typescript errors
+        working-directory: ./frontend
+        run: npx tsc --noEmit
 
