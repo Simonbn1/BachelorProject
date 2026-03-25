@@ -43,15 +43,15 @@ jobs:
         env:
           COMPOSE_PROJECT_NAME: ci
         run: |
-          docker compose docker-compose.yml up -d
+          docker compose -f docker-compose.yml up -d
           bash -c 'for i in {1..60}; do curl -fsS http://localhost:8080/actuator/health && exit 0; sleep 2; done; exit 1'
-          docker compose docker-compose.yml down
+          docker compose -f docker-compose.yml down
 
       - name: Dump compose state on failure
         if: failure()
         run: |
-          docker compose docker-compose.yml ps || true
-          docker compose docker-compose.yml logs --no-color || true
+          docker compose -f docker-compose.yml ps || true
+          docker compose -f docker-compose.yml logs --no-color || true
 
       # ----------------------------
       # Frontend
