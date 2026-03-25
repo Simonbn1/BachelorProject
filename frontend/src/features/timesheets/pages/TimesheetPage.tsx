@@ -129,33 +129,35 @@ export function TimesheetPage() {
         <section className="timesheet-card">
           <div className="timesheet-header">
             <div className="timesheet-header-left">
-              <button
-                className="week-icon"
-                type="button"
-                onClick={() => setIsCalendarOpen(true)}
-              >
-                🗓
-              </button>
-              <div>
-                <div className="week-nav">
-                  <button
-                    className="add-project week-nav-btn"
-                    type="button"
-                    onClick={goToPreviousWeek}
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
-                  <h5>Uke {weekNumber}</h5>
-                  <button
-                    className="add-project week-nav-btn"
-                    type="button"
-                    onClick={goToNextWeek}
-                  >
-                    <ChevronRight size={16} />
-                  </button>
+              <div className="week-nav-group">
+                <button
+                  className="week-icon"
+                  type="button"
+                  onClick={() => setIsCalendarOpen(true)}
+                >
+                  🗓
+                </button>
+                <div>
+                  <div className="week-nav">
+                    <button
+                      className="add-project week-nav-btn"
+                      type="button"
+                      onClick={goToPreviousWeek}
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                    <h5>Uke {weekNumber}</h5>
+                    <button
+                      className="add-project week-nav-btn"
+                      type="button"
+                      onClick={goToNextWeek}
+                    >
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
                 </div>
-                <div className="week-subtitle">{weekLabel}</div>
               </div>
+              <div className="week-subtitle">{weekLabel}</div>
             </div>
 
             <div className="timesheet-progress-wrap">

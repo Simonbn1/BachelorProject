@@ -40,10 +40,16 @@
   margin-bottom: 22px;
 }
 
+.week-nav-group {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
 .timesheet-header-left {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .week-icon {
@@ -76,6 +82,7 @@
   margin-top: 4px;
   color: rgba(255, 255, 255, 0.55);
   font-size: 0.85rem;
+  text-align: center;
 }
 
 .timesheet-progress {
