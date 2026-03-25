@@ -8,7 +8,7 @@ public interface TimeEntryService {
   TimeEntry upsertTimeEntry(
       Long userId,
       LocalDate weekStart,
-      Long workItemId,
+      Long projectId,
       LocalDate entryDate,
       double hours,
       String description);

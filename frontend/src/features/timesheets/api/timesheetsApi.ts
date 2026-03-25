@@ -12,7 +12,6 @@ export async function saveTimeEntries(
     userId: number,
     weekStart: string,
     projectId: number,
-    workItemId: number,
     hours: Record<string, string>,
 ) {
     const days = ["mon", "tue", "wed", "thu", "fri"];
@@ -29,7 +28,7 @@ export async function saveTimeEntries(
         await api.post("/api/time-entries", {
             userId,
             weekStart,
-            workItemId,
+            projectId,
             entryDate: entryDateStr,
             hours: parsedHours,
             description: "",

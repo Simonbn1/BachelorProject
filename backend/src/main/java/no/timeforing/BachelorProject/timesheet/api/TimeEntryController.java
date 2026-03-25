@@ -21,7 +21,7 @@ public class TimeEntryController {
     public TimeEntry upsert(@RequestBody UpsertTimeEntryRequest req, JwtAuthenticationToken auth) {
         Long effectiveUserId = effectiveUserId(req.userId, auth);
         return timeEntryService.upsertTimeEntry(
-                effectiveUserId, req.weekStart, req.workItemId, req.entryDate, req.hours, req.description);
+                effectiveUserId, req.weekStart, req.projectId, req.entryDate, req.hours, req.description);
     }
 
     @GetMapping
