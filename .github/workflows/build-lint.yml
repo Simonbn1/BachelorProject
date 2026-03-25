@@ -42,6 +42,7 @@ jobs:
       - name: Compose smoke test
         env:
           COMPOSE_PROJECT_NAME: ci
+          APP_JWT_SECRET: ci-test-secret-that-is-long-enough-for-jwt
         run: |
           docker compose -f docker-compose.yml up -d
           bash -c 'for i in {1..60}; do curl -fsS http://localhost:8080/actuator/health && exit 0; sleep 2; done; exit 1'
