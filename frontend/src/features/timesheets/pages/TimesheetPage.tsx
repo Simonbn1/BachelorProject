@@ -54,6 +54,10 @@ export function TimesheetPage() {
     }
   }
 
+  function isOvertime(projectId: number, day: string) {
+    return getNumericValue(projectId, day) > 7.5;
+  }
+
   function getNumericValue(projectId: number, day: string) {
     const raw = hours[`${projectId}-${day}`] ?? "0";
     return Number.parseFloat(raw.replace(",", ".")) || 0;
@@ -71,6 +75,7 @@ export function TimesheetPage() {
 
   const weeklyTarget = 37.5;
   const progressPercent = Math.min((weekTotal / weeklyTarget) * 100, 100);
+  const overtimeTotal = Math.max(0, weekTotal - weeklyTarget);
 
   function removeProject(projectId: number) {
     setVisibleProjects((prev) =>
@@ -158,6 +163,11 @@ export function TimesheetPage() {
                 <div className="progress-text">
                   {weekTotal.toFixed(1).replace(".", ",")} /{""}
                   {weeklyTarget.toFixed(1).replace(".", ",")}
+                  {overtimeTotal > 0 && (
+                    <span className="overtime-badge">
+                      +{overtimeTotal.toFixed(1).replace(".", ",")}
+                    </span>
+                  )}
                 </div>
                 <div className="progress-bar">
                   <div
@@ -186,43 +196,98 @@ export function TimesheetPage() {
                 <strong>{project.name}</strong>
                 <span>Prosjekt #{project.id}</span>
               </div>
+              <div style={{ position: "relative" }}>
+                {isOvertime(project.id, "mon") && (
+                  <span className="overtime-indicator">
+                    +
+                    {(getNumericValue(project.id, "mon") - 7.5)
+                      .toFixed(1)
+                      .replace(".", ",")}
+                    t
+                  </span>
+                )}
 
-              <input
-                value={hours[`${project.id}-mon`] ?? ""}
-                placeholder="0,0"
-                onChange={(e) =>
-                  handleChange(project.id, "mon", e.target.value)
-                }
-              />
-              <input
-                value={hours[`${project.id}-tue`] ?? ""}
-                placeholder="0,0"
-                onChange={(e) =>
-                  handleChange(project.id, "tue", e.target.value)
-                }
-              />
-              <input
-                value={hours[`${project.id}-wed`] ?? ""}
-                placeholder="0,0"
-                onChange={(e) =>
-                  handleChange(project.id, "wed", e.target.value)
-                }
-              />
-              <input
-                value={hours[`${project.id}-thu`] ?? ""}
-                placeholder="0,0"
-                onChange={(e) =>
-                  handleChange(project.id, "thu", e.target.value)
-                }
-              />
-              <input
-                value={hours[`${project.id}-fri`] ?? ""}
-                placeholder="0,0"
-                onChange={(e) =>
-                  handleChange(project.id, "fri", e.target.value)
-                }
-              />
+                <input
+                  value={hours[`${project.id}-mon`] ?? ""}
+                  placeholder="0,0"
+                  onChange={(e) =>
+                    handleChange(project.id, "mon", e.target.value)
+                  }
+                />
+              </div>
+              <div style={{ position: "relative" }}>
+                {isOvertime(project.id, "tue") && (
+                  <span className="overtime-indicator">
+                    +
+                    {(getNumericValue(project.id, "tue") - 7.5)
+                      .toFixed(1)
+                      .replace(".", ",")}
+                    t
+                  </span>
+                )}
+                <input
+                  value={hours[`${project.id}-tue`] ?? ""}
+                  placeholder="0,0"
+                  onChange={(e) =>
+                    handleChange(project.id, "tue", e.target.value)
+                  }
+                />
+              </div>
+              <div style={{ position: "relative" }}>
+                {isOvertime(project.id, "wed") && (
+                  <span className="overtime-indicator">
+                    +
+                    {(getNumericValue(project.id, "wed") - 7.5)
+                      .toFixed(1)
+                      .replace(".", ",")}
+                    t
+                  </span>
+                )}
+                <input
+                  value={hours[`${project.id}-wed`] ?? ""}
+                  placeholder="0,0"
+                  onChange={(e) =>
+                    handleChange(project.id, "wed", e.target.value)
+                  }
+                />
+              </div>
+              <div style={{ position: "relative" }}>
+                {isOvertime(project.id, "thu") && (
+                  <span className="overtime-indicator">
+                    +
+                    {(getNumericValue(project.id, "thu") - 7.5)
+                      .toFixed(1)
+                      .replace(".", ",")}
+                    t
+                  </span>
+                )}
+                <input
+                  value={hours[`${project.id}-thu`] ?? ""}
+                  placeholder="0,0"
+                  onChange={(e) =>
+                    handleChange(project.id, "thu", e.target.value)
+                  }
+                />
+              </div>
 
+              <div style={{ position: "relative" }}>
+                {isOvertime(project.id, "fri") && (
+                  <span className="overtime-indicator">
+                    +
+                    {(getNumericValue(project.id, "fri") - 7.5)
+                      .toFixed(1)
+                      .replace(".", ",")}
+                    t
+                  </span>
+                )}
+                <input
+                  value={hours[`${project.id}-fri`] ?? ""}
+                  placeholder="0,0"
+                  onChange={(e) =>
+                    handleChange(project.id, "fri", e.target.value)
+                  }
+                />
+              </div>
               <div className="total">
                 {getRowTotal(project.id).toFixed(1).replace(".", ",")}
               </div>

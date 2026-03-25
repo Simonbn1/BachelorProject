@@ -312,3 +312,34 @@ textarea.dark-input {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   margin: 16px 0;
 }
+
+.overtime-indicator {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #c600ff, #6a5cff);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.input-overtime {
+  border-color: rgba(158, 131, 255, 0.7) !important;
+  box-shadow: 0 0 0 2px rgba(123, 97, 255, 0.2);
+}
+
+.overtime-badge {
+  margin-left: 8px;
+  background: linear-gradient(90deg, #c600ff, #6a5cff);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 8px;
+  vertical-align: middle;
+}
