@@ -42,17 +42,24 @@ export default function AbsencePage() {
       return;
     }
 
-    if (!absenceType) {
-      alert("Velg årsak til fravær først.");
-      return;
-    }
+    const userId = Number(localStorage.getItem("userId") ?? "1");
 
-    if (!selectedStartDate || !selectedEndDate) {
+    const isRangeBased = absenceType === "VACATION" || absenceType === "LEAVE";
+
+    if (isRangeBased && (!selectedStartDate || selectedEndDate)) {
       alert("Velg en periode først.");
       return;
     }
 
-    const userId = Number(localStorage.getItem("userId") ?? "1");
+    if (!isRangeBased && Object.keys(hours).length === 0) {
+      alert("Fyll inn timer for minst en dag.");
+      return;
+    }
+
+    if (!absenceType) {
+      alert("Velg årsak til fravær først.");
+      return;
+    }
 
     try {
       await saveAbsences(
@@ -62,11 +69,16 @@ export default function AbsencePage() {
         projectId,
         selectedStartDate,
         selectedEndDate,
+        hours,
+        isRangeBased,
       );
       alert("Fravær lagret!");
     } catch (error) {
-      console.error("Feil ved lagring av fravær:", error);
-      alert("Noe gikk galt. Sjekk konsollen.");
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Noe gikk galt. Sjekk konsollen";
+      alert(message);
     }
   }
 

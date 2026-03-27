@@ -55,6 +55,21 @@ export default function AbsenceForm({
         </select>
       </div>
 
+      <div className="input-group-row">
+        <label>Årsak til fravær:</label>
+        <select
+          className="dark-input"
+          value={absenceType}
+          onChange={(e) => onTypeChange(e.target.value)}
+        >
+          <option value="">Velg type...</option>
+          <option value="SICKNESS">Sykdom</option>
+          <option value="VACATION">Ferie</option>
+          <option value="LEAVE">Permisjon</option>
+          <option value="OTHER">Annet</option>
+        </select>
+      </div>
+
       <hr className="modal-divider" />
 
       {absenceType === "VACATION" || absenceType === "LEAVE" ? (
@@ -78,21 +93,6 @@ export default function AbsenceForm({
             onChange={(e) => onDescriptionChange(e.target.value)}
           />
         </div>
-      </div>
-
-      <div className="input-group-row">
-        <label>Årsak til fravær:</label>
-        <select
-          className="dark-input"
-          value={absenceType}
-          onChange={(e) => onTypeChange(e.target.value)}
-        >
-          <option value="">Velg type...</option>
-          <option value="SICKNESS">Sykdom</option>
-          <option value="VACATION">Ferie</option>
-          <option value="LEAVE">Permisjon</option>
-          <option value="OTHER">Annet</option>
-        </select>
       </div>
 
       <div className="timesheet-actions">

@@ -7,6 +7,7 @@ import no.timeforing.BachelorProject.timesheet.domain.Timesheet;
 import no.timeforing.BachelorProject.absence.domain.enums.AbsenceType;
 import no.timeforing.BachelorProject.timesheet.domain.enums.TimesheetStatus;
 import no.timeforing.BachelorProject.absence.repository.AbsenceRepository;
+import no.timeforing.BachelorProject.timesheet.repository.TimeEntryRepository;
 import no.timeforing.BachelorProject.timesheet.repository.TimesheetRepository;
 import no.timeforing.BachelorProject.absence.application.AbsenceService;
 import no.timeforing.BachelorProject.user.domain.User;
@@ -19,12 +20,14 @@ public class AbsenceServiceImpl implements AbsenceService {
   private final AbsenceRepository absenceRepository;
   private final TimesheetRepository timesheetRepository;
   private final UserRepository userRepository;
+  private final TimeEntryRepository timeEntryRepository;
 
   public AbsenceServiceImpl(
-      AbsenceRepository absenceRepository, TimesheetRepository timesheetRepository, UserRepository userRepository) {
+      AbsenceRepository absenceRepository, TimesheetRepository timesheetRepository, UserRepository userRepository,  TimeEntryRepository timeEntryRepository) {
     this.absenceRepository = absenceRepository;
     this.timesheetRepository = timesheetRepository;
     this.userRepository = userRepository;
+    this.timeEntryRepository = timeEntryRepository;
   }
 
   private Timesheet findOrCreateTimesheet(Long userId, LocalDate weekStart) {
@@ -48,6 +51,18 @@ public class AbsenceServiceImpl implements AbsenceService {
 
     if (ts.getStatus() == TimesheetStatus.SENT || ts.getStatus() == TimesheetStatus.APPROVED) {
       throw new IllegalStateException("Timesheet is sent/approved and cannot be edited.");
+    }
+
+    double existingHours = timeEntryRepository
+            .findByTimesheet_UserIdAndEntryDate(userId, absenceDate)
+            .stream()
+            .mapToDouble(no.timeforing.BachelorProject.timesheet.domain.TimeEntry::getHours)
+            .sum();
+
+    if (existingHours > 0) {
+        throw new IllegalStateException(
+                "Bruker har allerede registrert " + existingHours + " timer for " + absenceDate + ". Kan ikke registrer fravær."
+        );
     }
 
     Absence absence = absenceRepository
