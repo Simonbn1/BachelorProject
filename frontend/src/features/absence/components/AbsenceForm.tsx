@@ -32,7 +32,7 @@ export default function AbsenceForm({
   projects,
 }: AbsenceFormProps) {
   useEffect(() => {
-    if (absenceType !== "VACATION" && absenceType !== "PERMISSION") {
+    if (absenceType !== "VACATION" && absenceType !== "LEAVE") {
       onHoursChange({});
     }
   }, [absenceType, onHoursChange]);
@@ -57,7 +57,7 @@ export default function AbsenceForm({
 
       <hr className="modal-divider" />
 
-      {absenceType === "VACATION" || absenceType === "PERMISSION" ? (
+      {absenceType === "VACATION" || absenceType === "LEAVE" ? (
         <DateRangeInput
           onHoursChange={onHoursChange}
           onRangeChange={onRangeChange}
@@ -90,7 +90,7 @@ export default function AbsenceForm({
           <option value="">Velg type...</option>
           <option value="SICKNESS">Sykdom</option>
           <option value="VACATION">Ferie</option>
-          <option value="PERMISSION">Permisjon</option>
+          <option value="LEAVE">Permisjon</option>
           <option value="OTHER">Annet</option>
         </select>
       </div>

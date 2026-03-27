@@ -33,6 +33,9 @@ public class TimeEntry {
   @Column(nullable = false)
   private double hours;
 
+  @Column(nullable = false)
+  private double overtimeHours;
+
   private String description;
 
   public TimeEntry(
@@ -45,6 +48,7 @@ public class TimeEntry {
     this.workItem = workItem;
     this.entryDate = entryDate;
     this.hours = hours;
+    this.overtimeHours = Math.max(0, hours - 7.5);
     this.description = description;
   }
 

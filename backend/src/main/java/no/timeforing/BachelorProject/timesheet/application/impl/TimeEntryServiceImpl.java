@@ -66,6 +66,7 @@ public class TimeEntryServiceImpl implements TimeEntryService {
                 .findByTimesheetIdAndWorkItemIdAndEntryDate(ts.getId(), workItem.getId(), entryDate)
                 .map(existing -> {
                     existing.setHours(hours);
+                    existing.setOvertimeHours(Math.max(0, hours - 7.5));
                     existing.setDescription(description);
                     return timeEntryRepository.save(existing);
                 })

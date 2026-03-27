@@ -7,6 +7,7 @@ import { useTimesheetWeek, parseLocalDate } from "../hooks/useTimesheetWeek.ts";
 import "../styles/TimesheetHeader.css";
 import { DatePicker, type DatesRangeValue } from "@mantine/dates";
 import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 type HoursState = Record<string, string>;
 
@@ -17,10 +18,12 @@ export function TimesheetPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [showAbsencePrompt, setShowAbsencePrompt] = useState(false);
 
   const { weekStart, weekLabel, weekNumber, goToPreviousWeek, goToNextWeek } =
     useTimesheetWeek();
 
+  const navigate = useNavigate();
   const startDate = parseLocalDate(weekStart);
   const endDate = new Date(startDate);
   endDate.setDate(startDate.getDate() + 4);
@@ -28,6 +31,7 @@ export function TimesheetPage() {
   useEffect(() => {
     setHours({});
     setVisibleProjects([]);
+    setShowAbsencePrompt(false);
   }, [weekStart]);
 
   useEffect(() => {
@@ -109,6 +113,24 @@ export function TimesheetPage() {
   // Save the project to the database
   async function handleSave() {
     const userId = 1;
+    const missing = (weeklyTarget - weekTotal).toFixed(1).replace(".", ",");
+
+    const absenceMessage = [
+      `Du har bare registrert ${weekTotal.toFixed(1).replace(".", ",")} av ${weeklyTarget.toFixed(1).replace(".", ",")} timer denne uken.`,
+      `Du mangler ${missing} timer.`,
+      `Ønsker du å registrere fravær for de resterende timene?`,
+    ].join(" ");
+
+    if (weekTotal < weeklyTarget) {
+      const confirm = window.confirm(absenceMessage);
+
+      if (confirm) {
+        navigate("/absence");
+        return;
+      } else {
+        setShowAbsencePrompt(true);
+      }
+    }
 
     try {
       for (const project of visibleProjects) {
@@ -313,9 +335,21 @@ export function TimesheetPage() {
             >
               + Legg til nytt prosjekt
             </button>
-            <button className="save-btn" type="button" onClick={handleSave}>
-              Lagre
-            </button>
+            <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+              {showAbsencePrompt && (
+                <button
+                  className="add-project"
+                  type="button"
+                  onClick={() => navigate("/absence")}
+                  style={{ borderColor: "rgba(198, 0, 255, 0.6" }}
+                >
+                  Registrer fravær?
+                </button>
+              )}
+              <button className="save-btn" type="button" onClick={handleSave}>
+                Lagre
+              </button>
+            </div>
           </div>
         </section>
       </div>
