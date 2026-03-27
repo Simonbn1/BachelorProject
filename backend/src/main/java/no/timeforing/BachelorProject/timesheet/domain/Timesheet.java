@@ -2,6 +2,10 @@ package no.timeforing.BachelorProject.timesheet.domain;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import no.timeforing.BachelorProject.timesheet.domain.enums.TimesheetStatus;
 import no.timeforing.BachelorProject.user.domain.User;
 
@@ -9,6 +13,9 @@ import no.timeforing.BachelorProject.user.domain.User;
 @Table(
     name = "timesheets",
     uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "weekStart"}))
+@Getter
+@Setter
+@NoArgsConstructor
 public class Timesheet {
 
   @Id
@@ -29,38 +36,9 @@ public class Timesheet {
   // ved avvisning
   private String managerComment;
 
-  public Timesheet() {}
-
   public Timesheet(User user, LocalDate weekStart) {
     this.user = user;
     this.weekStart = weekStart;
   }
 
-  public Long getId() {
-    return id;
-  }
-
-  public User getUser() {
-    return user;
-  }
-
-  public LocalDate getWeekStart() {
-    return weekStart;
-  }
-
-  public TimesheetStatus getStatus() {
-    return status;
-  }
-
-  public void setStatus(TimesheetStatus status) {
-    this.status = status;
-  }
-
-  public String getManagerComment() {
-    return managerComment;
-  }
-
-  public void setManagerComment(String managerComment) {
-    this.managerComment = managerComment;
-  }
 }

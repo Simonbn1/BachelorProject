@@ -9,6 +9,8 @@ import no.timeforing.BachelorProject.timesheet.domain.enums.TimesheetStatus;
 import no.timeforing.BachelorProject.absence.repository.AbsenceRepository;
 import no.timeforing.BachelorProject.timesheet.repository.TimesheetRepository;
 import no.timeforing.BachelorProject.absence.application.AbsenceService;
+import no.timeforing.BachelorProject.user.domain.User;
+import no.timeforing.BachelorProject.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,11 +18,25 @@ public class AbsenceServiceImpl implements AbsenceService {
 
   private final AbsenceRepository absenceRepository;
   private final TimesheetRepository timesheetRepository;
+  private final UserRepository userRepository;
 
   public AbsenceServiceImpl(
-      AbsenceRepository absenceRepository, TimesheetRepository timesheetRepository) {
+      AbsenceRepository absenceRepository, TimesheetRepository timesheetRepository, UserRepository userRepository) {
     this.absenceRepository = absenceRepository;
     this.timesheetRepository = timesheetRepository;
+    this.userRepository = userRepository;
+  }
+
+  private Timesheet findOrCreateTimesheet(Long userId, LocalDate weekStart) {
+      return timesheetRepository
+            .findByUserIdAndWeekStart(userId, weekStart)
+            .orElseGet(() -> {
+                User user = userRepository.findById(userId)
+                     .orElseThrow(() -> new IllegalArgumentException("No user found with id: " + userId));
+                Timesheet newTs = new Timesheet(user, weekStart);
+                return timesheetRepository.save(newTs);
+            });
+
   }
 
   @Override
@@ -28,10 +44,7 @@ public class AbsenceServiceImpl implements AbsenceService {
       Long userId, LocalDate weekStart, LocalDate absenceDate, AbsenceType type, String description, double hours, Long projectId) {
     if (hours < 0) throw new IllegalArgumentException("Hours cannot be negative.");
 
-    Timesheet ts =
-        timesheetRepository
-            .findByUserIdAndWeekStart(userId, weekStart)
-            .orElseThrow(() -> new IllegalArgumentException("Timesheet not found for user/week"));
+    Timesheet ts = findOrCreateTimesheet(userId, weekStart);
 
     if (ts.getStatus() == TimesheetStatus.SENT || ts.getStatus() == TimesheetStatus.APPROVED) {
       throw new IllegalStateException("Timesheet is sent/approved and cannot be edited.");
@@ -50,10 +63,7 @@ public class AbsenceServiceImpl implements AbsenceService {
 
   @Override
   public List<Absence> listAbsences(Long userId, LocalDate weekStart) {
-    Timesheet ts =
-        timesheetRepository
-            .findByUserIdAndWeekStart(userId, weekStart)
-            .orElseThrow(() -> new IllegalArgumentException("Timesheet not found for user/week"));
-    return absenceRepository.findByTimesheetId(ts.getId());
+      Timesheet ts = findOrCreateTimesheet(userId, weekStart);
+      return absenceRepository.findByTimesheetId(ts.getId());
   }
 }

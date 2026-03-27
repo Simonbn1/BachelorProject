@@ -1,10 +1,16 @@
 package no.timeforing.BachelorProject.timesheet.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import no.timeforing.BachelorProject.project.domain.Project;
 
 @Entity
-@Table(name = "work_items")
+@Table(name = "work_items", uniqueConstraints = @UniqueConstraint(columnNames = {"external_id"}))
+@Getter
+@Setter
+@NoArgsConstructor
 public class WorkItem {
 
   @Id
@@ -20,39 +26,9 @@ public class WorkItem {
   @ManyToOne(optional = false)
   private Project project;
 
-  public WorkItem() {}
-
   public WorkItem(String externalId, String title, Project project) {
     this.externalId = externalId;
     this.title = title;
-    this.project = project;
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public String getExternalId() {
-    return externalId;
-  }
-
-  public void setExternalId(String externalId) {
-    this.externalId = externalId;
-  }
-
-  public String getTitle() {
-    return title;
-  }
-
-  public void setTitle(String title) {
-    this.title = title;
-  }
-
-  public Project getProject() {
-    return project;
-  }
-
-  public void setProject(Project project) {
     this.project = project;
   }
 }
