@@ -2,6 +2,6 @@
 
 For login as test user
 
-User: Test User
+User: test@test.com
 
 Password: 123
