@@ -12,6 +12,13 @@ export default function AbsencePage() {
   const [description, setDescription] = useState<string>("");
   const [projectId, setProjectId] = useState<number | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(null);
+  const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(null);
+
+  const handleRangeChange = useCallback((start: Date, end: Date) => {
+    setSelectedStartDate(start);
+    setSelectedEndDate(end);
+  }, []);
 
   useEffect(() => {
     async function fetchProjects() {
@@ -40,17 +47,21 @@ export default function AbsencePage() {
       return;
     }
 
-    const weekStart = "2026-03-16";
+    if (!selectedStartDate || !selectedEndDate) {
+      alert("Velg en periode først.");
+      return;
+    }
+
     const userId = Number(localStorage.getItem("userId") ?? "1");
 
     try {
       await saveAbsences(
         userId,
-        weekStart,
         absenceType,
         description,
-        hours,
         projectId,
+        selectedStartDate,
+        selectedEndDate,
       );
       alert("Fravær lagret!");
     } catch (error) {
@@ -72,6 +83,7 @@ export default function AbsencePage() {
             projectId={projectId}
             projects={projects}
             onHoursChange={handleHoursChange}
+            onRangeChange={handleRangeChange}
             onTypeChange={(type) => setAbsenceType(type)}
             onDescriptionChange={(desc) => setDescription(desc)}
             onProjectChange={(id) => setProjectId(id)}

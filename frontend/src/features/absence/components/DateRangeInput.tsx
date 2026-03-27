@@ -5,6 +5,7 @@ import "../styles/calendar.css";
 
 type DateRangeInputProps = {
   onHoursChange: (hours: Record<string, string>) => void;
+  onRangeChange: (startDate: Date, endDate: Date) => void;
 };
 
 const DAY_KEYS: Record<number, string> = {
@@ -15,13 +16,18 @@ const DAY_KEYS: Record<number, string> = {
   5: "fri",
 };
 
-export default function DateRangeInput({ onHoursChange }: DateRangeInputProps) {
+export default function DateRangeInput({
+  onHoursChange,
+  onRangeChange,
+}: DateRangeInputProps) {
   const [value, setValue] = useState<DatesRangeValue>([null, null]);
 
   function handleChange(val: DatesRangeValue) {
     setValue(val);
     const [startDate, endDate] = val;
     if (!startDate || !endDate) return;
+
+    onRangeChange(new Date(startDate), new Date(endDate));
 
     const updated: Record<string, string> = {};
     const cur = new Date(startDate);

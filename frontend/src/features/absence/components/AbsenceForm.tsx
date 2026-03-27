@@ -10,6 +10,7 @@ type AbsenceFormProps = {
   description: string;
   projectId: number | null;
   onHoursChange: (hours: Record<string, string>) => void;
+  onRangeChange: (startDate: Date, endDate: Date) => void;
   onTypeChange: (type: string) => void;
   onDescriptionChange: (description: string) => void;
   onProjectChange: (projectId: number) => void;
@@ -23,6 +24,7 @@ export default function AbsenceForm({
   description,
   projectId,
   onHoursChange,
+  onRangeChange,
   onTypeChange,
   onDescriptionChange,
   onProjectChange,
@@ -56,7 +58,10 @@ export default function AbsenceForm({
       <hr className="modal-divider" />
 
       {absenceType === "VACATION" || absenceType === "PERMISSION" ? (
-        <DateRangeInput onHoursChange={onHoursChange} />
+        <DateRangeInput
+          onHoursChange={onHoursChange}
+          onRangeChange={onRangeChange}
+        />
       ) : (
         <DayHoursInput hours={hours} onHoursChange={onHoursChange} />
       )}

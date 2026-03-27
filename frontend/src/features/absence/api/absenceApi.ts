@@ -1,39 +1,49 @@
 import { api } from "../../../shared/api/client.ts";
 
-const DAY_OFFSETS: Record<string, number> = {
-  mon: 0,
-  tue: 1,
-  wed: 2,
-  thu: 3,
-  fri: 4,
-};
+function formatDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getMonday(date: Date): string {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDay() - day + (day === 0 ? -6 : 1);
+  d.setDate(diff);
+  return formatDate(d);
+}
 
 export async function saveAbsences(
   userId: number,
-  weekStart: string,
   absenceType: string,
   description: string,
-  hours: Record<string, string>,
   projectId: number,
+  startDate: Date,
+  endDate: Date,
 ) {
-  const days = ["mon", "tue", "wed", "thu", "fri"];
+  const cur = new Date(startDate);
+  const end = new Date(endDate);
 
-  for (const day of days) {
-    const parsedHours = parseFloat((hours[day] ?? "0").replace(",", "."));
-    if (parsedHours === 0) continue;
+  while (cur <= end) {
+    const dayOfWeek = cur.getDay();
 
-    const absenceDate = new Date(weekStart);
-    absenceDate.setDate(absenceDate.getDate() + DAY_OFFSETS[day]);
-    const absenceDateStr = absenceDate.toISOString().split("T")[0];
+    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+      const weekStart = getMonday(cur);
+      const absenceDateStr = formatDate(cur);
 
-    await api.post("api/absences", {
-      userId,
-      weekStart,
-      absenceDate: absenceDateStr,
-      type: absenceType,
-      description: description,
-      hours: parsedHours,
-      projectId,
-    });
+      await api.post("api/absences", {
+        userId,
+        weekStart,
+        absenceDate: absenceDateStr,
+        type: absenceType,
+        description,
+        hours: 7.5,
+        projectId,
+      });
+    }
+
+    cur.setDate(cur.getDate() + 1);
   }
 }
