@@ -1,5 +1,22 @@
 import { api } from "../../../shared/api/client";
 
+export async function fetchTimeEntries(userId: number, weekStart: string) {
+  const response = await api.get("api/time-entries", {
+    params: { userId, weekStart },
+  });
+  return response.data;
+}
+
+export async function deleteTimeEntries(
+  userId: number,
+  weekStart: string,
+  projectId: number,
+) {
+  await api.delete("api/time-entries", {
+    params: { userId, weekStart, projectId },
+  });
+}
+
 const DAY_OFFSET: Record<string, number> = {
   mon: 0,
   tue: 1,

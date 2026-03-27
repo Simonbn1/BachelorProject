@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { fetchProjects } from "../../projects/api/projectsApi";
 import type { Project } from "../../projects/types/projects";
 import TopBar from "../../../shared/components/TopBar";
-import { saveTimeEntries } from "../api/timesheetsApi.ts";
+import {
+  deleteTimeEntries,
+  fetchTimeEntries,
+  saveTimeEntries,
+} from "../api/timesheetsApi.ts";
 import { useTimesheetWeek, parseLocalDate } from "../hooks/useTimesheetWeek.ts";
 import "../styles/TimesheetHeader.css";
 import { DatePicker, type DatesRangeValue } from "@mantine/dates";
@@ -32,7 +36,49 @@ export function TimesheetPage() {
     setHours({});
     setVisibleProjects([]);
     setShowAbsencePrompt(false);
-  }, [weekStart]);
+
+    async function loadEntries() {
+      try {
+        const userId = 1;
+        const entries = await fetchTimeEntries(userId, weekStart);
+
+        if (entries.length === 0) return;
+
+        const loadedHours: HoursState = {};
+        const loadedProjectsIds = new Set<number>();
+
+        for (const entry of entries) {
+          const projectId = entry.workItem.project.id;
+          const date = new Date(entry.entryDate);
+          const dayIndex = date.getDay();
+          const dayKeys: Record<number, string> = {
+            1: "mon",
+            2: "tue",
+            3: "wed",
+            4: "thu",
+            5: "fri",
+          };
+          const day = dayKeys[dayIndex];
+          if (day) {
+            loadedHours[`${projectId}-${day}`] = String(entry.hours).replace(
+              ".",
+              ",",
+            );
+          }
+          loadedProjectsIds.add(projectId);
+        }
+
+        const loadedProjects = projects.filter((p) =>
+          loadedProjectsIds.has(p.id),
+        );
+        setVisibleProjects(loadedProjects);
+        setHours(loadedHours);
+      } catch (error) {
+        console.error("Kunne ikke hente timeføringer:", error);
+      }
+    }
+    loadEntries();
+  }, [weekStart, projects]);
 
   useEffect(() => {
     async function load() {
@@ -81,7 +127,23 @@ export function TimesheetPage() {
   const progressPercent = Math.min((weekTotal / weeklyTarget) * 100, 100);
   const overtimeTotal = Math.max(0, weekTotal - weeklyTarget);
 
-  function removeProject(projectId: number) {
+  async function removeProject(projectId: number) {
+    const userId = 1;
+
+    try {
+      await deleteTimeEntries(userId, weekStart, projectId);
+    } catch (error) {
+      console.debug("Kunne ikke hente prosjekter:", error);
+    }
+
+    setHours((prev) => {
+      const updated = { ...prev };
+      const days = ["mon", "tue", "wed", "thu", "fri"];
+      for (const day of days) {
+        delete updated[`${projectId}-${day}`];
+      }
+      return updated;
+    });
     setVisibleProjects((prev) =>
       prev.filter((project) => project.id !== projectId),
     );

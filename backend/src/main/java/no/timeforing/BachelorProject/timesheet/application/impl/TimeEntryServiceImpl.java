@@ -79,10 +79,23 @@ public class TimeEntryServiceImpl implements TimeEntryService {
 
     @Override
     public List<TimeEntry> listEntries(Long userId, LocalDate weekStart) {
+        return timesheetRepository
+                .findByUserIdAndWeekStart(userId, weekStart)
+                .map(ts -> timeEntryRepository.findByTimesheetId(ts.getId()))
+                .orElse(List.of());
+    }
+
+    @Override
+    public void deleteEntries(Long userId, LocalDate weekStart, Long projectId) {
         Timesheet ts = timesheetRepository
                 .findByUserIdAndWeekStart(userId, weekStart)
                 .orElseThrow(() -> new IllegalArgumentException("Timesheet not found for user/week"));
 
-        return timeEntryRepository.findByTimesheetId(ts.getId());
+        WorkItem workItem = workItemRepository
+                .findFirstByProjectId(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("WorkItem not found for project: " + projectId));
+
+        List<TimeEntry> entries = timeEntryRepository.findByTimesheetIdAndWorkItemId(ts.getId(), workItem.getId());
+        timeEntryRepository.deleteAll(entries);
     }
 }

@@ -14,4 +14,6 @@ public interface TimeEntryService {
       String description);
 
   List<TimeEntry> listEntries(Long userId, LocalDate weekStart);
+
+  void deleteEntries(Long userId, LocalDate weekStart, Long projectId);
 }

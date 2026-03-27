@@ -11,4 +11,6 @@ public interface TimeEntryRepository extends JpaRepository<TimeEntry, Long> {
 
   Optional<TimeEntry> findByTimesheetIdAndWorkItemIdAndEntryDate(
       Long timesheetId, Long workItemId, LocalDate entryDate);
+
+  List<TimeEntry> findByTimesheetIdAndWorkItemId(Long timesheetId, Long workItemId);
 }

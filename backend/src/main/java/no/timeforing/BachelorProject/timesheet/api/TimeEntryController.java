@@ -41,4 +41,14 @@ public class TimeEntryController {
         }
         return Long.valueOf(auth.getToken().getSubject());
     }
+
+    @DeleteMapping
+    public void delete (
+            @RequestParam Long projectId,
+            @RequestParam String weekStart,
+            @RequestParam(required = false) Long userId,
+            JwtAuthenticationToken auth) {
+        Long effectiveUserId = effectiveUserId(userId, auth);
+        timeEntryService.deleteEntries(effectiveUserId, java.time.LocalDate.parse(weekStart), projectId);
+    }
 }
