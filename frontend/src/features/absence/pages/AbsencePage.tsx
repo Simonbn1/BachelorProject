@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback } from "react";
 import { saveAbsences } from "../api/absenceApi.ts";
 import { api } from "../../../shared/api/client.ts";
 import type { Project } from "../../projects/types/projects.ts";
+import { fetchWorkItems } from "../../timesheets/api/timesheetsApi.ts";
 
 export default function AbsencePage() {
   const [hours, setHours] = useState<Record<string, string>>({});
@@ -14,6 +15,24 @@ export default function AbsencePage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(null);
   const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(null);
+  const [workItems, setWorkItems] = useState<{ id: number; title: string }[]>(
+    [],
+  );
+  const [workItemId, setWorkItemId] = useState<number | null>(null);
+
+  const handleProjectChange = useCallback(async (id: number) => {
+    setProjectId(id);
+    setWorkItemId(null);
+    setWorkItems([]);
+    if (id) {
+      try {
+        const items = await fetchWorkItems(id);
+        setWorkItems(items);
+      } catch (error) {
+        console.error("Kunne ikke hente arbeidsoppgaver:", error);
+      }
+    }
+  }, []);
 
   const handleRangeChange = useCallback((start: Date, end: Date) => {
     setSelectedStartDate(start);
@@ -41,23 +60,27 @@ export default function AbsencePage() {
       alert("Velg et prosjekt først.");
       return;
     }
+    if (!workItemId) {
+      alert("Velg en arbeidsoppgave først.");
+      return;
+    }
+
+    if (!absenceType) {
+      alert("Velg årsak til fravær først.");
+      return;
+    }
 
     const userId = Number(localStorage.getItem("userId") ?? "1");
 
     const isRangeBased = absenceType === "VACATION" || absenceType === "LEAVE";
 
-    if (isRangeBased && (!selectedStartDate || selectedEndDate)) {
+    if (isRangeBased && (!selectedStartDate || !selectedEndDate)) {
       alert("Velg en periode først.");
       return;
     }
 
     if (!isRangeBased && Object.keys(hours).length === 0) {
       alert("Fyll inn timer for minst en dag.");
-      return;
-    }
-
-    if (!absenceType) {
-      alert("Velg årsak til fravær først.");
       return;
     }
 
@@ -94,11 +117,14 @@ export default function AbsencePage() {
             description={description}
             projectId={projectId}
             projects={projects}
+            workItems={workItems}
+            workItemId={workItemId}
             onHoursChange={handleHoursChange}
             onRangeChange={handleRangeChange}
             onTypeChange={(type) => setAbsenceType(type)}
             onDescriptionChange={(desc) => setDescription(desc)}
-            onProjectChange={(id) => setProjectId(id)}
+            onProjectChange={handleProjectChange}
+            onWorkItemChange={(id) => setWorkItemId(id)}
             onSave={handleSave}
           />
         </section>

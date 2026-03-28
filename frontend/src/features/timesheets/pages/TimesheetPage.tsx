@@ -5,6 +5,7 @@ import TopBar from "../../../shared/components/TopBar";
 import {
   deleteTimeEntries,
   fetchTimeEntries,
+  fetchWorkItems,
   saveTimeEntries,
 } from "../api/timesheetsApi.ts";
 import { useTimesheetWeek, parseLocalDate } from "../hooks/useTimesheetWeek.ts";
@@ -14,15 +15,25 @@ import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 type HoursState = Record<string, string>;
+type ProjectWithWorkItem = Project & {
+  workItemId: number;
+  workItemTitle?: string;
+};
 
 export function TimesheetPage() {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [visibleProjects, setVisibleProjects] = useState<Project[]>([]);
+  const [visibleProjects, setVisibleProjects] = useState<ProjectWithWorkItem[]>(
+    [],
+  );
   const [hours, setHours] = useState<HoursState>({});
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [showAbsencePrompt, setShowAbsencePrompt] = useState(false);
+  const [workItems, setWorkItems] = useState<{ id: number; title: string }[]>(
+    [],
+  );
+  const [selectedWorkItemId, setSelectedWorkItemId] = useState("");
 
   const { weekStart, weekLabel, weekNumber, goToPreviousWeek, goToNextWeek } =
     useTimesheetWeek();
@@ -45,10 +56,15 @@ export function TimesheetPage() {
         if (entries.length === 0) return;
 
         const loadedHours: HoursState = {};
-        const loadedProjectsIds = new Set<number>();
+        const loadedWorkItems = new Map<
+          number,
+          { projectId: number; title: string }
+        >();
 
         for (const entry of entries) {
           const projectId = entry.workItem.project.id;
+          const workItemId = entry.workItem.id;
+          const workItemTitle = entry.workItem.title;
           const date = new Date(entry.entryDate);
           const dayIndex = date.getDay();
           const dayKeys: Record<number, string> = {
@@ -60,17 +76,26 @@ export function TimesheetPage() {
           };
           const day = dayKeys[dayIndex];
           if (day) {
-            loadedHours[`${projectId}-${day}`] = String(entry.hours).replace(
+            loadedHours[`${workItemId}-${day}`] = String(entry.hours).replace(
               ".",
               ",",
             );
           }
-          loadedProjectsIds.add(projectId);
+          loadedWorkItems.set(workItemId, { projectId, title: workItemTitle });
         }
 
-        const loadedProjects = projects.filter((p) =>
-          loadedProjectsIds.has(p.id),
-        );
+        const loadedProjects: ProjectWithWorkItem[] = [];
+        for (const [workItemId, { projectId, title }] of loadedWorkItems) {
+          const project = projects.find((p) => p.id === projectId);
+          if (project) {
+            loadedProjects.push({
+              ...project,
+              workItemId,
+              workItemTitle: title,
+            });
+          }
+        }
+
         setVisibleProjects(loadedProjects);
         setHours(loadedHours);
       } catch (error) {
@@ -92,9 +117,9 @@ export function TimesheetPage() {
     load();
   }, []);
 
-  function handleChange(projectId: number, day: string, value: string) {
+  function handleChange(workItemId: number, day: string, value: string) {
     const normalized = value.replace(",", ".");
-    const key = `${projectId}-${day}`;
+    const key = `${workItemId}-${day}`;
 
     if (normalized === "" || /^(\d+)?([.]\d{0,1})?$/.test(normalized)) {
       setHours((prev) => ({
@@ -104,22 +129,22 @@ export function TimesheetPage() {
     }
   }
 
-  function isOvertime(projectId: number, day: string) {
-    return getNumericValue(projectId, day) > 7.5;
+  function isOvertime(workItemId: number, day: string) {
+    return getNumericValue(workItemId, day) > 7.5;
   }
 
-  function getNumericValue(projectId: number, day: string) {
-    const raw = hours[`${projectId}-${day}`] ?? "0";
+  function getNumericValue(workItemId: number, day: string) {
+    const raw = hours[`${workItemId}-${day}`] ?? "0";
     return Number.parseFloat(raw.replace(",", ".")) || 0;
   }
 
-  function getRowTotal(projectId: number) {
+  function getRowTotal(workItemId: number) {
     const days = ["mon", "tue", "wed", "thu", "fri"];
-    return days.reduce((sum, day) => sum + getNumericValue(projectId, day), 0);
+    return days.reduce((sum, day) => sum + getNumericValue(workItemId, day), 0);
   }
 
   const weekTotal = visibleProjects.reduce(
-    (sum, project) => sum + getRowTotal(project.id),
+    (sum, project) => sum + getRowTotal(project.workItemId),
     0,
   );
 
@@ -127,11 +152,11 @@ export function TimesheetPage() {
   const progressPercent = Math.min((weekTotal / weeklyTarget) * 100, 100);
   const overtimeTotal = Math.max(0, weekTotal - weeklyTarget);
 
-  async function removeProject(projectId: number) {
+  async function removeProject(workItemId: number) {
     const userId = 1;
 
     try {
-      await deleteTimeEntries(userId, weekStart, projectId);
+      await deleteTimeEntries(userId, weekStart, workItemId);
     } catch (error) {
       console.debug("Kunne ikke hente prosjekter:", error);
     }
@@ -140,36 +165,43 @@ export function TimesheetPage() {
       const updated = { ...prev };
       const days = ["mon", "tue", "wed", "thu", "fri"];
       for (const day of days) {
-        delete updated[`${projectId}-${day}`];
+        delete updated[`${workItemId}-${day}`];
       }
       return updated;
     });
     setVisibleProjects((prev) =>
-      prev.filter((project) => project.id !== projectId),
+      prev.filter((project) => project.workItemId !== workItemId),
     );
   }
 
   function addSelectedProject() {
     const projectId = Number(selectedProjectId);
+    const workItemId = Number(selectedWorkItemId);
     const projectToAdd = projects.find((project) => project.id === projectId);
+    const workItemToAdd = workItems.find((w) => w.id === workItemId);
 
-    if (!projectToAdd) {
+    if (!projectToAdd || !workItemToAdd) {
       return;
     }
 
     const alreadyExists = visibleProjects.some(
-      (project) => project.id === projectId,
+      (project) => project.workItemId === workItemId,
     );
 
     if (alreadyExists) {
       setIsAddModalOpen(false);
       setSelectedProjectId("");
+      setWorkItems([]);
       return;
     }
 
-    setVisibleProjects((prev) => [...prev, projectToAdd]);
+    setVisibleProjects((prev) => [
+      ...prev,
+      { ...projectToAdd, workItemId, workItemTitle: workItemToAdd.title },
+    ]);
     setIsAddModalOpen(false);
     setSelectedProjectId("");
+    setWorkItems([]);
   }
 
   // Save the project to the database
@@ -196,7 +228,7 @@ export function TimesheetPage() {
 
     try {
       for (const project of visibleProjects) {
-        await saveTimeEntries(userId, weekStart, project.id, hours);
+        await saveTimeEntries(userId, weekStart, project.workItemId, hours);
       }
       alert("Timer lagret!");
     } catch (error) {
@@ -277,16 +309,18 @@ export function TimesheetPage() {
           </div>
 
           {visibleProjects.map((project) => (
-            <div key={project.id} className="project-row">
+            <div key={project.workItemId} className="project-row">
               <div className="project-name">
                 <strong>{project.name}</strong>
-                <span>Prosjekt #{project.id}</span>
+                <span>
+                  Oppgave: {project.workItemTitle ?? `Prosjekt #${project.id}`}
+                </span>
               </div>
               <div style={{ position: "relative" }}>
-                {isOvertime(project.id, "mon") && (
+                {isOvertime(project.workItemId, "mon") && (
                   <span className="overtime-indicator">
                     +
-                    {(getNumericValue(project.id, "mon") - 7.5)
+                    {(getNumericValue(project.workItemId, "mon") - 7.5)
                       .toFixed(1)
                       .replace(".", ",")}
                     t
@@ -294,95 +328,95 @@ export function TimesheetPage() {
                 )}
 
                 <input
-                  value={hours[`${project.id}-mon`] ?? ""}
+                  value={hours[`${project.workItemId}-mon`] ?? ""}
                   placeholder="0,0"
                   onChange={(e) =>
-                    handleChange(project.id, "mon", e.target.value)
+                    handleChange(project.workItemId, "mon", e.target.value)
                   }
                 />
               </div>
               <div style={{ position: "relative" }}>
-                {isOvertime(project.id, "tue") && (
+                {isOvertime(project.workItemId, "tue") && (
                   <span className="overtime-indicator">
                     +
-                    {(getNumericValue(project.id, "tue") - 7.5)
+                    {(getNumericValue(project.workItemId, "tue") - 7.5)
                       .toFixed(1)
                       .replace(".", ",")}
                     t
                   </span>
                 )}
                 <input
-                  value={hours[`${project.id}-tue`] ?? ""}
+                  value={hours[`${project.workItemId}-tue`] ?? ""}
                   placeholder="0,0"
                   onChange={(e) =>
-                    handleChange(project.id, "tue", e.target.value)
+                    handleChange(project.workItemId, "tue", e.target.value)
                   }
                 />
               </div>
               <div style={{ position: "relative" }}>
-                {isOvertime(project.id, "wed") && (
+                {isOvertime(project.workItemId, "wed") && (
                   <span className="overtime-indicator">
                     +
-                    {(getNumericValue(project.id, "wed") - 7.5)
+                    {(getNumericValue(project.workItemId, "wed") - 7.5)
                       .toFixed(1)
                       .replace(".", ",")}
                     t
                   </span>
                 )}
                 <input
-                  value={hours[`${project.id}-wed`] ?? ""}
+                  value={hours[`${project.workItemId}-wed`] ?? ""}
                   placeholder="0,0"
                   onChange={(e) =>
-                    handleChange(project.id, "wed", e.target.value)
+                    handleChange(project.workItemId, "wed", e.target.value)
                   }
                 />
               </div>
               <div style={{ position: "relative" }}>
-                {isOvertime(project.id, "thu") && (
+                {isOvertime(project.workItemId, "thu") && (
                   <span className="overtime-indicator">
                     +
-                    {(getNumericValue(project.id, "thu") - 7.5)
+                    {(getNumericValue(project.workItemId, "thu") - 7.5)
                       .toFixed(1)
                       .replace(".", ",")}
                     t
                   </span>
                 )}
                 <input
-                  value={hours[`${project.id}-thu`] ?? ""}
+                  value={hours[`${project.workItemId}-thu`] ?? ""}
                   placeholder="0,0"
                   onChange={(e) =>
-                    handleChange(project.id, "thu", e.target.value)
+                    handleChange(project.workItemId, "thu", e.target.value)
                   }
                 />
               </div>
 
               <div style={{ position: "relative" }}>
-                {isOvertime(project.id, "fri") && (
+                {isOvertime(project.workItemId, "fri") && (
                   <span className="overtime-indicator">
                     +
-                    {(getNumericValue(project.id, "fri") - 7.5)
+                    {(getNumericValue(project.workItemId, "fri") - 7.5)
                       .toFixed(1)
                       .replace(".", ",")}
                     t
                   </span>
                 )}
                 <input
-                  value={hours[`${project.id}-fri`] ?? ""}
+                  value={hours[`${project.workItemId}-fri`] ?? ""}
                   placeholder="0,0"
                   onChange={(e) =>
-                    handleChange(project.id, "fri", e.target.value)
+                    handleChange(project.workItemId, "fri", e.target.value)
                   }
                 />
               </div>
               <div className="total">
-                {getRowTotal(project.id).toFixed(1).replace(".", ",")}
+                {getRowTotal(project.workItemId).toFixed(1).replace(".", ",")}
               </div>
 
               <button
                 className="delete-btn"
                 type="button"
                 aria-label="Slett rad"
-                onClick={() => removeProject(project.id)}
+                onClick={() => removeProject(project.workItemId)}
               >
                 <Trash2 size={22} />
               </button>
@@ -451,7 +485,12 @@ export function TimesheetPage() {
             <button
               className="close-btn"
               type="button"
-              onClick={() => setIsAddModalOpen(false)}
+              onClick={() => {
+                setIsAddModalOpen(false);
+                setSelectedProjectId("");
+                setSelectedWorkItemId("");
+                setWorkItems([]);
+              }}
             >
               ✕
             </button>
@@ -463,7 +502,22 @@ export function TimesheetPage() {
                 id="project-select"
                 className="dark-input"
                 value={selectedProjectId}
-                onChange={(e) => setSelectedProjectId(e.target.value)}
+                onChange={async (e) => {
+                  setSelectedProjectId(e.target.value);
+                  setSelectedWorkItemId("");
+                  if (e.target.value) {
+                    try {
+                      const items = await fetchWorkItems(
+                        Number(e.target.value),
+                      );
+                      setWorkItems(items);
+                    } catch (error) {
+                      console.error("Kunne ikke hente arbeidsoppgaver:", error);
+                    }
+                  } else {
+                    setWorkItems([]);
+                  }
+                }}
               >
                 <option value="">Velg prosjekt...</option>
                 {projects.map((project) => (
@@ -473,6 +527,25 @@ export function TimesheetPage() {
                 ))}
               </select>
             </div>
+
+            {workItems.length > 0 && (
+              <div className="input-group-row">
+                <label htmlFor="Arbeidsoppgave"></label>
+                <select
+                  id="workitem-select"
+                  className="dark-input"
+                  value={selectedWorkItemId}
+                  onChange={(e) => setSelectedWorkItemId(e.target.value)}
+                >
+                  <option value="">Velg Arbeidsoppgave...</option>
+                  {workItems.map((workItem) => (
+                    <option key={workItem.id} value={workItem.id}>
+                      {workItem.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div className="action-buttons">
               <button

@@ -7,13 +7,20 @@ export async function fetchTimeEntries(userId: number, weekStart: string) {
   return response.data;
 }
 
+export async function fetchWorkItems(projectId: number) {
+  const response = await api.get("api/work-items", {
+    params: { projectId },
+  });
+  return response.data;
+}
+
 export async function deleteTimeEntries(
   userId: number,
   weekStart: string,
-  projectId: number,
+  workItemId: number,
 ) {
   await api.delete("api/time-entries", {
-    params: { userId, weekStart, projectId },
+    params: { userId, weekStart, workItemId },
   });
 }
 
@@ -28,15 +35,17 @@ const DAY_OFFSET: Record<string, number> = {
 export async function saveTimeEntries(
   userId: number,
   weekStart: string,
-  projectId: number,
+  workItemId: number,
   hours: Record<string, string>,
 ) {
   const days = ["mon", "tue", "wed", "thu", "fri"];
 
   for (const day of days) {
-    const key = `${projectId}-${day}`;
+    const key = `${workItemId}-${day}`;
     const raw = hours[key] ?? "0";
     const parsedHours = parseFloat(raw.replace(",", ".")) || 0;
+
+    if (parsedHours === 0) continue;
 
     const entryDate = new Date(weekStart);
     entryDate.setDate(entryDate.getDate() + DAY_OFFSET[day]);
@@ -45,7 +54,7 @@ export async function saveTimeEntries(
     await api.post("/api/time-entries", {
       userId,
       weekStart,
-      projectId,
+      workItemId,
       entryDate: entryDateStr,
       hours: parsedHours,
       description: "",

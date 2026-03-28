@@ -9,11 +9,14 @@ type AbsenceFormProps = {
   absenceType: string;
   description: string;
   projectId: number | null;
+  workItems: { id: number; title: string }[];
+  workItemId: number | null;
   onHoursChange: (hours: Record<string, string>) => void;
   onRangeChange: (startDate: Date, endDate: Date) => void;
   onTypeChange: (type: string) => void;
   onDescriptionChange: (description: string) => void;
   onProjectChange: (projectId: number) => void;
+  onWorkItemChange: (workItemId: number) => void;
   onSave: () => void;
   projects: Project[];
 };
@@ -23,11 +26,13 @@ export default function AbsenceForm({
   absenceType,
   description,
   projectId,
+  workItems,
   onHoursChange,
   onRangeChange,
   onTypeChange,
   onDescriptionChange,
   onProjectChange,
+  onWorkItemChange,
   onSave,
   projects,
 }: AbsenceFormProps) {
@@ -54,6 +59,24 @@ export default function AbsenceForm({
           ))}
         </select>
       </div>
+
+      {workItems.length > 0 && (
+        <div className="input-group-row">
+          <label>Arbeidsoppgave:</label>
+          <select
+            className="dark-input"
+            value={projectId ?? ""}
+            onChange={(e) => onWorkItemChange(Number(e.target.value))}
+          >
+            <option value="">Velg Arbeidsoppgave...</option>
+            {workItems.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.title}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div className="input-group-row">
         <label>Årsak til fravær:</label>
@@ -85,7 +108,7 @@ export default function AbsenceForm({
 
       <div style={{ display: "flex", gap: "40px", marginTop: "16px" }}>
         <div className="input-group-row">
-          <label>Beskrivelse</label>
+          <label>Beskrivelse:</label>
           <textarea
             className="dark-input"
             placeholder="Beskrivelse..."

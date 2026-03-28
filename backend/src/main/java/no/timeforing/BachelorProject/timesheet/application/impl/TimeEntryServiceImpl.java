@@ -37,7 +37,7 @@ public class TimeEntryServiceImpl implements TimeEntryService {
     public TimeEntry upsertTimeEntry(
             Long userId,
             LocalDate weekStart,
-            Long projectId,
+            Long workItemId,
             LocalDate entryDate,
             double hours,
             String description) {
@@ -59,8 +59,8 @@ public class TimeEntryServiceImpl implements TimeEntryService {
         }
 
         WorkItem workItem = workItemRepository
-                .findFirstByProjectId(projectId)
-                .orElseThrow(() -> new IllegalArgumentException("WorkItem not found for project: " + projectId));
+                .findById(workItemId)
+                .orElseThrow(() -> new IllegalArgumentException("WorkItem not found for project: " + workItemId));
 
         return timeEntryRepository
                 .findByTimesheetIdAndWorkItemIdAndEntryDate(ts.getId(), workItem.getId(), entryDate)
@@ -86,16 +86,13 @@ public class TimeEntryServiceImpl implements TimeEntryService {
     }
 
     @Override
-    public void deleteEntries(Long userId, LocalDate weekStart, Long projectId) {
-        Timesheet ts = timesheetRepository
+    public void deleteEntries(Long userId, LocalDate weekStart, Long workItemId) {
+        timesheetRepository
                 .findByUserIdAndWeekStart(userId, weekStart)
-                .orElseThrow(() -> new IllegalArgumentException("Timesheet not found for user/week"));
-
-        WorkItem workItem = workItemRepository
-                .findFirstByProjectId(projectId)
-                .orElseThrow(() -> new IllegalArgumentException("WorkItem not found for project: " + projectId));
-
-        List<TimeEntry> entries = timeEntryRepository.findByTimesheetIdAndWorkItemId(ts.getId(), workItem.getId());
-        timeEntryRepository.deleteAll(entries);
+                .ifPresent(ts -> {
+                    List<TimeEntry> entries = timeEntryRepository
+                            .findByTimesheetIdAndWorkItemId(ts.getId(), workItemId);
+                    timeEntryRepository.deleteAll(entries);
+                });
     }
 }

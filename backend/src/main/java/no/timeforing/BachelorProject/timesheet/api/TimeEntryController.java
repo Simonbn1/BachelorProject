@@ -21,7 +21,7 @@ public class TimeEntryController {
     public TimeEntry upsert(@RequestBody UpsertTimeEntryRequest req, JwtAuthenticationToken auth) {
         Long effectiveUserId = effectiveUserId(req.userId, auth);
         return timeEntryService.upsertTimeEntry(
-                effectiveUserId, req.weekStart, req.projectId, req.entryDate, req.hours, req.description);
+                effectiveUserId, req.weekStart, req.workItemId, req.entryDate, req.hours, req.description);
     }
 
     @GetMapping
@@ -44,11 +44,11 @@ public class TimeEntryController {
 
     @DeleteMapping
     public void delete (
-            @RequestParam Long projectId,
+            @RequestParam Long workItemId,
             @RequestParam String weekStart,
             @RequestParam(required = false) Long userId,
             JwtAuthenticationToken auth) {
         Long effectiveUserId = effectiveUserId(userId, auth);
-        timeEntryService.deleteEntries(effectiveUserId, java.time.LocalDate.parse(weekStart), projectId);
+        timeEntryService.deleteEntries(effectiveUserId, java.time.LocalDate.parse(weekStart), workItemId);
     }
 }

@@ -1,29 +1,20 @@
 INSERT INTO projects (customer, name)
 VALUES
-    ('Bertel O. Steen', 'Vedlikehold'),
-    ('Accenture', 'Intern Utvikling'),
-    ('Accenture', 'Kundestøtte'),
-    ('Telenor', 'Systemintegrasjon'),
-    ('Telenor', 'Infrastruktur'),
-    ('DNB', 'Digital transformasjon'),
-    ('DNB', 'Sikkerhetsrevisjon'),
-    ('DNB', 'Dataanalyse'),
-    ('Equinor', 'Feltoperasjoner'),
-    ('Bouvet', 'Webutiklving')
+   ('Accenture', 'Intern Utvikling'),
+   ('Telenor', 'Systemintegrasjon'),
+   ('DNB', 'Digital transformasjon')
 ON CONFLICT DO NOTHING;
 
 INSERT INTO work_items (external_id, title, project_id)
 VALUES
-    ('Bertel O. Steen', 'Vedlikehold', 1),
-    ('Accenture', 'Intern Utvikling', 2),
-    ('Accenture', 'Kundestøtte', 3),
-    ('Telenor', 'Systemintegrasjon', 4),
-    ('Telenor', 'Infrastruktur', 5),
-    ('DNB', 'Digital transformasjon', 6),
-    ('DNB', 'Sikkerhetsrevisjon', 7),
-    ('DNB', 'Dataanalyse', 8),
-    ('Equinor', 'Feltoperasjoner', 9),
-    ('Bouvet', 'Webutiklving', 10)
+    ('ACC-001', 'Frontend utvikling', 1),
+    ('ACC-002', 'Backend utvikling', 1),
+    ('ACC-003', 'Testing og QA', 1),
+    ('TEL-001', 'API integrasjon', 2),
+    ('TEL-002', 'Databasemigrering', 2),
+    ('DNB-001', 'Sikkerhetsrevisjon', 3),
+    ('DNB-002', 'UI design', 3),
+    ('DNB-003', 'Dataanlyse', 3)
 ON CONFLICT DO NOTHING;
 
 
