@@ -15,7 +15,12 @@ export default function LoginPage() {
     try {
       const res = await login(email, password);
       saveAuth(res);
-      navigate("/timesheet", { replace: true });
+
+      if (res.user.roles.includes("ADMIN")) {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/timesheet", { replace: true });
+      }
     } catch (err) {
       console.error(err);
       alert("Login failed");

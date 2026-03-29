@@ -7,4 +7,5 @@ public class RegisterRequest {
     @NotBlank public String displayName;
     @NotBlank @Email public String email;
     @NotBlank public String password;
+    @NotBlank public String role;
 }
