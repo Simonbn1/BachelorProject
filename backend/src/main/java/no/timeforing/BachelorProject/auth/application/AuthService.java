@@ -6,7 +6,6 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import jakarta.validation.constraints.NotBlank;
 import no.timeforing.BachelorProject.auth.dto.LoginResponse;
 import no.timeforing.BachelorProject.user.domain.User;
 import no.timeforing.BachelorProject.user.repository.UserRepository;
@@ -45,7 +44,7 @@ public class AuthService {
     }
 
     @Transactional
-    public LoginResponse register(String displayName, String email, String password, @NotBlank String role) {
+    public LoginResponse register(String displayName, String email, String password) {
         String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
 
         if (userRepository.findByEmail(normalizedEmail).isPresent()) {

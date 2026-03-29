@@ -24,7 +24,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public LoginResponse register(@Valid @RequestBody RegisterRequest req) {
-        return authService.register(req.displayName, req.email, req.password, req.role);
+        return authService.register(req.displayName, req.email, req.password);
     }
 
     @PostMapping("/login")
