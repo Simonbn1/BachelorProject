@@ -61,6 +61,7 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/projects", "/api/projects/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/time-entries", "/api/time-entries/**").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/approvals/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

@@ -1,0 +1,189 @@
+.admin-page {
+  min-height: 100vh;
+  padding: 32px;
+  color: #f5f7ff;
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(90, 110, 255, 0.18),
+      transparent 30%
+    ),
+    linear-gradient(135deg, #1c1f2a 0%, #2a2f45 100%);
+}
+
+.admin-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.admin-eyebrow {
+  margin: 0 0 8px;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.admin-page-header h1 {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.1;
+}
+
+.admin-subtitle {
+  margin-top: 10px;
+  max-width: 700px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.admin-filter-card,
+.admin-table-card,
+.admin-info-card,
+.admin-error-card,
+.admin-empty-state {
+  background: rgba(20, 24, 40, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(12px);
+}
+
+.admin-filter-card {
+  min-width: 220px;
+  padding: 18px;
+}
+
+.admin-filter-card label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.admin-filter-card input {
+  width: 100%;
+  padding: 10px 12px;
+  color: #f5f7ff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+}
+
+.admin-table-card {
+  overflow: hidden;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 18px 20px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.admin-table th {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.admin-table td {
+  color: #eef2ff;
+}
+
+.admin-user-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-user-name {
+  font-weight: 600;
+}
+
+.admin-user-email {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-pill.not-sent {
+  background: rgba(130, 130, 130, 0.18);
+  color: #d6d6d6;
+}
+
+.status-pill.sent {
+  background: rgba(255, 184, 77, 0.18);
+  color: #ffd089;
+}
+
+.status-pill.approved {
+  background: rgba(86, 214, 139, 0.18);
+  color: #8df0b2;
+}
+
+.status-pill.rejected {
+  background: rgba(255, 99, 99, 0.18);
+  color: #ff9d9d;
+}
+
+.admin-secondary-button {
+  padding: 10px 14px;
+  color: #f5f7ff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.admin-secondary-button:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.admin-info-card,
+.admin-error-card,
+.admin-empty-state {
+  margin-top: 18px;
+  padding: 18px;
+}
+
+.admin-error-card {
+  color: #ffb4b4;
+}
+
+@media (max-width: 900px) {
+  .admin-page {
+    padding: 20px;
+  }
+
+  .admin-page-header {
+    flex-direction: column;
+  }
+
+  .admin-filter-card {
+    width: 100%;
+  }
+
+  .admin-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
