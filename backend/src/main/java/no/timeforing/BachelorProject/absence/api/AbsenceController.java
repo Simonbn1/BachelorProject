@@ -21,7 +21,7 @@ public class AbsenceController {
     public Absence upsert(@RequestBody UpsertAbsenceRequest req, JwtAuthenticationToken auth) {
         Long effectiveUserId = effectiveUserId(req.userId, auth);
         return absenceService.upsertAbsence(
-                effectiveUserId, req.weekStart, req.absenceDate, req.type, req.description, req.hours, req.projectId);
+                effectiveUserId, req.weekStart, req.absenceDate, req.type, req.description, req.hours, req.projectId, req.workItemId);
     }
 
     @GetMapping

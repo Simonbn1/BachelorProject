@@ -40,12 +40,16 @@ public class Absence {
   @Column(nullable = false)
   private Long projectId;
 
-  public Absence(Timesheet timesheet, LocalDate absenceDate, AbsenceType type, String description, double hours, Long projectId) {
+  @Column(nullable = false)
+  private Long workItemId;
+
+  public Absence(Timesheet timesheet, LocalDate absenceDate, AbsenceType type, String description, double hours, Long projectId,  Long workItemId) {
     this.timesheet = timesheet;
     this.absenceDate = absenceDate;
     this.type = type;
     this.description = description;
     this.hours = hours;
     this.projectId = projectId;
+    this.workItemId = workItemId;
   }
 }

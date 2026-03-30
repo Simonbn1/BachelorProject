@@ -21,6 +21,7 @@ async function postAbsence(
   absenceType: string,
   description: string,
   projectId: number,
+  workItemId: number,
   weekStart: string,
   absenceDateStr: string,
   hours: number,
@@ -34,6 +35,7 @@ async function postAbsence(
       description,
       hours,
       projectId,
+      workItemId,
     });
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 500) {
@@ -58,6 +60,7 @@ export async function saveAbsences(
   absenceType: string,
   description: string,
   projectId: number,
+  workItemId: number,
   startDate: Date | null,
   endDate: Date | null,
   hours: Record<string, string>,
@@ -74,6 +77,7 @@ export async function saveAbsences(
           absenceType,
           description,
           projectId,
+          workItemId,
           getMonday(cur),
           formatDate(cur),
           7.5,
@@ -95,6 +99,7 @@ export async function saveAbsences(
         absenceType,
         description,
         projectId,
+        workItemId,
         weekStart,
         formatDate(absenceDate),
         parsedHours,

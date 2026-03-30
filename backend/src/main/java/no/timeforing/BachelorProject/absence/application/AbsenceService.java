@@ -7,7 +7,7 @@ import no.timeforing.BachelorProject.absence.domain.enums.AbsenceType;
 
 public interface AbsenceService {
   Absence upsertAbsence(
-      Long userId, LocalDate weekStart, LocalDate absenceDate, AbsenceType type, String description,double hours, Long projectId);
+      Long userId, LocalDate weekStart, LocalDate absenceDate, AbsenceType type, String description,double hours, Long projectId, Long workItemId);
 
   List<Absence> listAbsences(Long userId, LocalDate weekStart);
 }

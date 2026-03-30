@@ -44,7 +44,7 @@ public class AbsenceServiceImpl implements AbsenceService {
 
   @Override
   public Absence upsertAbsence(
-      Long userId, LocalDate weekStart, LocalDate absenceDate, AbsenceType type, String description, double hours, Long projectId) {
+      Long userId, LocalDate weekStart, LocalDate absenceDate, AbsenceType type, String description, double hours, Long projectId, Long workItemId) {
     if (hours < 0) throw new IllegalArgumentException("Hours cannot be negative.");
 
     Timesheet ts = findOrCreateTimesheet(userId, weekStart);
@@ -59,19 +59,31 @@ public class AbsenceServiceImpl implements AbsenceService {
             .mapToDouble(no.timeforing.BachelorProject.timesheet.domain.TimeEntry::getHours)
             .sum();
 
+    double MAX_DAILY_HOURS = 7.5;
     if (existingHours > 0) {
-        throw new IllegalStateException(
-                "Bruker har allerede registrert " + existingHours + " timer for " + absenceDate + ". Kan ikke registrer fravær."
-        );
+        double remaining = MAX_DAILY_HOURS - existingHours;
+        if (remaining <= 0) {
+            throw new IllegalStateException(
+                    "Kan ikke registrere fravær for " + absenceDate + ": dagen er allerede fult registrert (" + existingHours + "t)."
+            );
+        }
+
+        if (hours > remaining) {
+            throw new IllegalStateException(
+                    "kan ikke registrere " + hours + "t fravær for " + absenceDate +
+                            ": brukeren har allerede " + existingHours + "t, maks er " + MAX_DAILY_HOURS + "t."
+            );
+        }
     }
 
     Absence absence = absenceRepository
             .findByTimesheetIdAndAbsenceDateAndType(ts.getId(), absenceDate, type)
-            .orElse(new Absence(ts, absenceDate, type, description, hours, projectId));
+            .orElse(new Absence(ts, absenceDate, type, description, hours, projectId, workItemId));
 
     absence.setHours(hours);
     absence.setDescription(description);
     absence.setProjectId(projectId);
+    absence.setWorkItemId(workItemId);
 
     return absenceRepository.save(absence);
   }

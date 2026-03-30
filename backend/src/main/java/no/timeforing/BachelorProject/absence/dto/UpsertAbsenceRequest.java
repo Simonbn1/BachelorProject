@@ -11,4 +11,5 @@ public class UpsertAbsenceRequest {
   public String description;
   public double hours;
   public long projectId;
+  public long workItemId;
 }

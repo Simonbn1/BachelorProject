@@ -19,6 +19,8 @@ type AbsenceFormProps = {
   onWorkItemChange: (workItemId: number) => void;
   onSave: () => void;
   projects: Project[];
+  lockedDays: Record<string, number>;
+  hasAbsenceParams: boolean;
 };
 
 export default function AbsenceForm({
@@ -35,6 +37,8 @@ export default function AbsenceForm({
   onWorkItemChange,
   onSave,
   projects,
+  lockedDays,
+  hasAbsenceParams,
 }: AbsenceFormProps) {
   useEffect(() => {
     if (absenceType !== "VACATION" && absenceType !== "LEAVE") {
@@ -46,12 +50,17 @@ export default function AbsenceForm({
     <>
       <div className="input-group-row">
         <label>Prosjekt:</label>
+
         <select
           className="dark-input"
           value={projectId ?? ""}
           onChange={(e) => onProjectChange(Number(e.target.value))}
         >
-          <option value="">Velg Prosjekt...</option>
+          <option value="">
+            {projects.length === 0
+              ? "Registrer timer i timeplanen først"
+              : "Velg Prosjekt..."}
+          </option>
           {projects.map((project) => (
             <option key={project.id} value={project.id}>
               {project.name}
@@ -101,7 +110,12 @@ export default function AbsenceForm({
           onRangeChange={onRangeChange}
         />
       ) : (
-        <DayHoursInput hours={hours} onHoursChange={onHoursChange} />
+        <DayHoursInput
+          hours={hours}
+          onHoursChange={onHoursChange}
+          lockedDays={lockedDays}
+          hasAbsenceParams={hasAbsenceParams}
+        />
       )}
 
       <hr className="modal-divider" />

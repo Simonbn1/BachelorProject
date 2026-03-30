@@ -174,6 +174,23 @@ export function TimesheetPage() {
     );
   }
 
+  function buildAbsenceParams(): URLSearchParams {
+    const days = ["mon", "tue", "wed", "thu", "fri"];
+    const params = new URLSearchParams();
+    for (const day of days) {
+      const totalWorked = visibleProjects.reduce(
+        (sum, project) => sum + getNumericValue(project.workItemId, day),
+        0,
+      );
+      if (totalWorked > 0 && totalWorked < 7.5) {
+        params.set(day, String(7.5 - totalWorked));
+      } else if (totalWorked === 0) {
+        params.set(day, "7.5");
+      }
+    }
+    return params;
+  }
+
   function addSelectedProject() {
     const projectId = Number(selectedProjectId);
     const workItemId = Number(selectedWorkItemId);
@@ -219,10 +236,21 @@ export function TimesheetPage() {
       const confirm = window.confirm(absenceMessage);
 
       if (confirm) {
-        navigate("/absence");
+        try {
+          for (const project of visibleProjects) {
+            await saveTimeEntries(userId, weekStart, project.workItemId, hours);
+          }
+        } catch (error) {
+          console.error("Feil ved lagring:", error);
+          alert("Noe gikkm galt ved lagring. Sjekk konsollen.");
+          return;
+        }
+
+        navigate(`/absence?${buildAbsenceParams().toString()}`);
         return;
       } else {
         setShowAbsencePrompt(true);
+        return;
       }
     }
 
@@ -436,7 +464,9 @@ export function TimesheetPage() {
                 <button
                   className="add-project"
                   type="button"
-                  onClick={() => navigate("/absence")}
+                  onClick={() => {
+                    navigate(`/absence?${buildAbsenceParams().toString()}`);
+                  }}
                   style={{ borderColor: "rgba(198, 0, 255, 0.6" }}
                 >
                   Registrer fravær?

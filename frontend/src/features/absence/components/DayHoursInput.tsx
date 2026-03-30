@@ -9,11 +9,15 @@ const DAYS = [
 type DayHoursInputProps = {
   hours: Record<string, string>;
   onHoursChange: (hours: Record<string, string>) => void;
+  lockedDays?: Record<string, number>;
+  hasAbsenceParams?: boolean;
 };
 
 export default function DayHoursInput({
   hours,
   onHoursChange,
+  lockedDays = {},
+  hasAbsenceParams = false,
 }: DayHoursInputProps) {
   const total = DAYS.reduce((sum, { key }) => {
     return sum + (parseFloat((hours[key] ?? "0").replace(",", ".")) || 0);
@@ -29,16 +33,45 @@ export default function DayHoursInput({
     <div className="input-group-row">
       <label>Timer denne uka:</label>
       <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-        {DAYS.map(({ key, label }) => (
-          <input
-            key={key}
-            className="dark-input"
-            value={hours[key] ?? ""}
-            onChange={(e) => handleDayChange(key, e.target.value)}
-            placeholder={label}
-            style={{ width: "70px", textAlign: "center" }}
-          />
-        ))}
+        {DAYS.map(({ key, label }) => {
+          const isLocked = hasAbsenceParams && !(key in lockedDays);
+          const missing = lockedDays[key];
+          return (
+            <div
+              key={key}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "4px",
+                alignItems: "center",
+              }}
+            >
+              {hasAbsenceParams && missing !== undefined && (
+                <span
+                  style={{
+                    fontSize: "0.7rem",
+                    color: "#f59e0b",
+                  }}
+                >
+                  mangler {String(missing).replace(".", ",")}t
+                </span>
+              )}
+              <input
+                className="dark-input"
+                value={hours[key] ?? ""}
+                onChange={(e) => handleDayChange(key, e.target.value)}
+                placeholder={label}
+                disabled={isLocked}
+                style={{
+                  width: "70px",
+                  textAlign: "center",
+                  opacity: isLocked ? 0.35 : 1,
+                  cursor: isLocked ? "not-allowed" : "text",
+                }}
+              />
+            </div>
+          );
+        })}
         <input
           className="dark-input"
           placeholder="Totalt"
