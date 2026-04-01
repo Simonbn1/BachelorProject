@@ -1,5 +1,6 @@
 import { api } from "../../../shared/api/client.ts";
 import axios from "axios";
+import type { AbsencePayloadEntry } from "../pages/AbsencePage.tsx";
 
 function formatDate(date: Date): string {
   const year = date.getFullYear();
@@ -103,6 +104,34 @@ export async function saveAbsences(
         weekStart,
         formatDate(absenceDate),
         parsedHours,
+      );
+    }
+  }
+}
+
+export async function saveAbsencesFromPayload(
+  userId: number,
+  absenceType: string,
+  description: string,
+  payload: AbsencePayloadEntry[],
+) {
+  for (const entry of payload) {
+    for (const [day, missing] of Object.entries(entry.missingHours)) {
+      if (!missing || missing <= 0) continue;
+
+      const weekStart = getMonday(new Date());
+      const absenceDate = new Date(weekStart);
+      absenceDate.setDate(absenceDate.getDate() + DAY_OFFSETS[day]);
+
+      await postAbsence(
+        userId,
+        absenceType,
+        description,
+        entry.projectId,
+        entry.workItemId,
+        weekStart,
+        formatDate(absenceDate),
+        missing,
       );
     }
   }

@@ -2,11 +2,18 @@ import TopBar from "../../../shared/components/TopBar.tsx";
 import "../../../features/timesheets/styles/TimesheetPage.css";
 import AbsenceForm from "../components/AbsenceForm.tsx";
 import { useEffect, useState, useCallback } from "react";
-import { saveAbsences } from "../api/absenceApi.ts";
+import { saveAbsences, saveAbsencesFromPayload } from "../api/absenceApi.ts";
 import type { Project } from "../../projects/types/projects.ts";
 import { fetchTimeEntries } from "../../timesheets/api/timesheetsApi.ts";
 import { useTimesheetWeek } from "../../timesheets/hooks/useTimesheetWeek.ts";
-import { useSearchParams } from "react-router-dom";
+
+export type AbsencePayloadEntry = {
+  projectId: number;
+  workItemId: number;
+  workItemTitle: string;
+  projectName: string;
+  missingHours: Record<string, number>;
+};
 
 export default function AbsencePage() {
   const [hours, setHours] = useState<Record<string, string>>({});
@@ -19,7 +26,9 @@ export default function AbsencePage() {
   const [workItems, setWorkItems] = useState<{ id: number; title: string }[]>(
     [],
   );
-  const [searchParams] = useSearchParams();
+  const [absencePayload, setAbsencePayload] = useState<
+    AbsencePayloadEntry[] | null
+  >(null);
   const [workItemId, setWorkItemId] = useState<number | null>(null);
   const [hasTimeEntries, setHasTimeEntries] = useState(false);
   const { weekStart } = useTimesheetWeek();
@@ -34,30 +43,30 @@ export default function AbsencePage() {
     setSelectedEndDate(end);
   }, []);
 
-  const missingHoursFromParams: Record<string, number> = {};
-  const days = ["mon", "tue", "wed", "thu", "fri"];
-  for (const day of days) {
-    const val = searchParams.get(day);
-    if (val) missingHoursFromParams[day] = parseFloat(val);
-  }
-  const hasAbsenceParams = Object.keys(missingHoursFromParams).length > 0;
-
   useEffect(() => {
-    if (hasAbsenceParams) {
+    const raw = sessionStorage.getItem("absencePayload");
+    if (raw) {
+      const payload: AbsencePayloadEntry[] = JSON.parse(raw);
+      sessionStorage.removeItem("absencePayload");
+
       const prefilled: Record<string, string> = {};
-      for (const [day, missing] of Object.entries(missingHoursFromParams)) {
-        prefilled[day] = String(missing).replace(",", ".");
+      for (const entry of payload) {
+        for (const [day, missing] of Object.entries(entry.missingHours)) {
+          const existing = parseFloat(prefilled[day] ?? "0");
+          prefilled[day] = String(parseFloat((existing + missing).toFixed(1)));
+        }
       }
-      setHours(prefilled);
+      setAbsencePayload(payload);
       setAbsenceType("SICKNESS");
+      setHours(prefilled);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, []);
 
   useEffect(() => {
+    const userId = Number(localStorage.getItem("userId") ?? "1");
+    if (absencePayload) return;
     async function loadSavedEntries() {
       try {
-        const userId = Number(localStorage.getItem("userId") ?? "1");
         const entries = await fetchTimeEntries(userId, weekStart);
 
         if (entries.length === 0) {
@@ -100,14 +109,39 @@ export default function AbsencePage() {
       }
     }
     loadSavedEntries();
-  }, [weekStart]);
+  }, [weekStart, absencePayload]);
 
   const handleHoursChange = useCallback((updated: Record<string, string>) => {
     setHours(updated);
   }, []);
 
   async function handleSave() {
+    const userId = Number(localStorage.getItem("userId") ?? "1");
     const isRangeBased = absenceType === "VACATION" || absenceType === "LEAVE";
+
+    if (!absenceType) {
+      alert("Velg årsak til fravær først.");
+      return;
+    }
+
+    if (absencePayload) {
+      try {
+        await saveAbsencesFromPayload(
+          userId,
+          absenceType,
+          description,
+          absencePayload,
+        );
+        alert("Fravær lagret");
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Noe gikk galt. Sjekk konsollen";
+        alert(message);
+      }
+      return;
+    }
 
     if (!isRangeBased && !hasTimeEntries) {
       alert("Du må registrere timer i timeplanen før du kan registrer fravær.");
@@ -122,13 +156,6 @@ export default function AbsencePage() {
       alert("Velg en arbeidsoppgave først.");
       return;
     }
-
-    if (!absenceType) {
-      alert("Velg årsak til fravær først.");
-      return;
-    }
-
-    const userId = Number(localStorage.getItem("userId") ?? "1");
 
     if (isRangeBased && (!selectedStartDate || !selectedEndDate)) {
       alert("Velg en periode først.");
@@ -162,11 +189,61 @@ export default function AbsencePage() {
     }
   }
 
+  const lockedDaysFromPayload: Record<string, number> = {};
+  if (absencePayload) {
+    for (const entry of absencePayload) {
+      for (const [day, missing] of Object.entries(entry.missingHours)) {
+        lockedDaysFromPayload[day] = missing;
+      }
+    }
+  }
+
   return (
     <div className="page">
       <div className="timesheet-shell">
         <TopBar />
         <section className="timesheet-card">
+          {absencePayload && (
+            <div
+              style={{
+                marginBottom: "16px",
+                padding: "12px 16px",
+                background: "rgba(255,255,255, 0.05)",
+                borderRadius: "8px",
+              }}
+            >
+              <p
+                style={{
+                  margin: "0 0 8px",
+                  fontSize: "0.85rem",
+                  color: "rgba(255,255,255,0.5)",
+                }}
+              >
+                Fravær registreres for:
+              </p>
+              {absencePayload.map((entry) => (
+                <div
+                  key={entry.workItemId}
+                  style={{ fontSize: "0.9rem", marginBottom: "4px" }}
+                >
+                  <strong>{entry.projectName}</strong> - {entry.workItemTitle}
+                  <span
+                    style={{
+                      marginLeft: "8px",
+                      color: "rgba(255,255,255,0.4)",
+                      fontSize: "0.8rem",
+                    }}
+                  >
+                    (
+                    {Object.entries(entry.missingHours)
+                      .map(([day, h]) => `${day}: ${h}t`)
+                      .join(", ")}
+                    )
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
           <AbsenceForm
             hours={hours}
             absenceType={absenceType}
@@ -182,8 +259,9 @@ export default function AbsencePage() {
             onProjectChange={handleProjectChange}
             onWorkItemChange={(id) => setWorkItemId(id)}
             onSave={handleSave}
-            lockedDays={missingHoursFromParams}
-            hasAbsenceParams={hasAbsenceParams}
+            lockedDays={absencePayload ? lockedDaysFromPayload : {}}
+            hasAbsenceParams={!!absencePayload}
+            hideProjectFields={!!absencePayload}
           />
         </section>
       </div>

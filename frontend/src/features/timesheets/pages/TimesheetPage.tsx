@@ -13,6 +13,7 @@ import "../styles/TimesheetHeader.css";
 import { DatePicker, type DatesRangeValue } from "@mantine/dates";
 import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import MultiSelectDropdown from "../components/MultiSelectDropdown.tsx";
 
 type HoursState = Record<string, string>;
 type ProjectWithWorkItem = Project & {
@@ -33,7 +34,10 @@ export function TimesheetPage() {
   const [workItems, setWorkItems] = useState<{ id: number; title: string }[]>(
     [],
   );
-  const [selectedWorkItemId, setSelectedWorkItemId] = useState("");
+  const [selectedWorkItemId, setSelectedWorkItemId] = useState<number[]>([]);
+  const [excludedFromAbsence, setExcludedFromAbsence] = useState<
+    Record<string, boolean>
+  >({});
 
   const { weekStart, weekLabel, weekNumber, goToPreviousWeek, goToNextWeek } =
     useTimesheetWeek();
@@ -174,50 +178,90 @@ export function TimesheetPage() {
     );
   }
 
-  function buildAbsenceParams(): URLSearchParams {
+  function buildAbsencePayload() {
     const days = ["mon", "tue", "wed", "thu", "fri"];
-    const params = new URLSearchParams();
+
+    const result: {
+      projectId: number;
+      workItemId: number;
+      workItemTitle: string;
+      projectName: string;
+      missingHours: Record<string, number>;
+    }[] = [];
+
     for (const day of days) {
       const totalWorked = visibleProjects.reduce(
         (sum, project) => sum + getNumericValue(project.workItemId, day),
         0,
       );
-      if (totalWorked > 0 && totalWorked < 7.5) {
-        params.set(day, String(7.5 - totalWorked));
-      } else if (totalWorked === 0) {
-        params.set(day, "7.5");
+
+      if (totalWorked >= 7.5) continue;
+
+      const missing = parseFloat((7.5 - totalWorked).toFixed(1));
+
+      const responsibleProject = visibleProjects.find(
+        (p) => !excludedFromAbsence[`${p.workItemId}-${day}`],
+      );
+
+      if (!responsibleProject) continue;
+
+      const existing = result.find(
+        (r) => r.workItemId === responsibleProject.workItemId,
+      );
+
+      if (existing) {
+        existing.missingHours[day] = missing;
+      } else {
+        result.push({
+          projectId: responsibleProject.id,
+          workItemId: responsibleProject.workItemId,
+          workItemTitle: responsibleProject.workItemTitle ?? "",
+          projectName: responsibleProject.name,
+          missingHours: { [day]: missing },
+        });
       }
     }
-    return params;
+    return result;
+  }
+
+  function toggleExcludedFromAbsence(workItemId: number, day: string) {
+    const key = `${workItemId}-${day}`;
+    setExcludedFromAbsence((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  }
+
+  function navigateToAbsence() {
+    const payload = buildAbsencePayload();
+    sessionStorage.setItem("absencePayload", JSON.stringify(payload));
+    navigate("/absence");
   }
 
   function addSelectedProject() {
     const projectId = Number(selectedProjectId);
-    const workItemId = Number(selectedWorkItemId);
     const projectToAdd = projects.find((project) => project.id === projectId);
-    const workItemToAdd = workItems.find((w) => w.id === workItemId);
 
-    if (!projectToAdd || !workItemToAdd) {
-      return;
+    if (!projectToAdd || selectedWorkItemId.length === 0) return;
+
+    for (const workItemId of selectedWorkItemId) {
+      const workItemToAdd = workItems.find((w) => w.id === workItemId);
+      if (!workItemToAdd) continue;
+
+      const alreadyExists = visibleProjects.some(
+        (project) => project.workItemId === workItemId,
+      );
+      if (alreadyExists) continue;
+
+      setVisibleProjects((prev) => [
+        ...prev,
+        { ...projectToAdd, workItemId, workItemTitle: workItemToAdd.title },
+      ]);
     }
 
-    const alreadyExists = visibleProjects.some(
-      (project) => project.workItemId === workItemId,
-    );
-
-    if (alreadyExists) {
-      setIsAddModalOpen(false);
-      setSelectedProjectId("");
-      setWorkItems([]);
-      return;
-    }
-
-    setVisibleProjects((prev) => [
-      ...prev,
-      { ...projectToAdd, workItemId, workItemTitle: workItemToAdd.title },
-    ]);
     setIsAddModalOpen(false);
     setSelectedProjectId("");
+    setSelectedWorkItemId([]);
     setWorkItems([]);
   }
 
@@ -242,11 +286,47 @@ export function TimesheetPage() {
           }
         } catch (error) {
           console.error("Feil ved lagring:", error);
-          alert("Noe gikkm galt ved lagring. Sjekk konsollen.");
+          alert("Noe gikk galt ved lagring. Sjekk konsollen.");
           return;
         }
 
-        navigate(`/absence?${buildAbsenceParams().toString()}`);
+        const days = ["mon", "tue", "wed", "thu", "fri"];
+        const conflictingDays: string[] = [];
+
+        for (const day of days) {
+          const totalWorked = visibleProjects.reduce(
+            (sum, project) => sum + getNumericValue(project.workItemId, day),
+            0,
+          );
+
+          if (totalWorked >= 7.5) continue;
+
+          const eligibleProjects = visibleProjects.filter(
+            (p) => !excludedFromAbsence[`${p.workItemId}-${day}`],
+          );
+
+          if (eligibleProjects.length > 1) {
+            conflictingDays.push(day);
+          }
+        }
+
+        if (conflictingDays.length > 0) {
+          const dayLabels: Record<string, string> = {
+            mon: "Mandag",
+            tue: "Tirsdag",
+            wed: "Onsdag",
+            thu: "Tirsdag",
+            fri: "Fredag",
+          };
+          const dayNames = conflictingDays.map((d) => dayLabels[d]).join(", ");
+          alert(
+            `Flere prosjekter konkurrerer om fravær for: ${dayNames}.\n\nHøyreklikk på dagen du ikke vil registrere fravær for å eksludere den.`,
+          );
+          setShowAbsencePrompt(true);
+          return;
+        }
+
+        navigateToAbsence();
         return;
       } else {
         setShowAbsencePrompt(true);
@@ -361,6 +441,18 @@ export function TimesheetPage() {
                   onChange={(e) =>
                     handleChange(project.workItemId, "mon", e.target.value)
                   }
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    toggleExcludedFromAbsence(project.workItemId, "mon");
+                  }}
+                  style={{
+                    opacity: excludedFromAbsence[`${project.workItemId}-mon}`]
+                      ? 0.3
+                      : 1,
+                    cursor: excludedFromAbsence[`${project.workItemId}-mon`]
+                      ? "not-allowed"
+                      : "text",
+                  }}
                 />
               </div>
               <div style={{ position: "relative" }}>
@@ -379,6 +471,18 @@ export function TimesheetPage() {
                   onChange={(e) =>
                     handleChange(project.workItemId, "tue", e.target.value)
                   }
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    toggleExcludedFromAbsence(project.workItemId, "tue");
+                  }}
+                  style={{
+                    opacity: excludedFromAbsence[`${project.workItemId}-tue`]
+                      ? 0.3
+                      : 1,
+                    cursor: excludedFromAbsence[`${project.workItemId}-tue`]
+                      ? "not-allowed"
+                      : "text",
+                  }}
                 />
               </div>
               <div style={{ position: "relative" }}>
@@ -397,6 +501,18 @@ export function TimesheetPage() {
                   onChange={(e) =>
                     handleChange(project.workItemId, "wed", e.target.value)
                   }
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    toggleExcludedFromAbsence(project.workItemId, "wed");
+                  }}
+                  style={{
+                    opacity: excludedFromAbsence[`${project.workItemId}-wed`]
+                      ? 0.3
+                      : 1,
+                    cursor: excludedFromAbsence[`${project.workItemId}-wed`]
+                      ? "not-allowed"
+                      : "text",
+                  }}
                 />
               </div>
               <div style={{ position: "relative" }}>
@@ -415,6 +531,18 @@ export function TimesheetPage() {
                   onChange={(e) =>
                     handleChange(project.workItemId, "thu", e.target.value)
                   }
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    toggleExcludedFromAbsence(project.workItemId, "thu");
+                  }}
+                  style={{
+                    opacity: excludedFromAbsence[`${project.workItemId}-thu`]
+                      ? 0.3
+                      : 1,
+                    cursor: excludedFromAbsence[`${project.workItemId}-thu`]
+                      ? "not-allowed"
+                      : "text",
+                  }}
                 />
               </div>
 
@@ -434,6 +562,18 @@ export function TimesheetPage() {
                   onChange={(e) =>
                     handleChange(project.workItemId, "fri", e.target.value)
                   }
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    toggleExcludedFromAbsence(project.workItemId, "fri");
+                  }}
+                  style={{
+                    opacity: excludedFromAbsence[`${project.workItemId}-fri`]
+                      ? 0.3
+                      : 1,
+                    cursor: excludedFromAbsence[`${project.workItemId}-fri`]
+                      ? "not-allowed"
+                      : "text",
+                  }}
                 />
               </div>
               <div className="total">
@@ -464,9 +604,7 @@ export function TimesheetPage() {
                 <button
                   className="add-project"
                   type="button"
-                  onClick={() => {
-                    navigate(`/absence?${buildAbsenceParams().toString()}`);
-                  }}
+                  onClick={navigateToAbsence}
                   style={{ borderColor: "rgba(198, 0, 255, 0.6" }}
                 >
                   Registrer fravær?
@@ -518,7 +656,7 @@ export function TimesheetPage() {
               onClick={() => {
                 setIsAddModalOpen(false);
                 setSelectedProjectId("");
-                setSelectedWorkItemId("");
+                setSelectedWorkItemId([]);
                 setWorkItems([]);
               }}
             >
@@ -534,7 +672,7 @@ export function TimesheetPage() {
                 value={selectedProjectId}
                 onChange={async (e) => {
                   setSelectedProjectId(e.target.value);
-                  setSelectedWorkItemId("");
+                  setSelectedWorkItemId([]);
                   if (e.target.value) {
                     try {
                       const items = await fetchWorkItems(
@@ -560,23 +698,21 @@ export function TimesheetPage() {
 
             {workItems.length > 0 && (
               <div className="input-group-row">
-                <label htmlFor="Arbeidsoppgave"></label>
-                <select
-                  id="workitem-select"
-                  className="dark-input"
-                  value={selectedWorkItemId}
-                  onChange={(e) => setSelectedWorkItemId(e.target.value)}
-                >
-                  <option value="">Velg Arbeidsoppgave...</option>
-                  {workItems.map((workItem) => (
-                    <option key={workItem.id} value={workItem.id}>
-                      {workItem.title}
-                    </option>
-                  ))}
-                </select>
+                <label>Arbeidsoppgave:</label>
+                <MultiSelectDropdown
+                  options={workItems.map((w) => ({
+                    id: w.id,
+                    title: w.title,
+                    disabled: visibleProjects.some(
+                      (p) => p.workItemId === w.id,
+                    ),
+                  }))}
+                  selectedIds={selectedWorkItemId}
+                  onChange={setSelectedWorkItemId}
+                  placeholder="Velg arbeidsoppgave..."
+                />
               </div>
             )}
-
             <div className="action-buttons">
               <button
                 className="save-btn"

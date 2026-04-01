@@ -21,6 +21,7 @@ type AbsenceFormProps = {
   projects: Project[];
   lockedDays: Record<string, number>;
   hasAbsenceParams: boolean;
+  hideProjectFields: boolean;
 };
 
 export default function AbsenceForm({
@@ -39,6 +40,7 @@ export default function AbsenceForm({
   projects,
   lockedDays,
   hasAbsenceParams,
+  hideProjectFields,
 }: AbsenceFormProps) {
   useEffect(() => {
     if (absenceType !== "VACATION" && absenceType !== "LEAVE") {
@@ -48,43 +50,47 @@ export default function AbsenceForm({
 
   return (
     <>
-      <div className="input-group-row">
-        <label>Prosjekt:</label>
+      {!hideProjectFields && (
+        <>
+          <div className="input-group-row">
+            <label>Prosjekt:</label>
 
-        <select
-          className="dark-input"
-          value={projectId ?? ""}
-          onChange={(e) => onProjectChange(Number(e.target.value))}
-        >
-          <option value="">
-            {projects.length === 0
-              ? "Registrer timer i timeplanen først"
-              : "Velg Prosjekt..."}
-          </option>
-          {projects.map((project) => (
-            <option key={project.id} value={project.id}>
-              {project.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {workItems.length > 0 && (
-        <div className="input-group-row">
-          <label>Arbeidsoppgave:</label>
-          <select
-            className="dark-input"
-            value={projectId ?? ""}
-            onChange={(e) => onWorkItemChange(Number(e.target.value))}
-          >
-            <option value="">Velg Arbeidsoppgave...</option>
-            {workItems.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.title}
+            <select
+              className="dark-input"
+              value={projectId ?? ""}
+              onChange={(e) => onProjectChange(Number(e.target.value))}
+            >
+              <option value="">
+                {projects.length === 0
+                  ? "Registrer timer i timeplanen først"
+                  : "Velg Prosjekt..."}
               </option>
-            ))}
-          </select>
-        </div>
+              {projects.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {workItems.length > 0 && (
+            <div className="input-group-row">
+              <label>Arbeidsoppgave:</label>
+              <select
+                className="dark-input"
+                value={projectId ?? ""}
+                onChange={(e) => onWorkItemChange(Number(e.target.value))}
+              >
+                <option value="">Velg Arbeidsoppgave...</option>
+                {workItems.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </>
       )}
 
       <div className="input-group-row">
