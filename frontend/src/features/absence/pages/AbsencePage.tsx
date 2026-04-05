@@ -4,8 +4,14 @@ import AbsenceForm from "../components/AbsenceForm.tsx";
 import { useEffect, useState, useCallback } from "react";
 import { saveAbsences, saveAbsencesFromPayload } from "../api/absenceApi.ts";
 import type { Project } from "../../projects/types/projects.ts";
-import { fetchTimeEntries } from "../../timesheets/api/timesheetsApi.ts";
-import { useTimesheetWeek } from "../../timesheets/hooks/useTimesheetWeek.ts";
+import {
+  parseLocalDate,
+  useTimesheetWeek,
+} from "../../timesheets/hooks/useTimesheetWeek.ts";
+import { fetchProjects } from "../../projects/api/projectsApi.ts";
+import { fetchWorkItems } from "../../timesheets/api/timesheetsApi.ts";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { DatePicker, type DatesRangeValue } from "@mantine/dates";
 
 export type AbsencePayloadEntry = {
   projectId: number;
@@ -29,13 +35,13 @@ export default function AbsencePage() {
   const [absencePayload, setAbsencePayload] = useState<
     AbsencePayloadEntry[] | null
   >(null);
-  const [workItemId, setWorkItemId] = useState<number | null>(null);
-  const [hasTimeEntries, setHasTimeEntries] = useState(false);
-  const { weekStart } = useTimesheetWeek();
+  const [selectedWorkItemIds, setSelectedWorkItemIds] = useState<number[]>([]);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const { weekStart, weekLabel, weekNumber, goToPreviousWeek, goToNextWeek } =
+    useTimesheetWeek();
 
   const handleProjectChange = useCallback((id: number) => {
     setProjectId(id);
-    setWorkItemId(null);
   }, []);
 
   const handleRangeChange = useCallback((start: Date, end: Date) => {
@@ -63,53 +69,50 @@ export default function AbsencePage() {
   }, []);
 
   useEffect(() => {
-    const userId = Number(localStorage.getItem("userId") ?? "1");
     if (absencePayload) return;
-    async function loadSavedEntries() {
+    async function loadProjects() {
       try {
-        const entries = await fetchTimeEntries(userId, weekStart);
-
-        if (entries.length === 0) {
-          setHasTimeEntries(false);
-          setProjectId(null);
-          setWorkItemId(null);
-          return;
-        }
-
-        setHasTimeEntries(true);
-
-        const projectMap = new Map<number, Project>();
-        const workItemMap = new Map<number, { id: number; title: string }>();
-
-        for (const entry of entries) {
-          const project = entry.workItem.project;
-          const workItem = entry.workItem;
-          projectMap.set(project.id, project);
-          workItemMap.set(workItem.id, {
-            id: workItem.id,
-            title: workItem.title,
-          });
-        }
-
-        const loadedProject = Array.from(projectMap.values());
-        const loadedWorkItems = Array.from(workItemMap.values());
-
-        setProjects(Array.from(projectMap.values()));
-        setWorkItems(Array.from(workItemMap.values()));
-
-        if (loadedProject.length === 1) {
-          setProjectId(loadedWorkItems[0].id);
-        }
-
-        if (loadedWorkItems.length === 1) {
-          setWorkItemId(loadedWorkItems[0].id);
-        }
+        const data = await fetchProjects();
+        setProjects(data);
       } catch (error) {
-        console.error("Kunne ikke hente timeføringer:", error);
+        console.error("Kunne ikke hente prosjekter:", error);
       }
     }
-    loadSavedEntries();
-  }, [weekStart, absencePayload]);
+    loadProjects();
+  }, [absencePayload]);
+
+  const handleFillWeek = useCallback(() => {
+    const days = ["mon", "tue", "wed", "thu", "fri"];
+    const updated = { ...hours };
+
+    const idsToFill =
+      selectedWorkItemIds.length > 0 ? selectedWorkItemIds : [null];
+
+    for (const wId of idsToFill) {
+      for (const day of days) {
+        const key = wId !== null ? `${wId}-${day}` : day;
+        const val = parseFloat((updated[key] ?? "0").replace(",", ".")) || 0;
+        if (val === 0) {
+          updated[key] = "7.5";
+        }
+      }
+    }
+    setHours(updated);
+  }, [hours, selectedWorkItemIds]);
+
+  useEffect(() => {
+    if (!projectId || absencePayload) return;
+    async function loadWorkItems() {
+      try {
+        const items = await fetchWorkItems(projectId!);
+        setWorkItems(items);
+        setSelectedWorkItemIds([]);
+      } catch (error) {
+        console.error("Kunne ikke hente arbeidsoppgaver:", error);
+      }
+    }
+    loadWorkItems();
+  }, [projectId, absencePayload]);
 
   const handleHoursChange = useCallback((updated: Record<string, string>) => {
     setHours(updated);
@@ -143,17 +146,8 @@ export default function AbsencePage() {
       return;
     }
 
-    if (!isRangeBased && !hasTimeEntries) {
-      alert("Du må registrere timer i timeplanen før du kan registrer fravær.");
-      return;
-    }
-
     if (!projectId) {
       alert("Velg et prosjekt først.");
-      return;
-    }
-    if (!workItemId) {
-      alert("Velg en arbeidsoppgave først.");
       return;
     }
 
@@ -167,18 +161,30 @@ export default function AbsencePage() {
       return;
     }
 
+    if (selectedWorkItemIds.length === 0) {
+      alert("Velg en arbeidsoppgave først.");
+      return;
+    }
+
     try {
-      await saveAbsences(
-        userId,
-        absenceType,
-        description,
-        projectId,
-        workItemId,
-        selectedStartDate,
-        selectedEndDate,
-        hours,
-        isRangeBased,
-      );
+      for (const wId of selectedWorkItemIds) {
+        const workItemHours: Record<string, string> = {};
+        for (const day of days) {
+          const val = hours[`${wId}-${day}`];
+          if (val) workItemHours[day] = val;
+        }
+        await saveAbsences(
+          userId,
+          absenceType,
+          description,
+          projectId,
+          wId,
+          selectedStartDate,
+          selectedEndDate,
+          workItemHours,
+          isRangeBased,
+        );
+      }
       alert("Fravær lagret!");
     } catch (error) {
       const message =
@@ -198,11 +204,80 @@ export default function AbsencePage() {
     }
   }
 
+  const days = ["mon", "tue", "wed", "thu", "fri"];
+  const weekTotal = days.reduce((sum, day) => {
+    if (selectedWorkItemIds.length > 0) {
+      return (
+        sum +
+        selectedWorkItemIds.reduce((s, wId) => {
+          return (
+            s +
+            (parseFloat((hours[`${wId}-${day}`] ?? "0").replace(",", ".")) || 0)
+          );
+        }, 0)
+      );
+    }
+    return sum + (parseFloat((hours[day] ?? "0").replace(",", ".")) || 0);
+  }, 0);
+  const weeklyTarget = 37.5;
+  const progressPercent = Math.min((weekTotal / weeklyTarget) * 100, 100);
+  const startDate = parseLocalDate(weekStart);
+  const endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 4);
+
   return (
     <div className="page">
       <div className="timesheet-shell">
         <TopBar />
         <section className="timesheet-card">
+          <div className="timesheet-header">
+            <div className="timesheet-header-left">
+              <div className="week-nav-group">
+                <button
+                  className="week-icon"
+                  type="button"
+                  onClick={() => setIsCalendarOpen(true)}
+                >
+                  🗓
+                </button>
+                <div>
+                  <div className="week-nav">
+                    <button
+                      className="add-project week-nav-btn"
+                      type="button"
+                      onClick={goToPreviousWeek}
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                    <h5>Uke {weekNumber}</h5>
+                    <button
+                      className="add-project week-nav-btn"
+                      type="button"
+                      onClick={goToNextWeek}
+                    >
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="week-subtitle">{weekLabel}</div>
+            </div>
+
+            <div className="timesheet-progress-wrap">
+              <div className="timesheet-progress">
+                <div className="progress-text">
+                  {weekTotal.toFixed(1).replace(".", ",")} /{""}
+                  {weeklyTarget.toFixed(1).replace(".", ",")}
+                </div>
+                <div className="progress-bar">
+                  <div
+                    className="progress-fill"
+                    style={{ width: `${progressPercent}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
           {absencePayload && (
             <div
               style={{
@@ -251,20 +326,49 @@ export default function AbsencePage() {
             projectId={projectId}
             projects={projects}
             workItems={workItems}
-            workItemId={workItemId}
             onHoursChange={handleHoursChange}
             onRangeChange={handleRangeChange}
             onTypeChange={(type) => setAbsenceType(type)}
             onDescriptionChange={(desc) => setDescription(desc)}
             onProjectChange={handleProjectChange}
-            onWorkItemChange={(id) => setWorkItemId(id)}
             onSave={handleSave}
             lockedDays={absencePayload ? lockedDaysFromPayload : {}}
             hasAbsenceParams={!!absencePayload}
             hideProjectFields={!!absencePayload}
+            selectedWorkItemIds={selectedWorkItemIds}
+            onWorkItemIdsChange={setSelectedWorkItemIds}
+            onFillWeek={handleFillWeek}
           />
         </section>
       </div>
+      {isCalendarOpen && (
+        <div
+          className="wireframe-modal"
+          onClick={() => setIsCalendarOpen(false)}
+        >
+          <div
+            className="modal-content"
+            style={{ width: "fit-content" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="close-btn"
+              type="button"
+              onClick={() => setIsCalendarOpen(false)}
+            >
+              x
+            </button>
+            <h5 style={{ margin: "0 0 16px" }}>Uke {weekNumber}</h5>
+            <DatePicker
+              type="range"
+              value={[startDate, endDate] as DatesRangeValue}
+              onChange={() => {}}
+              locale="nb"
+              firstDayOfWeek={1}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

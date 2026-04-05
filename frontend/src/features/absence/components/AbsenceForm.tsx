@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import "../styles/calendar.css";
 import DateRangeInput from "./DateRangeInput.tsx";
 import DayHoursInput from "./DayHoursInput.tsx";
+import MultiSelectDropdown from "../../timesheets/components/MultiSelectDropdown.tsx";
 
 type AbsenceFormProps = {
   hours: Record<string, string>;
@@ -10,18 +11,19 @@ type AbsenceFormProps = {
   description: string;
   projectId: number | null;
   workItems: { id: number; title: string }[];
-  workItemId: number | null;
   onHoursChange: (hours: Record<string, string>) => void;
   onRangeChange: (startDate: Date, endDate: Date) => void;
   onTypeChange: (type: string) => void;
   onDescriptionChange: (description: string) => void;
   onProjectChange: (projectId: number) => void;
-  onWorkItemChange: (workItemId: number) => void;
   onSave: () => void;
   projects: Project[];
   lockedDays: Record<string, number>;
   hasAbsenceParams: boolean;
   hideProjectFields: boolean;
+  selectedWorkItemIds?: number[];
+  onWorkItemIdsChange: (id: number[]) => void;
+  onFillWeek: () => void;
 };
 
 export default function AbsenceForm({
@@ -35,12 +37,14 @@ export default function AbsenceForm({
   onTypeChange,
   onDescriptionChange,
   onProjectChange,
-  onWorkItemChange,
   onSave,
   projects,
   lockedDays,
   hasAbsenceParams,
   hideProjectFields,
+  selectedWorkItemIds,
+  onWorkItemIdsChange,
+  onFillWeek,
 }: AbsenceFormProps) {
   useEffect(() => {
     if (absenceType !== "VACATION" && absenceType !== "LEAVE") {
@@ -62,7 +66,7 @@ export default function AbsenceForm({
             >
               <option value="">
                 {projects.length === 0
-                  ? "Registrer timer i timeplanen først"
+                  ? "Ingen prosjekter tilgjengelig"
                   : "Velg Prosjekt..."}
               </option>
               {projects.map((project) => (
@@ -76,18 +80,12 @@ export default function AbsenceForm({
           {workItems.length > 0 && (
             <div className="input-group-row">
               <label>Arbeidsoppgave:</label>
-              <select
-                className="dark-input"
-                value={projectId ?? ""}
-                onChange={(e) => onWorkItemChange(Number(e.target.value))}
-              >
-                <option value="">Velg Arbeidsoppgave...</option>
-                {workItems.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.title}
-                  </option>
-                ))}
-              </select>
+              <MultiSelectDropdown
+                options={workItems.map((w) => ({ id: w.id, title: w.title }))}
+                selectedIds={selectedWorkItemIds ?? []}
+                onChange={onWorkItemIdsChange}
+                placeholder="Velg arbeidsoppgave..."
+              />
             </div>
           )}
         </>
@@ -107,25 +105,90 @@ export default function AbsenceForm({
           <option value="OTHER">Annet</option>
         </select>
       </div>
-
       <hr className="modal-divider" />
 
+      {/** Ai code, må endres */}
       {absenceType === "VACATION" || absenceType === "LEAVE" ? (
         <DateRangeInput
           onHoursChange={onHoursChange}
           onRangeChange={onRangeChange}
         />
       ) : (
-        <DayHoursInput
-          hours={hours}
-          onHoursChange={onHoursChange}
-          lockedDays={lockedDays}
-          hasAbsenceParams={hasAbsenceParams}
-        />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
+            maxHeight: "100px",
+            overflowY: "auto",
+          }}
+        >
+          {(selectedWorkItemIds ?? []).length > 0 ? (
+            <>
+              {(selectedWorkItemIds ?? []).map((wId, index) => {
+                const workItem = workItems.find((w) => w.id === wId);
+                return (
+                  <div key={wId} className="input-group-row">
+                    {index === 0 ? (
+                      <label>Timer denne uka:</label>
+                    ) : (
+                      <label>&nbsp;</label>
+                    )}
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "4px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: "0.85rem",
+                          color: "rgba(255,255,255,0.6)",
+                        }}
+                      >
+                        {projects.find((p) => p.id === projectId)?.name} —{" "}
+                        {workItem?.title}
+                      </span>
+                      <DayHoursInput
+                        hours={hours}
+                        onHoursChange={onHoursChange}
+                        lockedDays={lockedDays}
+                        hasAbsenceParams={hasAbsenceParams}
+                        workItemId={wId}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </>
+          ) : (
+            <div className="input-group-row">
+              <label>Timer denne uka:</label>
+              <DayHoursInput
+                hours={hours}
+                onHoursChange={onHoursChange}
+                lockedDays={lockedDays}
+                hasAbsenceParams={hasAbsenceParams}
+              />
+            </div>
+          )}
+          {!hideProjectFields && (
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <button
+                className="add-project"
+                type="button"
+                onClick={onFillWeek}
+              >
+                Fyll uke
+              </button>
+            </div>
+          )}
+        </div>
       )}
+      {/** Ai code, må endres */}
 
       <hr className="modal-divider" />
-
       <div style={{ display: "flex", gap: "40px", marginTop: "16px" }}>
         <div className="input-group-row">
           <label>Beskrivelse:</label>
@@ -137,12 +200,14 @@ export default function AbsenceForm({
           />
         </div>
       </div>
-
       <div className="timesheet-actions">
         <div />
-        <button className="save-btn" type="button" onClick={onSave}>
-          Lagre Fravær
-        </button>
+        <div style={{ display: "flex", gap: "40px" }}>
+          <div />
+          <button className="save-btn" type="button" onClick={onSave}>
+            Lagre Fravær
+          </button>
+        </div>
       </div>
     </>
   );
