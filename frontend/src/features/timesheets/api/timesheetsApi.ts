@@ -61,3 +61,21 @@ export async function saveTimeEntries(
     });
   }
 }
+
+export async function exportTimesheetExcel(weekStart: string): Promise<Blob> {
+  const response = await api.get("/api/timesheets/export/excel", {
+    params: { weekStart },
+    responseType: "blob",
+  });
+
+  return response.data;
+}
+
+export async function exportInvoiceBasisExcel(weekStart: string): Promise<Blob> {
+  const response = await api.get("/api/timesheets/export/invoice-basis", {
+    params: { weekStart },
+    responseType: "blob",
+  });
+
+  return response.data;
+}
