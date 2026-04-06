@@ -643,25 +643,33 @@ export function TimesheetPage() {
             >
               + Legg til nytt prosjekt
             </button>
-            <div style={{display: "flex", gap: "12px", alignItems: "center"}}>
+            <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
               {showAbsencePrompt && (
-                  <button
-                      className="add-project"
-                      type="button"
-                      onClick={navigateToAbsence}
-                      style={{borderColor: "rgba(198, 0, 255, 0.6"}}
-                  >
-                    Registrer fravær?
-                  </button>
+                <button
+                  className="add-project"
+                  type="button"
+                  onClick={navigateToAbsence}
+                  style={{ borderColor: "rgba(198, 0, 255, 0.6" }}
+                >
+                  Registrer fravær?
+                </button>
               )}
               <button className="save-btn" type="button" onClick={handleSave}>
                 Lagre
               </button>
-              <button className="add-project" type="button" onClick={handleExportExcel}>
+              <button
+                className="add-project"
+                type="button"
+                onClick={handleExportExcel}
+              >
                 Eksporter Excel
               </button>
 
-              <button className="add-project" type="button" onClick={handleExportInvoiceBasis}>
+              <button
+                className="add-project"
+                type="button"
+                onClick={handleExportInvoiceBasis}
+              >
                 Eksporter fakturagrunnlag
               </button>
             </div>
@@ -670,12 +678,12 @@ export function TimesheetPage() {
       </div>
 
       {isCalendarOpen && (
+        <div
+          className="wireframe-modal"
+          onClick={() => setIsCalendarOpen(false)}
+        >
           <div
-              className="wireframe-modal"
-              onClick={() => setIsCalendarOpen(false)}
-          >
-            <div
-                className="modal-content"
+            className="modal-content"
             style={{ width: "fit-content" }}
             onClick={(e) => e.stopPropagation()}
           >
