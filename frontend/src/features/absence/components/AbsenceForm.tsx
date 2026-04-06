@@ -107,7 +107,6 @@ export default function AbsenceForm({
       </div>
       <hr className="modal-divider" />
 
-      {/** Ai code, må endres */}
       {absenceType === "VACATION" || absenceType === "LEAVE" ? (
         <DateRangeInput
           onHoursChange={onHoursChange}
@@ -119,7 +118,7 @@ export default function AbsenceForm({
             display: "flex",
             flexDirection: "column",
             gap: "12px",
-            maxHeight: "100px",
+            maxHeight: "150px",
             overflowY: "auto",
           }}
         >
@@ -144,10 +143,10 @@ export default function AbsenceForm({
                       <span
                         style={{
                           fontSize: "0.85rem",
-                          color: "rgba(255,255,255,0.6)",
+                          color: "rgba(255,255,255,0,6)",
                         }}
                       >
-                        {projects.find((p) => p.id === projectId)?.name} —{" "}
+                        {projects.find((p) => p.id === projectId)?.name} -{" "}
                         {workItem?.title}
                       </span>
                       <DayHoursInput
@@ -186,7 +185,6 @@ export default function AbsenceForm({
           )}
         </div>
       )}
-      {/** Ai code, må endres */}
 
       <hr className="modal-divider" />
       <div style={{ display: "flex", gap: "40px", marginTop: "16px" }}>
