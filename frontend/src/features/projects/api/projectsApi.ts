@@ -1,14 +1,7 @@
 import type { Project } from "../types/projects";
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
+import { api } from "../../../shared/api/client";
 
 export async function fetchProjects(): Promise<Project[]> {
-  const res = await fetch(`${API_BASE_URL}/api/projects`);
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch projects");
-  }
-
-  return res.json();
+    const res = await api.get("/api/projects");
+    return res.data;
 }
