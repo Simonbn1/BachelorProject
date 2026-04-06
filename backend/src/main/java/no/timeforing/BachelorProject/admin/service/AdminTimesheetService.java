@@ -1,5 +1,10 @@
 package no.timeforing.BachelorProject.admin.service;
 
+import no.timeforing.BachelorProject.absence.domain.Absence;
+import no.timeforing.BachelorProject.absence.repository.AbsenceRepository;
+import no.timeforing.BachelorProject.admin.api.dto.AdminAbsenceResponse;
+import no.timeforing.BachelorProject.admin.api.dto.AdminTimeEntryResponse;
+import no.timeforing.BachelorProject.admin.api.dto.AdminTimesheetDetailResponse;
 import no.timeforing.BachelorProject.admin.api.dto.AdminTimesheetSummaryResponse;
 import no.timeforing.BachelorProject.timesheet.domain.TimeEntry;
 import no.timeforing.BachelorProject.timesheet.domain.Timesheet;
@@ -15,13 +20,16 @@ public class AdminTimesheetService {
 
     private final TimesheetRepository timesheetRepository;
     private final TimeEntryRepository timeEntryRepository;
+    private final AbsenceRepository absenceRepository;
 
     public AdminTimesheetService(
             TimesheetRepository timesheetRepository,
-            TimeEntryRepository timeEntryRepository
+            TimeEntryRepository timeEntryRepository,
+            AbsenceRepository absenceRepository
     ) {
         this.timesheetRepository = timesheetRepository;
         this.timeEntryRepository = timeEntryRepository;
+        this.absenceRepository = absenceRepository;
     }
 
     public List<AdminTimesheetSummaryResponse> getTimesheetsForWeek(LocalDate weekStart) {
@@ -30,10 +38,15 @@ public class AdminTimesheetService {
         return timesheets.stream()
                 .map(timesheet -> {
                     List<TimeEntry> entries = timeEntryRepository.findAllByTimesheetId(timesheet.getId());
+                    List<Absence> absences = absenceRepository.findByTimesheetId(timesheet.getId());
 
-                    double totalHours = entries.stream()
-                            .mapToDouble(TimeEntry::getHours)
-                            .sum();
+                    double totalHours = Math.round(
+                            entries.stream()
+                                    .mapToDouble(TimeEntry::getHours)
+                                    .sum() * 10.0
+                    ) / 10.0;
+
+                    boolean hasAbsence = !absences.isEmpty();
 
                     return new AdminTimesheetSummaryResponse(
                             timesheet.getId(),
@@ -42,9 +55,63 @@ public class AdminTimesheetService {
                             timesheet.getUser().getEmail(),
                             timesheet.getStatus().name(),
                             totalHours,
-                            false
+                            hasAbsence
                     );
                 })
                 .toList();
+    }
+
+    public AdminTimesheetDetailResponse getTimesheetDetails(Long timesheetId) {
+        Timesheet timesheet = timesheetRepository.findById(timesheetId)
+                .orElseThrow(() -> new IllegalArgumentException("Timesheet not found: " + timesheetId));
+
+        List<TimeEntry> entries = timeEntryRepository.findAllByTimesheetId(timesheetId);
+        List<Absence> absences = absenceRepository.findByTimesheetId(timesheetId);
+
+        List<AdminTimeEntryResponse> timeEntryResponses = entries.stream()
+                .map(entry -> new AdminTimeEntryResponse(
+                        entry.getId(),
+                        entry.getWorkItem() != null && entry.getWorkItem().getProject() != null
+                                ? entry.getWorkItem().getProject().getId()
+                                : null,
+                        entry.getWorkItem() != null && entry.getWorkItem().getProject() != null
+                                ? entry.getWorkItem().getProject().getName()
+                                : null,
+                        entry.getWorkItem() != null ? entry.getWorkItem().getId() : null,
+                        entry.getWorkItem() != null ? entry.getWorkItem().getTitle() : null,
+                        entry.getEntryDate(),
+                        entry.getHours(),
+                        entry.getDescription()
+                ))
+                .toList();
+
+        List<AdminAbsenceResponse> absenceResponses = absences.stream()
+                .map(absence -> new AdminAbsenceResponse(
+                        absence.getId(),
+                        absence.getAbsenceDate(),
+                        absence.getType().name(),
+                        absence.getHours(),
+                        absence.getDescription()
+                ))
+                .toList();
+
+        double totalHours = Math.round(
+                entries.stream()
+                        .mapToDouble(TimeEntry::getHours)
+                        .sum() * 10.0
+        ) / 10.0;
+
+        return new AdminTimesheetDetailResponse(
+                timesheet.getId(),
+                timesheet.getUser().getId(),
+                timesheet.getUser().getDisplayName(),
+                timesheet.getUser().getEmail(),
+                timesheet.getWeekStart(),
+                timesheet.getStatus().name(),
+                timesheet.getManagerComment(),
+                totalHours,
+                timeEntryResponses,
+                absenceResponses
+        );
     }
 }

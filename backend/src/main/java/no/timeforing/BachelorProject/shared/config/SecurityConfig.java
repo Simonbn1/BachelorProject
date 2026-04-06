@@ -1,6 +1,7 @@
 package no.timeforing.BachelorProject.shared.config;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +17,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,7 +27,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
-import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
@@ -34,6 +43,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Value("${app.jwt.secret}")
@@ -50,19 +60,22 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(c -> {})
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/", "/api/health").permitAll()
-                        .requestMatchers("/actuator/**").permitAll()
+
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/health").permitAll()
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/projects", "/api/projects/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/time-entries", "/api/time-entries/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
+
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/approvals/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/projects", "/api/projects/**").authenticated()
+
                         .anyRequest().authenticated()
                 )
                 .headers(h -> h.frameOptions(f -> f.sameOrigin()))
@@ -83,8 +96,11 @@ public class SecurityConfig {
             config.addAllowedOriginPattern("*");
         } else {
             allowedOrigins.forEach(origin -> {
-                if ("*".equals(origin)) config.addAllowedOriginPattern("*");
-                else config.addAllowedOrigin(origin);
+                if ("*".equals(origin)) {
+                    config.addAllowedOriginPattern("*");
+                } else {
+                    config.addAllowedOrigin(origin);
+                }
             });
         }
 
@@ -125,7 +141,7 @@ public class SecurityConfig {
 
         JWKSet jwkSet = new JWKSet(jwk);
 
-        return new NimbusJwtEncoder(new ImmutableJWKSet<SecurityContext>(jwkSet));
+        return new NimbusJwtEncoder(new ImmutableJWKSet<>(jwkSet));
     }
 
     private SecretKey secretKey() {
@@ -137,23 +153,25 @@ public class SecurityConfig {
     }
 
     private JwtAuthenticationConverter jwtAuthConverter() {
-        JwtGrantedAuthoritiesConverter defaultScopes = new JwtGrantedAuthoritiesConverter();
-        defaultScopes.setAuthorityPrefix("SCOPE_");
-        defaultScopes.setAuthoritiesClaimName("scope");
+        JwtGrantedAuthoritiesConverter scopeConverter = new JwtGrantedAuthoritiesConverter();
+        scopeConverter.setAuthorityPrefix("SCOPE_");
+        scopeConverter.setAuthoritiesClaimName("scope");
 
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(jwt -> {
-            Collection<GrantedAuthority> authorities = defaultScopes.convert(jwt);
+            List<GrantedAuthority> authorities = new ArrayList<>(scopeConverter.convert(jwt));
 
             Object rolesClaim = jwt.getClaims().get("roles");
             if (rolesClaim instanceof Collection<?> roles) {
-                List<GrantedAuthority> roleAuthorities = roles.stream()
-                        .map(Object::toString)
-                        .map(r -> r.startsWith("ROLE_") ? r : "ROLE_" + r)
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
-                authorities.addAll(roleAuthorities);
+                authorities.addAll(
+                        roles.stream()
+                                .map(Object::toString)
+                                .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role)
+                                .map(SimpleGrantedAuthority::new)
+                                .collect(Collectors.toList())
+                );
             }
+
             return authorities;
         });
 
