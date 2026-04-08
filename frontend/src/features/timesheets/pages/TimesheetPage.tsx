@@ -182,6 +182,14 @@ export function TimesheetPage() {
 
   function buildAbsencePayload() {
     const days = ["mon", "tue", "wed", "thu", "fri"];
+    const today = new Date();
+    const dayIndexMap: Record<string, number> = {
+      mon: 0,
+      tue: 1,
+      wed: 2,
+      thu: 3,
+      fri: 4,
+    };
 
     const result: {
       projectId: number;
@@ -192,6 +200,10 @@ export function TimesheetPage() {
     }[] = [];
 
     for (const day of days) {
+      const dayDate = new Date(startDate);
+      dayDate.setDate(startDate.getDate() + dayIndexMap[day]);
+      if (dayDate > today) continue;
+
       const totalWorked = visibleProjects.reduce(
         (sum, project) => sum + getNumericValue(project.workItemId, day),
         0,
@@ -235,6 +247,54 @@ export function TimesheetPage() {
   }
 
   function navigateToAbsence() {
+    const days = ["mon", "tue", "wed", "thu", "fri"];
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    const dayIndexMap: Record<string, number> = {
+      mon: 0,
+      tue: 1,
+      wed: 2,
+      thu: 3,
+      fri: 4,
+    };
+    const dayLabels: Record<string, string> = {
+      mon: "Mandag",
+      tue: "Tirsdag",
+      wed: "Onsdag",
+      thu: "Torsdag",
+      fri: "Fredag",
+    };
+
+    const conflictingDays: string[] = [];
+    for (const day of days) {
+      const dayDate = new Date(startDate);
+      dayDate.setDate(startDate.getDate() + dayIndexMap[day]);
+      if (dayDate > today) continue;
+
+      const totalWorked = visibleProjects.reduce(
+        (sum, project) => sum + getNumericValue(project.workItemId, day),
+        0,
+      );
+
+      if (totalWorked >= 7.5) continue;
+
+      const eligbleProjects = visibleProjects.filter(
+        (p) => !excludedFromAbsence[`${p.workItemId}-${day}`],
+      );
+      if (eligbleProjects.length > 1) {
+        conflictingDays.push(day);
+      }
+    }
+
+    if (conflictingDays.length > 0) {
+      const conflictNames = conflictingDays.map((d) => dayLabels[d]).join(", ");
+      alert(
+        `Flere prosjekter konkurrerer om fravær for: ${conflictNames}.\n\nHøyreklikk på dagen du ikke vil registrere fravær for å eksludere den.`,
+      );
+      setShowAbsencePrompt(true);
+      return;
+    }
+
     const payload = buildAbsencePayload();
     sessionStorage.setItem("absencePayload", JSON.stringify(payload));
     navigate("/absence");
@@ -270,81 +330,81 @@ export function TimesheetPage() {
   // Save the project to the database
   async function handleSave() {
     const userId = 1;
-    const missing = (weeklyTarget - weekTotal).toFixed(1).replace(".", ",");
-
-    const absenceMessage = [
-      `Du har bare registrert ${weekTotal.toFixed(1).replace(".", ",")} av ${weeklyTarget.toFixed(1).replace(".", ",")} timer denne uken.`,
-      `Du mangler ${missing} timer.`,
-      `Ønsker du å registrere fravær for de resterende timene?`,
-    ].join(" ");
-
-    if (weekTotal < weeklyTarget) {
-      const confirm = window.confirm(absenceMessage);
-
-      if (confirm) {
-        try {
-          for (const project of visibleProjects) {
-            await saveTimeEntries(userId, weekStart, project.workItemId, hours);
-          }
-        } catch (error) {
-          console.error("Feil ved lagring:", error);
-          alert("Noe gikk galt ved lagring. Sjekk konsollen.");
-          return;
-        }
-
-        const days = ["mon", "tue", "wed", "thu", "fri"];
-        const conflictingDays: string[] = [];
-
-        for (const day of days) {
-          const totalWorked = visibleProjects.reduce(
-            (sum, project) => sum + getNumericValue(project.workItemId, day),
-            0,
-          );
-
-          if (totalWorked >= 7.5) continue;
-
-          const eligibleProjects = visibleProjects.filter(
-            (p) => !excludedFromAbsence[`${p.workItemId}-${day}`],
-          );
-
-          if (eligibleProjects.length > 1) {
-            conflictingDays.push(day);
-          }
-        }
-
-        if (conflictingDays.length > 0) {
-          const dayLabels: Record<string, string> = {
-            mon: "Mandag",
-            tue: "Tirsdag",
-            wed: "Onsdag",
-            thu: "Tirsdag",
-            fri: "Fredag",
-          };
-          const dayNames = conflictingDays.map((d) => dayLabels[d]).join(", ");
-          alert(
-            `Flere prosjekter konkurrerer om fravær for: ${dayNames}.\n\nHøyreklikk på dagen du ikke vil registrere fravær for å eksludere den.`,
-          );
-          setShowAbsencePrompt(true);
-          return;
-        }
-
-        navigateToAbsence();
-        return;
-      } else {
-        setShowAbsencePrompt(true);
-        return;
-      }
-    }
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    const dayIndexMap: Record<string, number> = {
+      mon: 0,
+      tue: 1,
+      wed: 2,
+      thu: 3,
+      fri: 4,
+    };
 
     try {
       for (const project of visibleProjects) {
         await saveTimeEntries(userId, weekStart, project.workItemId, hours);
       }
-      alert("Timer lagret!");
     } catch (error) {
       console.error("Feil ved lagring:", error);
       alert("Noe gikk galt ved lagring. Sjekk konsollen.");
+      return;
     }
+
+    const days = ["mon", "tue", "wed", "thu", "fri"];
+    const passedDaysWithMissingHours = days.filter((day) => {
+      const dayDate = new Date(startDate);
+      dayDate.setDate(startDate.getDate() + dayIndexMap[day]);
+      if (dayDate > today) return false;
+      const totalWorked = visibleProjects.reduce(
+        (sum, project) => sum + getNumericValue(project.workItemId, day),
+        0,
+      );
+      return totalWorked < 7.5;
+    });
+
+    if (passedDaysWithMissingHours.length === 0) {
+      alert("Timer lagret!");
+      return;
+    }
+
+    const dayLabels: Record<string, string> = {
+      mon: "Mandag",
+      tue: "Tirsdag",
+      wed: "Onsdag",
+      thu: "Torsdag",
+      fri: "Fredag",
+    };
+    const dayNames = passedDaysWithMissingHours
+      .map((d) => dayLabels[d])
+      .join(", ");
+    const confirm = window.confirm(
+      `Timer lagret! Du har ikke registrert 7,5 timer for: ${dayNames}.\n\nØnsker du å registrere fravær for disse dagene?`,
+    );
+
+    if (!confirm) {
+      setShowAbsencePrompt(true);
+      return;
+    }
+
+    const conflictingDays: string[] = [];
+    for (const day of passedDaysWithMissingHours) {
+      const eligbleProjects = visibleProjects.filter(
+        (p) => !excludedFromAbsence[`${p.workItemId}-${day}`],
+      );
+      if (eligbleProjects.length > 1) {
+        conflictingDays.push(day);
+      }
+    }
+
+    if (conflictingDays.length > 0) {
+      const conflictNames = conflictingDays.map((d) => dayLabels[d]).join(", ");
+      alert(
+        `Flere prosjekter konkurrerer om fravær for: ${conflictNames}.\n\nHøyreklikk på dagen du ikke vil registrere fravær for å eksludere den.`,
+      );
+      setShowAbsencePrompt(true);
+      return;
+    }
+    navigateToAbsence();
   }
 
   async function handleExportExcel() {
