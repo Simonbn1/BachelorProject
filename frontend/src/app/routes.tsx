@@ -6,7 +6,7 @@ import RegisterPage from "../features/auth/pages/RegisterPage.tsx";
 import ProtectedRoute from "../features/auth/components/ProtectedRoute.tsx";
 import AdminGuard from "../features/admin/components/AdminGuard";
 import AdminDashboardPage from "../features/admin/pages/AdminDashboardPage";
-import AdminTimesheetsPage from "../features/admin/pages/AdminPage";
+import AdminTimesheetsPage from "../features/admin/pages/AdminTimesheetPage";
 
 export const router = createBrowserRouter([
   {

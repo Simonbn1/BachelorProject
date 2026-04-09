@@ -15,7 +15,7 @@ function getMondayOfCurrentWeek() {
   return monday.toISOString().split("T")[0];
 }
 
-export default function AdminPage() {
+export default function AdminTimesheetPage() {
   const navigate = useNavigate();
 
   const [weekStart, setWeekStart] = useState(getMondayOfCurrentWeek());
