@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AdminOverviewTable from "../components/AdminOverviewTable";
 import { fetchAdminTimesheets } from "../api/adminApi";
 import type { AdminTimesheetSummary } from "../types/admin";
@@ -15,6 +16,8 @@ function getMondayOfCurrentWeek() {
 }
 
 export default function AdminPage() {
+  const navigate = useNavigate();
+
   const [weekStart, setWeekStart] = useState(getMondayOfCurrentWeek());
   const [items, setItems] = useState<AdminTimesheetSummary[]>([]);
   const [loading, setLoading] = useState(false);
@@ -32,7 +35,7 @@ export default function AdminPage() {
         setItems(data);
       } catch (err) {
         console.error(err);
-        setError("Kunne ikke hente adminoversikt.");
+        setError("Kunne ikke hente oversikten.");
       } finally {
         setLoading(false);
       }
@@ -44,9 +47,17 @@ export default function AdminPage() {
   return (
     <div className="admin-page">
       <div className="admin-page-header">
-        <div>
-          <p className="admin-eyebrow">Adminpanel</p>
-          <h1>Behandle timesheets</h1>
+        <div className="admin-page-header-content">
+          <button
+            type="button"
+            className="page-back-button"
+            onClick={() => navigate("/admin")}
+          >
+            ← Tilbake til oversikt
+          </button>
+
+          <p className="admin-eyebrow">TIMEOPPFØLGING</p>
+          <h1>Godkjenn timer</h1>
           <p className="admin-subtitle">
             Se innsendinger per uke, åpne detaljer og godkjenn eller avvis.
           </p>
@@ -63,19 +74,24 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {loading && (
-        <div className="admin-info-card">Laster adminoversikt...</div>
-      )}
-      {error && <div className="admin-error-card">{error}</div>}
+      {loading && <div className="admin-info-card">Laster oversikt...</div>}
 
-      {!loading && !error && (
+      {!loading && error && <div className="admin-error-card">{error}</div>}
+
+      {!loading && !error && items.length > 0 && (
         <AdminOverviewTable
           items={items}
           onOpenDetails={(timesheetId) => setSelectedTimesheetId(timesheetId)}
         />
       )}
 
-      {selectedTimesheetId && (
+      {!loading && !error && items.length === 0 && (
+        <div className="admin-info-card">
+          Ingen innsendinger funnet for valgt uke.
+        </div>
+      )}
+
+      {selectedTimesheetId !== null && (
         <div className="admin-info-card">
           Valgt timesheet id: {selectedTimesheetId}. Neste steg er å koble på
           detaljvisning her.

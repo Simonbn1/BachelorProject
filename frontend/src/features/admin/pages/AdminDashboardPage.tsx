@@ -5,54 +5,54 @@ import {
   Users,
   FolderKanban,
 } from "lucide-react";
-import "../../../shared/styles/AdminDashboardPage.css";
+import "../styles/AdminDashboardPage.css";
 
-type AdminCard = {
+type DashboardCard = {
   title: string;
   description: string;
-  icon: React.ElementType;
   path: string;
+  icon: React.ElementType;
 };
 
 export default function AdminDashboardPage() {
   const navigate = useNavigate();
 
-  const cards: AdminCard[] = [
+  const cards: DashboardCard[] = [
     {
-      title: "Behandle timesheets",
+      title: "Godkjenn timer",
       description:
         "Se ukesinnsendinger, åpne detaljer og godkjenn eller avvis.",
-      icon: ClipboardList,
       path: "/admin/timesheets",
+      icon: ClipboardList,
     },
     {
-      title: "Eksporter fakturagrunnlag",
+      title: "Fakturagrunnlag",
       description:
         "Eksporter timer og fravær for videre fakturering og oppfølging.",
-      icon: FileSpreadsheet,
       path: "/admin/export",
+      icon: FileSpreadsheet,
     },
     {
       title: "Ansatte",
       description: "Se brukere, roller og administrativ informasjon.",
-      icon: Users,
       path: "/admin/employees",
+      icon: Users,
     },
     {
       title: "Prosjekter",
       description: "Administrer prosjekter og work items.",
-      icon: FolderKanban,
       path: "/admin/projects",
+      icon: FolderKanban,
     },
   ];
 
   return (
     <div className="admin-dashboard-page">
-      <div className="admin-dashboard-hero">
-        <p className="admin-dashboard-kicker">ADMINPANEL</p>
-        <h1>Oversikt og administrasjon</h1>
+      <div className="admin-dashboard-header">
+        <p className="admin-dashboard-kicker">TIMEOPPFØLGING</p>
+        <h1>Oversikt</h1>
         <p className="admin-dashboard-subtitle">
-          Velg en funksjon for å administrere timesheets, eksport og data.
+          Velg en funksjon for å følge opp timer, fakturagrunnlag og ansatte.
         </p>
       </div>
 
@@ -64,14 +64,14 @@ export default function AdminDashboardPage() {
             <button
               key={card.path}
               className="admin-dashboard-card"
-              onClick={() => navigate(card.path)}
               type="button"
+              onClick={() => navigate(card.path)}
             >
               <div className="admin-dashboard-card-icon">
                 <Icon size={22} />
               </div>
 
-              <div className="admin-dashboard-card-content">
+              <div className="admin-dashboard-card-body">
                 <h2>{card.title}</h2>
                 <p>{card.description}</p>
               </div>
