@@ -86,8 +86,12 @@ export default function AdminTimesheetPage() {
       )}
 
       {!loading && !error && items.length === 0 && (
-        <div className="admin-info-card">
-          Ingen innsendinger funnet for valgt uke.
+        <div className="admin-empty-state">
+          <div className="admin-empty-state-icon">📅</div>
+          <div>
+            <h2>Ingen innsendinger funnet</h2>
+            <p>Det finnes ingen ukesinnsendinger for valgt uke enda.</p>
+          </div>
         </div>
       )}
 
