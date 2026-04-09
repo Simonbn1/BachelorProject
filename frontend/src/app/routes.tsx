@@ -9,61 +9,61 @@ import AdminDashboardPage from "../features/admin/pages/AdminDashboardPage";
 import AdminTimesheetsPage from "../features/admin/pages/AdminPage";
 
 export const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <Navigate to="/login" replace />,
-    },
-    {
-        path: "/login",
-        element: <LoginPage />,
-    },
-    {
-        path: "/register",
-        element: <RegisterPage />,
-    },
-    {
-        path: "/timesheet",
-        element: (
-            <ProtectedRoute>
-                <TimesheetPage />
-            </ProtectedRoute>
-        ),
-    },
-    {
-        path: "/absence",
-        element: (
-            <ProtectedRoute>
-                <AbsencePage />
-            </ProtectedRoute>
-        ),
-    },
-    {
-        element: <AdminGuard />,
-        children: [
-            {
-                path: "/admin",
-                element: <AdminDashboardPage />,
-            },
-            {
-                path: "/admin/timesheets",
-                element: <AdminTimesheetsPage />,
-            },
-            {
-                path: "/admin/export",
-                element: <div>Eksport kommer</div>,
-            },
-            {
-                path: "/admin/employees",
-                element: <div>Ansatte kommer</div>,
-            },
-            {
-                path: "/admin/projects",
-                element: <div>Prosjekter kommer</div>,
-            },
-        ],
-    },
-    {
-        path: "*",
-        element: <Navigate to="/login" replace />,
-    },
+  {
+    path: "/",
+    element: <Navigate to="/login" replace />,
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />,
+  },
+  {
+    path: "/timesheet",
+    element: (
+      <ProtectedRoute>
+        <TimesheetPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/absence",
+    element: (
+      <ProtectedRoute>
+        <AbsencePage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    element: <AdminGuard />,
+    children: [
+      {
+        path: "/admin",
+        element: <AdminDashboardPage />,
+      },
+      {
+        path: "/admin/timesheets",
+        element: <AdminTimesheetsPage />,
+      },
+      {
+        path: "/admin/export",
+        element: <div>Eksport kommer</div>,
+      },
+      {
+        path: "/admin/employees",
+        element: <div>Ansatte kommer</div>,
+      },
+      {
+        path: "/admin/projects",
+        element: <div>Prosjekter kommer</div>,
+      },
+    ],
+  },
+  {
+    path: "*",
+    element: <Navigate to="/login" replace />,
+  },
 ]);
