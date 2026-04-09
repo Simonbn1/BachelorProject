@@ -1,10 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import {
-  ClipboardList,
-  FileSpreadsheet,
-  Users,
-  FolderKanban,
-} from "lucide-react";
+import {ClipboardList, FileSpreadsheet, Users, FolderKanban} from "lucide-react";
 import "../styles/AdminDashboardPage.css";
 
 type DashboardCard = {
