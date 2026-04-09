@@ -1,0 +1,103 @@
+.admin-dashboard-page {
+    min-height: 100vh;
+    padding: 32px;
+    background:
+            radial-gradient(circle at top left, rgba(82, 102, 255, 0.16), transparent 28%),
+            radial-gradient(circle at top right, rgba(130, 88, 255, 0.12), transparent 24%),
+            linear-gradient(180deg, #0c1226 0%, #111933 100%);
+    color: #f5f7ff;
+}
+
+.admin-dashboard-hero {
+    max-width: 760px;
+    margin-bottom: 28px;
+}
+
+.admin-dashboard-kicker {
+    margin: 0 0 8px;
+    font-size: 0.82rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(216, 224, 255, 0.72);
+}
+
+.admin-dashboard-hero h1 {
+    margin: 0;
+    font-size: clamp(2rem, 3vw, 3rem);
+    line-height: 1.08;
+    font-weight: 800;
+}
+
+.admin-dashboard-subtitle {
+    margin: 12px 0 0;
+    max-width: 680px;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: rgba(230, 235, 255, 0.82);
+}
+
+.admin-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.admin-dashboard-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+    min-height: 220px;
+    padding: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(17, 25, 51, 0.92), rgba(13, 20, 43, 0.96));
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.22);
+    color: #f5f7ff;
+    text-align: left;
+    cursor: pointer;
+    transition:
+            transform 0.18s ease,
+            border-color 0.18s ease,
+            box-shadow 0.18s ease,
+            background 0.18s ease;
+}
+
+.admin-dashboard-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(154, 170, 255, 0.28);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+    background: linear-gradient(180deg, rgba(21, 31, 63, 0.96), rgba(15, 23, 47, 0.98));
+}
+
+.admin-dashboard-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(124, 144, 255, 0.12);
+    border: 1px solid rgba(154, 170, 255, 0.16);
+    color: #dce4ff;
+}
+
+.admin-dashboard-card-content h2 {
+    margin: 0 0 10px;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.admin-dashboard-card-content p {
+    margin: 0;
+    color: rgba(226, 232, 255, 0.76);
+    line-height: 1.55;
+}
+
+.admin-dashboard-card-link {
+    margin-top: auto;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #dbe3ff;
+    opacity: 0.92;
+}
