@@ -9,7 +9,6 @@ import AdminDashboardPage from "../features/admin/pages/AdminDashboardPage";
 import AdminTimesheetsPage from "../features/admin/pages/AdminTimesheetPage";
 import AdminEmployeesPage from "../features/admin/pages/AdminEmployeesPage";
 
-
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -56,7 +55,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/admin/employees",
-          element: <AdminEmployeesPage />,
+        element: <AdminEmployeesPage />,
       },
       {
         path: "/admin/projects",
