@@ -7,6 +7,8 @@ import ProtectedRoute from "../features/auth/components/ProtectedRoute.tsx";
 import AdminGuard from "../features/admin/components/AdminGuard";
 import AdminDashboardPage from "../features/admin/pages/AdminDashboardPage";
 import AdminTimesheetsPage from "../features/admin/pages/AdminTimesheetPage";
+import AdminEmployeesPage from "../features/admin/pages/AdminEmployeesPage";
+
 
 export const router = createBrowserRouter([
   {
@@ -54,7 +56,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/admin/employees",
-        element: <div>Ansatte kommer</div>,
+          element: <AdminEmployeesPage />,
       },
       {
         path: "/admin/projects",
