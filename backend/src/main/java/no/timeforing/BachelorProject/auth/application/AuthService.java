@@ -38,24 +38,15 @@ public class AuthService {
         this.tokenService = tokenService;
         this.passwordEncoder = passwordEncoder;
 
-        this.allowedEmails = Arrays.stream(allowedEmailsCsv.split(","))
-                .map(String::trim)
-                .filter(s -> !s.isBlank())
-                .map(s -> s.toLowerCase(Locale.ROOT))
-                .collect(Collectors.toSet());
-
-        this.adminEmails = Arrays.stream(adminEmailsCsv.split(","))
-                .map(String::trim)
-                .filter(s -> !s.isBlank())
-                .map(s -> s.toLowerCase(Locale.ROOT))
-                .collect(Collectors.toSet());
+        this.allowedEmails = parseEmails(allowedEmailsCsv);
+        this.adminEmails = parseEmails(adminEmailsCsv);
     }
 
     @Transactional
     public LoginResponse register(String displayName, String email, String password) {
-        String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
+        String normalizedEmail = normalize(email);
 
-        if (!isAllowedEmail(normalizedEmail)) {
+        if (!allowedEmails.contains(normalizedEmail)) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
                     "This email is not approved for registration"
@@ -66,38 +57,24 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
         }
 
-        String hash = passwordEncoder.encode(password);
-
         User user = new User();
-        user.setDisplayName(displayName == null || displayName.isBlank()
-                ? deriveDisplayName(normalizedEmail)
-                : displayName.trim());
+        user.setDisplayName(
+                (displayName == null || displayName.isBlank())
+                        ? deriveDisplayName(normalizedEmail)
+                        : displayName.trim()
+        );
         user.setEmail(normalizedEmail);
-        user.setPasswordHash(hash);
-        user.setRole(isAdminEmail(normalizedEmail) ? "ADMIN" : "EMPLOYEE");
+        user.setPasswordHash(passwordEncoder.encode(password));
+        user.setRole(adminEmails.contains(normalizedEmail) ? "ADMIN" : "EMPLOYEE");
 
         user = userRepository.save(user);
 
-        List<String> roles = List.of(user.getRole());
-        TokenService.IssuedToken token = tokenService.issueToken(user, roles);
-
-        LoginResponse res = new LoginResponse();
-        res.accessToken = token.token();
-        res.expiresInSeconds = token.expiresInSeconds();
-
-        LoginResponse.UserInfo ui = new LoginResponse.UserInfo();
-        ui.id = user.getId();
-        ui.displayName = user.getDisplayName();
-        ui.email = user.getEmail();
-        ui.roles = roles;
-        res.user = ui;
-
-        return res;
+        return createLoginResponse(user);
     }
 
     @Transactional(readOnly = true)
     public LoginResponse login(String email, String password) {
-        String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
+        String normalizedEmail = normalize(email);
 
         User user = userRepository.findByEmail(normalizedEmail)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -107,6 +84,26 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
         }
 
+        return createLoginResponse(user);
+    }
+
+    // ------------------------
+    // Helper methods
+    // ------------------------
+
+    private Set<String> parseEmails(String csv) {
+        return Arrays.stream(csv.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .map(this::normalize)
+                .collect(Collectors.toSet());
+    }
+
+    private String normalize(String email) {
+        return email.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private LoginResponse createLoginResponse(User user) {
         List<String> roles = List.of(user.getRole());
         TokenService.IssuedToken token = tokenService.issueToken(user, roles);
 
@@ -119,24 +116,20 @@ public class AuthService {
         ui.displayName = user.getDisplayName();
         ui.email = user.getEmail();
         ui.roles = roles;
-        res.user = ui;
 
+        res.user = ui;
         return res;
     }
 
-    private boolean isAllowedEmail(String email) {
-        return allowedEmails.contains(email.toLowerCase(Locale.ROOT));
-    }
-
-    private boolean isAdminEmail(String email) {
-        return adminEmails.contains(email.toLowerCase(Locale.ROOT));
-    }
-
     private String deriveDisplayName(String email) {
-        String local = email.split("@")[0].replace(".", " ").replace("_", " ").trim();
+        String local = email.split("@")[0]
+                .replace(".", " ")
+                .replace("_", " ")
+                .trim();
+
         if (local.isBlank()) return "User";
-        String[] parts = local.split("\\s+");
-        return Arrays.stream(parts)
+
+        return Arrays.stream(local.split("\\s+"))
                 .filter(p -> !p.isBlank())
                 .map(p -> p.substring(0, 1).toUpperCase(Locale.ROOT) + p.substring(1))
                 .collect(Collectors.joining(" "));
