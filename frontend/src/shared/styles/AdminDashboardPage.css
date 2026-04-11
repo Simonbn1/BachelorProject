@@ -159,3 +159,60 @@
   outline: 2px solid rgba(143, 160, 255, 0.7);
   outline-offset: 3px;
 }
+
+.admin-dashboard-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+}
+
+.admin-dashboard-topbar-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.admin-dashboard-user {
+    color: rgba(233, 238, 255, 0.82);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.admin-dashboard-logout-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 10px 14px;
+    color: #f5f7ff;
+    font: inherit;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.055);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+    cursor: pointer;
+    transition:
+            transform 0.18s ease,
+            background 0.18s ease,
+            border-color 0.18s ease,
+            box-shadow 0.18s ease;
+}
+
+.admin-dashboard-logout-button:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(160, 176, 255, 0.18);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+}
+
+.admin-dashboard-logout-button:active {
+    transform: translateY(0);
+}
+
+.admin-dashboard-logout-button:focus-visible {
+    outline: 2px solid rgba(143, 160, 255, 0.7);
+    outline-offset: 3px;
+}
