@@ -24,17 +24,25 @@ public class AuthService {
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
 
+    private final Set<String> allowedEmails;
     private final Set<String> adminEmails;
 
     public AuthService(
             UserRepository userRepository,
             TokenService tokenService,
             PasswordEncoder passwordEncoder,
+            @Value("${app.auth.allowed-emails:}") String allowedEmailsCsv,
             @Value("${app.auth.admin-emails:}") String adminEmailsCsv
     ) {
         this.userRepository = userRepository;
         this.tokenService = tokenService;
         this.passwordEncoder = passwordEncoder;
+
+        this.allowedEmails = Arrays.stream(allowedEmailsCsv.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .map(s -> s.toLowerCase(Locale.ROOT))
+                .collect(Collectors.toSet());
 
         this.adminEmails = Arrays.stream(adminEmailsCsv.split(","))
                 .map(String::trim)
@@ -47,6 +55,13 @@ public class AuthService {
     public LoginResponse register(String displayName, String email, String password) {
         String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
 
+        if (!isAllowedEmail(normalizedEmail)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "This email is not approved for registration"
+            );
+        }
+
         if (userRepository.findByEmail(normalizedEmail).isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
         }
@@ -54,7 +69,9 @@ public class AuthService {
         String hash = passwordEncoder.encode(password);
 
         User user = new User();
-        user.setDisplayName(displayName);
+        user.setDisplayName(displayName == null || displayName.isBlank()
+                ? deriveDisplayName(normalizedEmail)
+                : displayName.trim());
         user.setEmail(normalizedEmail);
         user.setPasswordHash(hash);
         user.setRole(isAdminEmail(normalizedEmail) ? "ADMIN" : "EMPLOYEE");
@@ -105,6 +122,10 @@ public class AuthService {
         res.user = ui;
 
         return res;
+    }
+
+    private boolean isAllowedEmail(String email) {
+        return allowedEmails.contains(email.toLowerCase(Locale.ROOT));
     }
 
     private boolean isAdminEmail(String email) {
