@@ -27,6 +27,7 @@ export default function RegisterPage() {
             placeholder="Fullt navn (fornavn og etternavn)"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
+            className={error?.includes("navn") ? "input-error" : ""}
           />
 
           <input
@@ -34,6 +35,7 @@ export default function RegisterPage() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            className={error?.includes("email") ? "input-error" : ""}
           />
 
           <input
@@ -41,6 +43,14 @@ export default function RegisterPage() {
             placeholder="Passord"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            className={
+              (password && password.length < 8) ||
+              (password && !/[a-zA-ZæøåÆØÅ]/.test(password)) ||
+              error?.includes("Passord") ||
+              error?.includes("password")
+                ? "input-error"
+                : ""
+            }
           />
 
           <input
@@ -48,6 +58,13 @@ export default function RegisterPage() {
             placeholder="Gjenta passord"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            className={
+              (confirmPassword && password !== confirmPassword) ||
+              error?.includes("gjenta") ||
+              error?.includes("stemmer")
+                ? "input-error"
+                : ""
+            }
           />
           <p>
             Har du allerede en konto? <Link to="/login">Login</Link>
