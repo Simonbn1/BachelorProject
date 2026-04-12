@@ -48,7 +48,7 @@ export default function LoginPage() {
           />
 
           <p style={{ marginTop: "1rem", textAlign: "center" }}>
-            No account? <Link to="/register">Create one</Link>
+            Ingen konto? <Link to="/register">Lag en</Link>
           </p>
 
           <button type="submit">Login</button>

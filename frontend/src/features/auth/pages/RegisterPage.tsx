@@ -1,42 +1,29 @@
 import "./RegisterPage.css";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { register } from "../api/authApi";
-import { saveAuth } from "../types/auth";
+import { Link } from "react-router-dom";
+import { useRegister } from "../hooks/useRegister";
 
 export default function RegisterPage() {
-  const navigate = useNavigate();
-  const [displayName, setDisplayName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    try {
-      const res = await register(displayName, email, password);
-      saveAuth(res);
-
-      if (res.user.roles.includes("ADMIN")) {
-        navigate("/admin", { replace: true });
-      } else {
-        navigate("/timesheet", { replace: true });
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Register failed");
-    }
-  };
+  const {
+    displayName,
+    setDisplayName,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    confirmPassword,
+    setConfirmPassword,
+    handleRegister,
+  } = useRegister();
 
   return (
     <div className="register-page">
       <div className="register-card">
-        <h2>Create account</h2>
+        <h2>Lag en konto</h2>
 
         <form onSubmit={handleRegister}>
           <input
             type="text"
-            placeholder="Name"
+            placeholder="Fullt navn (fornavn og etternavn)"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
           />
@@ -50,13 +37,26 @@ export default function RegisterPage() {
 
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Passord"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          {password && password.length < 8 && (
+            <p className="input-hint">Passordet må være minst 8 tegn</p>
+          )}
+
+          <input
+            type="password"
+            placeholder="Gjenta passord"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+          {confirmPassword && password !== confirmPassword && (
+            <p className="input-hint">Passordene stemmer ikke overens</p>
+          )}
 
           <p>
-            Already have an account? <Link to="/login">Login</Link>
+            Har du allerede en konto? <Link to="/login">Login</Link>
           </p>
 
           <button type="submit">Register</button>
