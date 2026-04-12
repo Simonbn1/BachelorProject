@@ -5,20 +5,47 @@ import { fetchAdminTimesheets } from "../api/adminApi";
 import type { AdminTimesheetSummary } from "../types/admin";
 import "../../../shared/styles/admin.css";
 
-function getMondayOfCurrentWeek() {
+function getCurrentWeekValue() {
   const today = new Date();
-  const day = today.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
-  const monday = new Date(today);
-  monday.setDate(today.getDate() + diff);
-  monday.setHours(0, 0, 0, 0);
+  const date = new Date(
+    Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()),
+  );
+  const dayNum = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil(
+    ((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7,
+  );
+
+  return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2, "0")}`;
+}
+
+function weekValueToMonday(weekValue: string) {
+  const [yearPart, weekPart] = weekValue.split("-W");
+  const year = Number(yearPart);
+  const week = Number(weekPart);
+
+  const simple = new Date(Date.UTC(year, 0, 1 + (week - 1) * 7));
+  const dayOfWeek = simple.getUTCDay() || 7;
+  const monday = new Date(simple);
+
+  if (dayOfWeek <= 4) {
+    monday.setUTCDate(simple.getUTCDate() - dayOfWeek + 1);
+  } else {
+    monday.setUTCDate(simple.getUTCDate() + (8 - dayOfWeek));
+  }
+
   return monday.toISOString().split("T")[0];
 }
 
 export default function AdminTimesheetPage() {
   const navigate = useNavigate();
 
-  const [weekStart, setWeekStart] = useState(getMondayOfCurrentWeek());
+  const initialWeek = getCurrentWeekValue();
+
+  const [selectedWeek, setSelectedWeek] = useState(initialWeek);
+  const [weekStart, setWeekStart] = useState(weekValueToMonday(initialWeek));
   const [items, setItems] = useState<AdminTimesheetSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -64,12 +91,16 @@ export default function AdminTimesheetPage() {
         </div>
 
         <div className="admin-filter-card">
-          <label htmlFor="weekStart">Uke start</label>
+          <label htmlFor="weekStart">Uke</label>
           <input
             id="weekStart"
-            type="date"
-            value={weekStart}
-            onChange={(e) => setWeekStart(e.target.value)}
+            type="week"
+            value={selectedWeek}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSelectedWeek(value);
+              setWeekStart(weekValueToMonday(value));
+            }}
           />
         </div>
       </div>
