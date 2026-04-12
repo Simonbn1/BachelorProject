@@ -1,45 +1,62 @@
+type ValidationResult = {
+  message: string;
+  field: "name" | "email" | "password" | "confirmPassword";
+} | null;
+
 export function validateRegister(
   displayName: string,
   email: string,
   password: string,
   confirmPassword: string,
-): string | null {
+): ValidationResult {
   const nameParts = displayName.trim().split(/\s+/);
 
   if (nameParts.length < 2) {
-    return "Vennligst oppgi fullt navn (fornavn og etternavn)";
+    return {
+      message: "Vennligst oppgi fullt navn (fornavn og etternavn)",
+      field: "name",
+    };
   }
 
   if (!/[a-zA-ZæøåÆØÅ -]+$/.test(displayName.trim())) {
-    return "Navn kan kun inneholde bokstaver, mellomrom og bindestrek.";
+    return {
+      message: "Navn kan kun inneholde bokstaver, mellomrom og bindestrek.",
+      field: "name",
+    };
   }
 
   if (!email) {
-    return "Vennligst oppgi en email";
+    return { message: "Vennligst oppgi en email", field: "email" };
   }
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return "Vennligst oppgi en gyldig e-postadresse.";
+    return {
+      message: "Vennligst oppgi en gyldig e-postadresse.",
+      field: "email",
+    };
   }
 
   if (!password) {
-    return "Vennligst oppgi et passord.";
+    return { message: "Vennligst oppgi et passord.", field: "password" };
   }
 
   if (password.length < 8) {
-    return "Passordet må minst være 8 tegn";
+    return { message: "Passordet må minst være 8 tegn", field: "password" };
   }
 
   if (!/[a-zA-ZæøåÆØÅ]/.test(password)) {
-    return "Passordet må inneholde minst en bokstav";
+    return {
+      message: "Passordet må inneholde minst en bokstav",
+      field: "password",
+    };
   }
 
   if (!confirmPassword) {
-    return "Vennligst genta passordet.";
+    return { message: "Vennligst genta passordet.", field: "confirmPassword" };
   }
 
   if (password !== confirmPassword) {
-    return "Passordene stemmer ikke.";
+    return { message: "Passordene stemmer ikke.", field: "confirmPassword" };
   }
 
   return null;

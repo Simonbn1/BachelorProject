@@ -39,6 +39,7 @@ export default function AbsencePage() {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const { weekStart, weekLabel, weekNumber, goToPreviousWeek, goToNextWeek } =
     useTimesheetWeek();
+  const [hoursError, setHoursError] = useState<string | null>(null);
 
   const handleProjectChange = useCallback((id: number) => {
     setProjectId(id);
@@ -224,6 +225,13 @@ export default function AbsencePage() {
   const startDate = parseLocalDate(weekStart);
   const endDate = new Date(startDate);
   endDate.setDate(startDate.getDate() + 4);
+
+  useEffect(() => {
+    if (hoursError) {
+      const timer = setTimeout(() => setHoursError(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [hoursError]);
 
   return (
     <div className="page">

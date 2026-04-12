@@ -11,22 +11,24 @@ export function useRegister() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [errorField, setErrorField] = useState<string | null>(null);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const validationError = validateRegister(
+    const result = validateRegister(
       displayName,
       email,
       password,
       confirmPassword,
     );
-    if (validationError) {
-      setError(validationError);
+    if (result) {
+      setError(result.message);
+      setErrorField(result.field);
       return;
     }
-
     setError(null);
+    setErrorField(null);
 
     try {
       const res = await register(displayName, email, password);
@@ -54,5 +56,6 @@ export function useRegister() {
     setConfirmPassword,
     handleRegister,
     error,
+    errorField,
   };
 }

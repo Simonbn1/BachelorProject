@@ -40,6 +40,7 @@ export function TimesheetPage() {
   const [excludedFromAbsence, setExcludedFromAbsence] = useState<
     Record<string, boolean>
   >({});
+  const [hoursError, setHoursError] = useState<string | null>(null);
 
   const { weekStart, weekLabel, weekNumber, goToPreviousWeek, goToNextWeek } =
     useTimesheetWeek();
@@ -128,6 +129,11 @@ export function TimesheetPage() {
     const key = `${workItemId}-${day}`;
 
     if (normalized === "" || /^(\d+)?([.]\d{0,1})?$/.test(normalized)) {
+      const parsed = parseFloat(normalized);
+      if (!isNaN(parsed) && parsed > 16) {
+        setHoursError("Du kan ikke registrere mer enn 16 timer per dag.");
+        return;
+      }
       setHours((prev) => ({
         ...prev,
         [key]: value,
@@ -449,6 +455,13 @@ export function TimesheetPage() {
     }
   }
 
+  useEffect(() => {
+    if (hoursError) {
+      const timer = setTimeout(() => setHoursError(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [hoursError]);
+
   return (
     <div className="page">
       <div className="timesheet-shell">
@@ -694,7 +707,17 @@ export function TimesheetPage() {
               </button>
             </div>
           ))}
-
+          {hoursError && (
+            <p
+              style={{
+                color: "#f59e0b",
+                fontSize: "0.85rem",
+                margin: "8px 16px",
+              }}
+            >
+              {hoursError}
+            </p>
+          )}
           <div className="timesheet-actions">
             <button
               className="add-project"
