@@ -96,10 +96,8 @@
 }
 
 .register-card .input-hint {
-    color: #f59e0b;
-    font-size: 0.8rem;
-    margin: 4px 0 0;
-    text-align: left;
+  color: #f59e0b;
+  font-size: 0.8rem;
+  margin: 4px 0 0;
+  text-align: left;
 }
-
-
