@@ -2,6 +2,7 @@ import { register } from "../api/authApi.ts";
 import { saveAuth } from "../types/auth.ts";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { validateRegister } from "../utils/validateRegister.ts";
 
 export function useRegister() {
   const navigate = useNavigate();
@@ -9,9 +10,23 @@ export function useRegister() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const validationError = validateRegister(
+      displayName,
+      email,
+      password,
+      confirmPassword,
+    );
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setError(null);
 
     try {
       const res = await register(displayName, email, password);
@@ -38,5 +53,6 @@ export function useRegister() {
     confirmPassword,
     setConfirmPassword,
     handleRegister,
+    error,
   };
 }

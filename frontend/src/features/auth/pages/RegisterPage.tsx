@@ -13,6 +13,7 @@ export default function RegisterPage() {
     confirmPassword,
     setConfirmPassword,
     handleRegister,
+    error,
   } = useRegister();
 
   return (
@@ -41,9 +42,6 @@ export default function RegisterPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          {password && password.length < 8 && (
-            <p className="input-hint">Passordet må være minst 8 tegn</p>
-          )}
 
           <input
             type="password"
@@ -51,15 +49,13 @@ export default function RegisterPage() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
-          {confirmPassword && password !== confirmPassword && (
-            <p className="input-hint">Passordene stemmer ikke overens</p>
-          )}
-
           <p>
             Har du allerede en konto? <Link to="/login">Login</Link>
           </p>
 
-          <button type="submit">Register</button>
+          {error && <p className="input-hint">{error}</p>}
+
+          <button type="submit">Registrer</button>
         </form>
       </div>
     </div>

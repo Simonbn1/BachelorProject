@@ -1,31 +1,9 @@
 import "./LoginPage.css";
-import { useState } from "react";
-import { login } from "../api/authApi";
-import { Link, useNavigate } from "react-router-dom";
-import { saveAuth } from "../types/auth";
+import { Link } from "react-router-dom";
+import { useLogin } from "../hooks/useLogin.ts";
 
 export default function LoginPage() {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    try {
-      const res = await login(email, password);
-      saveAuth(res);
-
-      if (res.user.roles.includes("ADMIN")) {
-        navigate("/admin", { replace: true });
-      } else {
-        navigate("/timesheet", { replace: true });
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Login failed");
-    }
-  };
+  const { email, setEmail, password, setPassword, handleLogin } = useLogin();
 
   return (
     <div className="login-page">
