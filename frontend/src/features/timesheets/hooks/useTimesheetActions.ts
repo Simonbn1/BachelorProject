@@ -1,5 +1,6 @@
 import type { HoursState, ProjectWithWorkItem } from "./useTimesheet.ts";
 import React from "react";
+import { useToasts } from "../../../shared/hooks/useToasts.ts";
 import {
   deleteTimeEntries,
   fetchWorkItems,
@@ -47,7 +48,6 @@ export function useTimesheetActions({
   setSelectedProjectId,
   workItems,
   setWorkItems,
-  excludedFromAbsence,
   setExcludedFromAbsence,
   setHoursError,
   setHasUnsavedChanges,
@@ -56,9 +56,10 @@ export function useTimesheetActions({
   weekStart,
   startDate,
   getNumericValue,
-  navigateToAbsence,
   projects,
 }: UseTimesheetActionsProps) {
+  const { showToast } = useToasts();
+
   function handleChange(workItemId: number, day: string, value: string) {
     setHasUnsavedChanges(true);
     const normalized = value.replace(",", ".");
@@ -140,7 +141,7 @@ export function useTimesheetActions({
 
   async function handleSave() {
     const userId = 1;
-    const today = new Date("2026-04-11");
+    const today = new Date();
     today.setHours(23, 59, 59, 999);
     const dayIndexMap: Record<string, number> = {
       mon: 0,
@@ -157,7 +158,7 @@ export function useTimesheetActions({
       setHasUnsavedChanges(false);
     } catch (error) {
       console.error("Feil ved lagring:", error);
-      alert("Noe gikk galt ved lagring. Sjekk konsollen.");
+      showToast("error", "Feil ved lagring", "Noe gikk galt. Sjekk konsollen");
       return;
     }
 
@@ -174,7 +175,7 @@ export function useTimesheetActions({
     });
 
     if (passedDaysWithMissingHours.length === 0) {
-      alert("Timer lagret!");
+      showToast("success", "Timer lagret!");
       return;
     }
 
@@ -188,34 +189,13 @@ export function useTimesheetActions({
     const dayNames = passedDaysWithMissingHours
       .map((d) => dayLabels[d])
       .join(", ");
-    const confirm = window.confirm(
-      `Timer lagret! Du har ikke registrert 7,5 timer for: ${dayNames}.\n\nØnsker du å registrere fravær for disse dagene?`,
+    showToast(
+      "warning",
+      "Timer lagret!",
+      `Timer lagret! Du har ikke registrert 7,5 timer for: ${dayNames}.`,
     );
-
-    if (!confirm) {
-      setShowAbsencePrompt(true);
-      return;
-    }
-
-    const conflictingDays: string[] = [];
-    for (const day of passedDaysWithMissingHours) {
-      const eligbleProjects = visibleProjects.filter(
-        (p) => !excludedFromAbsence[`${p.workItemId}-${day}`],
-      );
-      if (eligbleProjects.length > 1) {
-        conflictingDays.push(day);
-      }
-    }
-
-    if (conflictingDays.length > 0) {
-      const conflictNames = conflictingDays.map((d) => dayLabels[d]).join(", ");
-      alert(
-        `Flere prosjekter konkurrerer om fravær for: ${conflictNames}.\n\nHøyreklikk på dagen du ikke vil registrere fravær for å eksludere den.`,
-      );
-      setShowAbsencePrompt(true);
-      return;
-    }
-    navigateToAbsence();
+    setShowAbsencePrompt(true);
+    return;
   }
 
   async function loadWorkItemsForProject(projectId: string) {

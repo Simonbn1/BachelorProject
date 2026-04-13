@@ -4,6 +4,7 @@ import AbsenceForm from "../components/AbsenceForm.tsx";
 import { useAbsence } from "../hooks/useAbsence.ts";
 import { useAbsenceSave } from "../hooks/useAbsenceSave.ts";
 import { useAbsenceFillWeek } from "../hooks/useAbsenceFillWeek.ts";
+import "../styles/AbsencePage.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DatePicker, type DatesRangeValue } from "@mantine/dates";
 

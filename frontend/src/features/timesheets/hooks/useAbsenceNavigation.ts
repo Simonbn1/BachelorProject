@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import type { ProjectWithWorkItem } from "./useTimesheet.ts";
+import { useToasts } from "../../../shared/hooks/useToasts.ts";
 
 type UseAbsenceNavigationProps = {
   visibleProjects: ProjectWithWorkItem[];
@@ -17,6 +18,7 @@ export function useAbsenceNavigation({
   setShowAbsencePrompt,
 }: UseAbsenceNavigationProps) {
   const navigate = useNavigate();
+  const { showToast } = useToasts();
 
   function buildAbsencePayload() {
     const days = ["mon", "tue", "wed", "thu", "fri"];
@@ -117,7 +119,9 @@ export function useAbsenceNavigation({
 
     if (conflictingDays.length > 0) {
       const conflictNames = conflictingDays.map((d) => dayLabels[d]).join(", ");
-      alert(
+      showToast(
+        "warning",
+        "Konflikt",
         `Flere prosjekter konkurrerer om fravær for: ${conflictNames}.\n\nHøyreklikk på dagen du ikke vil registrere fravær for å eksludere den.`,
       );
       setShowAbsencePrompt(true);
