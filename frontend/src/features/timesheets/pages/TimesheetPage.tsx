@@ -171,7 +171,7 @@ export function TimesheetPage() {
                   Oppgave: {project.workItemTitle ?? `Prosjekt #${project.id}`}
                 </span>
               </div>
-              <div style={{ position: "relative" }}>
+              <div className="day-input-wrapper">
                 {isOvertime(project.workItemId, "mon") && (
                   <span className="overtime-indicator">
                     +
@@ -192,17 +192,14 @@ export function TimesheetPage() {
                     e.preventDefault();
                     toggleExcludedFromAbsence(project.workItemId, "mon");
                   }}
-                  style={{
-                    opacity: excludedFromAbsence[`${project.workItemId}-mon}`]
-                      ? 0.3
-                      : 1,
-                    cursor: excludedFromAbsence[`${project.workItemId}-mon`]
-                      ? "not-allowed"
-                      : "text",
-                  }}
+                  className={
+                    excludedFromAbsence[`${project.workItemId}-mon`]
+                      ? "input-excluded"
+                      : ""
+                  }
                 />
               </div>
-              <div style={{ position: "relative" }}>
+              <div className="day-input-wrapper">
                 {isOvertime(project.workItemId, "tue") && (
                   <span className="overtime-indicator">
                     +
@@ -222,17 +219,14 @@ export function TimesheetPage() {
                     e.preventDefault();
                     toggleExcludedFromAbsence(project.workItemId, "tue");
                   }}
-                  style={{
-                    opacity: excludedFromAbsence[`${project.workItemId}-tue`]
-                      ? 0.3
-                      : 1,
-                    cursor: excludedFromAbsence[`${project.workItemId}-tue`]
-                      ? "not-allowed"
-                      : "text",
-                  }}
+                  className={
+                    excludedFromAbsence[`${project.workItemId}-tue`]
+                      ? "input-excluded"
+                      : ""
+                  }
                 />
               </div>
-              <div style={{ position: "relative" }}>
+              <div className="day-input-wrapper">
                 {isOvertime(project.workItemId, "wed") && (
                   <span className="overtime-indicator">
                     +
@@ -252,17 +246,14 @@ export function TimesheetPage() {
                     e.preventDefault();
                     toggleExcludedFromAbsence(project.workItemId, "wed");
                   }}
-                  style={{
-                    opacity: excludedFromAbsence[`${project.workItemId}-wed`]
-                      ? 0.3
-                      : 1,
-                    cursor: excludedFromAbsence[`${project.workItemId}-wed`]
-                      ? "not-allowed"
-                      : "text",
-                  }}
+                  className={
+                    excludedFromAbsence[`${project.workItemId}-wed`]
+                      ? "input-excluded"
+                      : ""
+                  }
                 />
               </div>
-              <div style={{ position: "relative" }}>
+              <div className="day-input-wrapper">
                 {isOvertime(project.workItemId, "thu") && (
                   <span className="overtime-indicator">
                     +
@@ -282,18 +273,15 @@ export function TimesheetPage() {
                     e.preventDefault();
                     toggleExcludedFromAbsence(project.workItemId, "thu");
                   }}
-                  style={{
-                    opacity: excludedFromAbsence[`${project.workItemId}-thu`]
-                      ? 0.3
-                      : 1,
-                    cursor: excludedFromAbsence[`${project.workItemId}-thu`]
-                      ? "not-allowed"
-                      : "text",
-                  }}
+                  className={
+                    excludedFromAbsence[`${project.workItemId}-thu`]
+                      ? "input-excluded"
+                      : ""
+                  }
                 />
               </div>
 
-              <div style={{ position: "relative" }}>
+              <div className="day-input-wrapper">
                 {isOvertime(project.workItemId, "fri") && (
                   <span className="overtime-indicator">
                     +
@@ -313,14 +301,11 @@ export function TimesheetPage() {
                     e.preventDefault();
                     toggleExcludedFromAbsence(project.workItemId, "fri");
                   }}
-                  style={{
-                    opacity: excludedFromAbsence[`${project.workItemId}-fri`]
-                      ? 0.3
-                      : 1,
-                    cursor: excludedFromAbsence[`${project.workItemId}-fri`]
-                      ? "not-allowed"
-                      : "text",
-                  }}
+                  className={
+                    excludedFromAbsence[`${project.workItemId}-fri`]
+                      ? "input-excluded"
+                      : ""
+                  }
                 />
               </div>
               <div className="total">
@@ -337,17 +322,7 @@ export function TimesheetPage() {
               </button>
             </div>
           ))}
-          {hoursError && (
-            <p
-              style={{
-                color: "#f59e0b",
-                fontSize: "0.85rem",
-                margin: "8px 16px",
-              }}
-            >
-              {hoursError}
-            </p>
-          )}
+          {hoursError && <p className="hours-error">{hoursError}</p>}
           <div className="timesheet-actions">
             <button
               className="add-project"
@@ -356,25 +331,22 @@ export function TimesheetPage() {
             >
               + Legg til nytt prosjekt
             </button>
-            <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+            <div className="timesheet-actions-right">
               {showAbsencePrompt && (
                 <button
-                  className="add-project"
+                  className="add-project absence-prompt-btn"
                   type="button"
                   onClick={navigateToAbsence}
-                  style={{ borderColor: "rgba(198, 0, 255, 0.6" }}
                 >
                   Registrer fravær?
                 </button>
               )}
               <button
-                className="save-btn"
+                className={
+                  hasUnsavedChanges ? "save-btn" : "save-btn save-btn--saved"
+                }
                 type="button"
                 onClick={handleSave}
-                style={{
-                  opacity: hasUnsavedChanges ? 1 : 0.4,
-                  transition: "opacity 0.3s ease",
-                }}
               >
                 Lagre
               </button>
@@ -404,8 +376,7 @@ export function TimesheetPage() {
           onClick={() => setIsCalendarOpen(false)}
         >
           <div
-            className="modal-content"
-            style={{ width: "fit-content" }}
+            className="modal-content modal-content--calendar"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -415,7 +386,7 @@ export function TimesheetPage() {
             >
               x
             </button>
-            <h5 style={{ margin: "0 0 16px" }}>Uke {weekNumber}</h5>
+            <h5 className="modal-week-title">Uke {weekNumber}</h5>
             <DatePicker
               type="range"
               value={[startDate, endDate] as DatesRangeValue}

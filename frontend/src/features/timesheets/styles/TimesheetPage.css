@@ -307,6 +307,12 @@ textarea.dark-input {
   border-radius: 10px;
   color: white;
   cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.save-btn--saved {
+    opacity: 0.4;
+    transition: opacity 0.3s ease;
 }
 
 .save-btn:hover {
@@ -350,3 +356,39 @@ textarea.dark-input {
   border-radius: 8px;
   vertical-align: middle;
 }
+
+.day-input-wrapper {
+    position: relative;
+}
+
+.input-excluded {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.hours-error{
+    color: #f59e0b;
+    font-size: 0.85rem;
+    margin: 8px 16px;
+}
+
+.timesheet-actions-right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.absence-prompt-btn {
+    border-color: rgba(198, 0, 255, 0.6);
+}
+
+.modal-content--calendar {
+    width: fit-content;
+}
+
+.modal-week-title {
+    margin: 0 0 16px;
+}
+
+
+
