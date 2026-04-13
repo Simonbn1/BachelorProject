@@ -90,6 +90,7 @@ export function TimesheetPage() {
 
   const { handleExportExcel, handleExportInvoiceBasis } = useTimesheetExport({
     weekStart,
+    visibleProjects,
   });
 
   return (
@@ -175,7 +176,7 @@ export function TimesheetPage() {
                 {isOvertime(project.workItemId, "mon") && (
                   <span className="overtime-indicator">
                     +
-                    {(getNumericValue(project.workItemId, "mon") - 7.5)
+                    {(getNumericValue(project.workItemId, "mon") - 8)
                       .toFixed(1)
                       .replace(".", ",")}
                     t
@@ -203,7 +204,7 @@ export function TimesheetPage() {
                 {isOvertime(project.workItemId, "tue") && (
                   <span className="overtime-indicator">
                     +
-                    {(getNumericValue(project.workItemId, "tue") - 7.5)
+                    {(getNumericValue(project.workItemId, "tue") - 8)
                       .toFixed(1)
                       .replace(".", ",")}
                     t
@@ -230,7 +231,7 @@ export function TimesheetPage() {
                 {isOvertime(project.workItemId, "wed") && (
                   <span className="overtime-indicator">
                     +
-                    {(getNumericValue(project.workItemId, "wed") - 7.5)
+                    {(getNumericValue(project.workItemId, "wed") - 8)
                       .toFixed(1)
                       .replace(".", ",")}
                     t
@@ -257,7 +258,7 @@ export function TimesheetPage() {
                 {isOvertime(project.workItemId, "thu") && (
                   <span className="overtime-indicator">
                     +
-                    {(getNumericValue(project.workItemId, "thu") - 7.5)
+                    {(getNumericValue(project.workItemId, "thu") - 8)
                       .toFixed(1)
                       .replace(".", ",")}
                     t
@@ -285,7 +286,7 @@ export function TimesheetPage() {
                 {isOvertime(project.workItemId, "fri") && (
                   <span className="overtime-indicator">
                     +
-                    {(getNumericValue(project.workItemId, "fri") - 7.5)
+                    {(getNumericValue(project.workItemId, "fri") - 8)
                       .toFixed(1)
                       .replace(".", ",")}
                     t

@@ -135,7 +135,7 @@ export function useTimesheet() {
     0,
   );
 
-  const weeklyTarget = 37.5;
+  const weeklyTarget = 40;
   const progressPercent = Math.min((weekTotal / weeklyTarget) * 100, 100);
   const overtimeTotal = Math.max(0, weekTotal - weeklyTarget);
 

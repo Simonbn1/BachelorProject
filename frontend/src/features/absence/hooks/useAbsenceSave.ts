@@ -1,5 +1,6 @@
 import type { AbsencePayloadEntry } from "./useAbsence.ts";
 import { saveAbsences, saveAbsencesFromPayload } from "../api/absenceApi.ts";
+import { useToasts } from "../../../shared/hooks/useToasts.ts";
 
 type UseAbsenceSaveProps = {
   hours: Record<string, string>;
@@ -24,12 +25,14 @@ export function useAbsenceSave({
   absencePayload,
   days,
 }: UseAbsenceSaveProps) {
+  const { showToast } = useToasts();
+
   async function handleSave() {
     const userId = Number(localStorage.getItem("userId") ?? "1");
     const isRangeBased = absenceType === "VACATION" || absenceType === "LEAVE";
 
     if (!absenceType) {
-      alert("Velg årsak til fravær først.");
+      showToast("warning", "Mangler årsak", "Velg årsak til fravær først.");
       return;
     }
 
@@ -41,34 +44,38 @@ export function useAbsenceSave({
           description,
           absencePayload,
         );
-        alert("Fravær lagret");
+        showToast("success", "Fravær lagret");
       } catch (error) {
         const message =
           error instanceof Error
             ? error.message
             : "Noe gikk galt. Sjekk konsollen";
-        alert(message);
+        showToast("error", "Feil ved lagring", message);
       }
       return;
     }
 
     if (!projectId) {
-      alert("Velg et prosjekt først.");
+      showToast("warning", "Mangler prosjekt", "Velg et prosjekt først.");
       return;
     }
 
     if (isRangeBased && (!selectedStartDate || !selectedEndDate)) {
-      alert("Velg en periode først.");
+      showToast("warning", "Mangler periode", "Velg en periode først.");
       return;
     }
 
     if (!isRangeBased && Object.keys(hours).length === 0) {
-      alert("Fyll inn timer for minst en dag.");
+      showToast("warning", "Mangler timer", "Fyll inn timer for minst en dag.");
       return;
     }
 
     if (selectedWorkItemIds.length === 0) {
-      alert("Velg en arbeidsoppgave først.");
+      showToast(
+        "warning",
+        "Mangler arbeidsoppgave",
+        "Velg en arbeidsoppgave først.",
+      );
       return;
     }
 
@@ -91,13 +98,13 @@ export function useAbsenceSave({
           isRangeBased,
         );
       }
-      alert("Fravær lagret!");
+      showToast("success", "Fravær lagret!");
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
           : "Noe gikk galt. Sjekk konsollen";
-      alert(message);
+      showToast("error", "Feil ved lagring", message);
     }
   }
 

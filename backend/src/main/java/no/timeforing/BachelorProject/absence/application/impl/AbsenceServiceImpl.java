@@ -59,7 +59,7 @@ public class AbsenceServiceImpl implements AbsenceService {
             .mapToDouble(no.timeforing.BachelorProject.timesheet.domain.TimeEntry::getHours)
             .sum();
 
-    double MAX_DAILY_HOURS = 7.5;
+    double MAX_DAILY_HOURS = 8;
     if (existingHours > 0) {
         double remaining = MAX_DAILY_HOURS - existingHours;
         if (remaining <= 0) {

@@ -35,7 +35,7 @@ export default function DateRangeInput({
 
     while (cur <= end) {
       const d = cur.getDay();
-      if (d >= 1 && d <= 5) updated[DAY_KEYS[d]] = "7.5";
+      if (d >= 1 && d <= 5) updated[DAY_KEYS[d]] = "8";
       cur.setDate(cur.getDate() + 1);
     }
     onHoursChange(updated);

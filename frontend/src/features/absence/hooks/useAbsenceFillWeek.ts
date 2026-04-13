@@ -23,7 +23,7 @@ export function useAbsenceFillWeek({
         const key = wId !== null ? `${wId}-${day}` : day;
         const val = parseFloat((updated[key] ?? "0").replace(",", ".")) || 0;
         if (val === 0) {
-          updated[key] = "7.5";
+          updated[key] = "8";
         }
       }
     }

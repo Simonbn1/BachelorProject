@@ -49,9 +49,9 @@ export function useAbsenceNavigation({
         0,
       );
 
-      if (totalWorked >= 7.5) continue;
+      if (totalWorked >= 8) continue;
 
-      const missing = parseFloat((7.5 - totalWorked).toFixed(1));
+      const missing = parseFloat((8 - totalWorked).toFixed(1));
 
       const responsibleProject = visibleProjects.find(
         (p) => !excludedFromAbsence[`${p.workItemId}-${day}`],
@@ -107,7 +107,7 @@ export function useAbsenceNavigation({
         0,
       );
 
-      if (totalWorked >= 7.5) continue;
+      if (totalWorked >= 8) continue;
 
       const eligbleProjects = visibleProjects.filter(
         (p) => !excludedFromAbsence[`${p.workItemId}-${day}`],

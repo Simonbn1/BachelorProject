@@ -79,7 +79,7 @@ export function useTimesheetActions({
   }
 
   function isOvertime(workItemId: number, day: string) {
-    return getNumericValue(workItemId, day) > 7.5;
+    return getNumericValue(workItemId, day) > 8;
   }
 
   function toggleExcludedFromAbsence(workItemId: number, day: string) {
@@ -171,7 +171,7 @@ export function useTimesheetActions({
         (sum, project) => sum + getNumericValue(project.workItemId, day),
         0,
       );
-      return totalWorked < 7.5;
+      return totalWorked < 8;
     });
 
     if (passedDaysWithMissingHours.length === 0) {
@@ -192,7 +192,7 @@ export function useTimesheetActions({
     showToast(
       "warning",
       "Timer lagret!",
-      `Timer lagret! Du har ikke registrert 7,5 timer for: ${dayNames}.`,
+      `Timer lagret! Du har ikke registrert 8 timer for: ${dayNames}.`,
     );
     setShowAbsencePrompt(true);
     return;

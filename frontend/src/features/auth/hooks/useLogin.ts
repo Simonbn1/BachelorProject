@@ -3,11 +3,13 @@ import { useState } from "react";
 import { login } from "../api/authApi.ts";
 import { saveAuth } from "../types/auth.ts";
 import { validateLogin } from "../utils/validateLogin.ts";
+import { useToasts } from "../../../shared/hooks/useToasts.ts";
 
 export function useLogin() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { showToast } = useToasts();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +31,7 @@ export function useLogin() {
       }
     } catch (err) {
       console.error(err);
-      alert("Login failed");
+      showToast("error", "Login failed");
     }
   };
 

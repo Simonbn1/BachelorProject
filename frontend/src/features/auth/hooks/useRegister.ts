@@ -3,6 +3,7 @@ import { saveAuth } from "../types/auth.ts";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { validateRegister } from "../utils/validateRegister.ts";
+import { useToasts } from "../../../shared/hooks/useToasts.ts";
 
 export function useRegister() {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ export function useRegister() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [errorField, setErrorField] = useState<string | null>(null);
+  const { showToast } = useToasts();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +43,7 @@ export function useRegister() {
       }
     } catch (err) {
       console.error(err);
-      alert("Register failed");
+      showToast("error", "Register failed");
     }
   };
 

@@ -131,7 +131,7 @@ export function useAbsence() {
     }
     return sum + (parseFloat((hours[day] ?? "0").replace(",", ".")) || 0);
   }, 0);
-  const weeklyTarget = 37.5;
+  const weeklyTarget = 40;
   const progressPercent = Math.min((weekTotal / weeklyTarget) * 100, 100);
 
   return {

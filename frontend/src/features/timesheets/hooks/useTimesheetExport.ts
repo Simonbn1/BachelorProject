@@ -2,13 +2,29 @@ import {
   exportInvoiceBasisExcel,
   exportTimesheetExcel,
 } from "../api/timesheetsApi.ts";
+import { useToasts } from "../../../shared/hooks/useToasts.ts";
+import type { ProjectWithWorkItem } from "./useTimesheet.ts";
 
 type UseTimesheetExportProps = {
   weekStart: string;
+  visibleProjects: ProjectWithWorkItem[];
 };
 
-export function useTimesheetExport({ weekStart }: UseTimesheetExportProps) {
+export function useTimesheetExport({
+  weekStart,
+  visibleProjects,
+}: UseTimesheetExportProps) {
+  const { showToast } = useToasts();
+
   async function handleExportExcel() {
+    if (visibleProjects.length === 0) {
+      showToast(
+        "warning",
+        "Ingen data",
+        "Legg til et prosjekt og registrer timer før du eksporterer.",
+      );
+      return;
+    }
     try {
       const blob = await exportTimesheetExcel(weekStart);
 
@@ -25,11 +41,23 @@ export function useTimesheetExport({ weekStart }: UseTimesheetExportProps) {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Excel-eksport feilet:", error);
-      alert("Kunne ikke eksportere timeliste til Excel");
+      showToast(
+        "error",
+        "Eksport feilet",
+        "Kunne ikke eksportere timeliste til Excel",
+      );
     }
   }
 
   async function handleExportInvoiceBasis() {
+    if (visibleProjects.length === 0) {
+      showToast(
+        "warning",
+        "Ingen data",
+        "Legg til et prosjekt og registrer timer før du eksporterer.",
+      );
+      return;
+    }
     try {
       const blob = await exportInvoiceBasisExcel(weekStart);
 
@@ -46,7 +74,11 @@ export function useTimesheetExport({ weekStart }: UseTimesheetExportProps) {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Eksport av fakturagrunnlag feilet:", error);
-      alert("Kunne ikke eksportere fakturagrunnlag");
+      showToast(
+        "error",
+        "Eksport feilet",
+        "Kunne ikke eksportere fakturagrunnlag",
+      );
     }
   }
 
