@@ -35,7 +35,7 @@ public class AbsenceServiceImpl implements AbsenceService {
             .findByUserIdAndWeekStart(userId, weekStart)
             .orElseGet(() -> {
                 User user = userRepository.findById(userId)
-                     .orElseThrow(() -> new IllegalArgumentException("No user found with id: " + userId));
+                     .orElseThrow(() -> new IllegalArgumentException("Ingen bruker funnet med id: " + userId));
                 Timesheet newTs = new Timesheet(user, weekStart);
                 return timesheetRepository.save(newTs);
             });
@@ -45,12 +45,12 @@ public class AbsenceServiceImpl implements AbsenceService {
   @Override
   public Absence upsertAbsence(
       Long userId, LocalDate weekStart, LocalDate absenceDate, AbsenceType type, String description, double hours, Long projectId, Long workItemId) {
-    if (hours < 0) throw new IllegalArgumentException("Hours cannot be negative.");
+    if (hours < 0) throw new IllegalArgumentException("Timer kan ikke være negative.");
 
     Timesheet ts = findOrCreateTimesheet(userId, weekStart);
 
     if (ts.getStatus() == TimesheetStatus.SENT || ts.getStatus() == TimesheetStatus.APPROVED) {
-      throw new IllegalStateException("Timesheet is sent/approved and cannot be edited.");
+      throw new IllegalStateException("Timene har blitt sendt/godkjet og kan ikke bli redigert.");
     }
 
     double existingHours = timeEntryRepository
@@ -64,14 +64,14 @@ public class AbsenceServiceImpl implements AbsenceService {
         double remaining = MAX_DAILY_HOURS - existingHours;
         if (remaining <= 0) {
             throw new IllegalStateException(
-                    "Kan ikke registrere fravær for " + absenceDate + ": dagen er allerede fult registrert (" + existingHours + "t)."
+                    "Kan ikke registrere fravær for " + absenceDate + ": brukeren har allerede registrert " + existingHours + "timer denne dagen, som tilsvarer en full arbeidsdag (7,5t)."
             );
         }
 
         if (hours > remaining) {
             throw new IllegalStateException(
-                    "kan ikke registrere " + hours + "t fravær for " + absenceDate +
-                            ": brukeren har allerede " + existingHours + "t, maks er " + MAX_DAILY_HOURS + "t."
+                    "Kan ikke registrere fravær for " + absenceDate + ": brukeren har allerede registrert " + existingHours +
+                            " timer denne dagen. Å legge til " + hours + " fraværstimer ville overskride en full arbeidsdag på " + MAX_DAILY_HOURS + "t."
             );
         }
     }

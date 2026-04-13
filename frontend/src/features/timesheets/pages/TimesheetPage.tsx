@@ -1,466 +1,96 @@
-import { useEffect, useState } from "react";
-import { fetchProjects } from "../../projects/api/projectsApi";
-import type { Project } from "../../projects/types/projects";
 import TopBar from "../../../shared/components/TopBar";
-import {
-  deleteTimeEntries,
-  fetchTimeEntries,
-  fetchWorkItems,
-  saveTimeEntries,
-  exportTimesheetExcel,
-  exportInvoiceBasisExcel,
-} from "../api/timesheetsApi.ts";
-import { useTimesheetWeek, parseLocalDate } from "../hooks/useTimesheetWeek.ts";
 import "../styles/TimesheetHeader.css";
 import { DatePicker, type DatesRangeValue } from "@mantine/dates";
 import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import MultiSelectDropdown from "../components/MultiSelectDropdown.tsx";
-
-type HoursState = Record<string, string>;
-type ProjectWithWorkItem = Project & {
-  workItemId: number;
-  workItemTitle?: string;
-};
+import { useTimesheet } from "../hooks/useTimesheet.ts";
+import { useTimesheetActions } from "../hooks/useTimesheetActions.ts";
+import { useAbsenceNavigation } from "../hooks/useAbsenceNavigation.ts";
+import { useTimesheetExport } from "../hooks/useTimesheetExport.ts";
 
 export function TimesheetPage() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [visibleProjects, setVisibleProjects] = useState<ProjectWithWorkItem[]>(
-    [],
-  );
-  const [hours, setHours] = useState<HoursState>({});
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [selectedProjectId, setSelectedProjectId] = useState("");
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [showAbsencePrompt, setShowAbsencePrompt] = useState(false);
-  const [workItems, setWorkItems] = useState<{ id: number; title: string }[]>(
-    [],
-  );
-  const [selectedWorkItemId, setSelectedWorkItemId] = useState<number[]>([]);
-  const [excludedFromAbsence, setExcludedFromAbsence] = useState<
-    Record<string, boolean>
-  >({});
-  const [hoursError, setHoursError] = useState<string | null>(null);
+  const {
+    projects,
+    visibleProjects,
+    setVisibleProjects,
+    hours,
+    setHours,
+    isAddModalOpen,
+    setIsAddModalOpen,
+    selectedProjectId,
+    setSelectedProjectId,
+    isCalendarOpen,
+    setIsCalendarOpen,
+    showAbsencePrompt,
+    setShowAbsencePrompt,
+    workItems,
+    setWorkItems,
+    selectedWorkItemId,
+    setSelectedWorkItemId,
+    excludedFromAbsence,
+    setExcludedFromAbsence,
+    hoursError,
+    setHoursError,
+    hasUnsavedChanges,
+    setHasUnsavedChanges,
+    weekStart,
+    weekLabel,
+    weekNumber,
+    startDate,
+    endDate,
+    goToPreviousWeek,
+    goToNextWeek,
+    weekTotal,
+    weeklyTarget,
+    progressPercent,
+    overtimeTotal,
+    getNumericValue,
+    getRowTotal,
+  } = useTimesheet();
 
-  const { weekStart, weekLabel, weekNumber, goToPreviousWeek, goToNextWeek } =
-    useTimesheetWeek();
+  const { navigateToAbsence } = useAbsenceNavigation({
+    visibleProjects,
+    excludedFromAbsence,
+    startDate,
+    getNumericValue,
+    setShowAbsencePrompt,
+  });
 
-  const navigate = useNavigate();
-  const startDate = parseLocalDate(weekStart);
-  const endDate = new Date(startDate);
-  endDate.setDate(startDate.getDate() + 4);
+  const {
+    handleChange,
+    handleSave,
+    removeProject,
+    addSelectedProject,
+    toggleExcludedFromAbsence,
+    isOvertime,
+    loadWorkItemsForProject,
+  } = useTimesheetActions({
+    hours,
+    setHours,
+    visibleProjects,
+    setVisibleProjects,
+    selectedProjectId,
+    selectedWorkItemId,
+    setSelectedWorkItemId,
+    setSelectedProjectId,
+    workItems,
+    setWorkItems,
+    excludedFromAbsence,
+    setExcludedFromAbsence,
+    setHoursError,
+    setHasUnsavedChanges,
+    setIsAddModalOpen,
+    setShowAbsencePrompt,
+    weekStart,
+    startDate,
+    getNumericValue,
+    navigateToAbsence,
+    projects,
+  });
 
-  useEffect(() => {
-    setHours({});
-    setVisibleProjects([]);
-    setShowAbsencePrompt(false);
-
-    async function loadEntries() {
-      try {
-        const userId = 1;
-        const entries = await fetchTimeEntries(userId, weekStart);
-
-        if (entries.length === 0) return;
-
-        const loadedHours: HoursState = {};
-        const loadedWorkItems = new Map<
-          number,
-          { projectId: number; title: string }
-        >();
-
-        for (const entry of entries) {
-          const projectId = entry.workItem.project.id;
-          const workItemId = entry.workItem.id;
-          const workItemTitle = entry.workItem.title;
-          const date = new Date(entry.entryDate);
-          const dayIndex = date.getDay();
-          const dayKeys: Record<number, string> = {
-            1: "mon",
-            2: "tue",
-            3: "wed",
-            4: "thu",
-            5: "fri",
-          };
-          const day = dayKeys[dayIndex];
-          if (day) {
-            loadedHours[`${workItemId}-${day}`] = String(entry.hours).replace(
-              ".",
-              ",",
-            );
-          }
-          loadedWorkItems.set(workItemId, { projectId, title: workItemTitle });
-        }
-
-        const loadedProjects: ProjectWithWorkItem[] = [];
-        for (const [workItemId, { projectId, title }] of loadedWorkItems) {
-          const project = projects.find((p) => p.id === projectId);
-          if (project) {
-            loadedProjects.push({
-              ...project,
-              workItemId,
-              workItemTitle: title,
-            });
-          }
-        }
-
-        setVisibleProjects(loadedProjects);
-        setHours(loadedHours);
-      } catch (error) {
-        console.error("Kunne ikke hente timeføringer:", error);
-      }
-    }
-    loadEntries();
-  }, [weekStart, projects]);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const data = await fetchProjects();
-        setProjects(data);
-      } catch (error) {
-        console.error("Kunne ikke hente prosjekter:", error);
-      }
-    }
-    load();
-  }, []);
-
-  function handleChange(workItemId: number, day: string, value: string) {
-    const normalized = value.replace(",", ".");
-    const key = `${workItemId}-${day}`;
-
-    if (normalized === "" || /^(\d+)?([.]\d{0,1})?$/.test(normalized)) {
-      const parsed = parseFloat(normalized);
-      if (!isNaN(parsed) && parsed > 16) {
-        setHoursError("Du kan ikke registrere mer enn 16 timer per dag.");
-        return;
-      }
-      setHours((prev) => ({
-        ...prev,
-        [key]: value,
-      }));
-    }
-  }
-
-  function isOvertime(workItemId: number, day: string) {
-    return getNumericValue(workItemId, day) > 7.5;
-  }
-
-  function getNumericValue(workItemId: number, day: string) {
-    const raw = hours[`${workItemId}-${day}`] ?? "0";
-    return Number.parseFloat(raw.replace(",", ".")) || 0;
-  }
-
-  function getRowTotal(workItemId: number) {
-    const days = ["mon", "tue", "wed", "thu", "fri"];
-    return days.reduce((sum, day) => sum + getNumericValue(workItemId, day), 0);
-  }
-
-  const weekTotal = visibleProjects.reduce(
-    (sum, project) => sum + getRowTotal(project.workItemId),
-    0,
-  );
-
-  const weeklyTarget = 37.5;
-  const progressPercent = Math.min((weekTotal / weeklyTarget) * 100, 100);
-  const overtimeTotal = Math.max(0, weekTotal - weeklyTarget);
-
-  async function removeProject(workItemId: number) {
-    const userId = 1;
-
-    try {
-      await deleteTimeEntries(userId, weekStart, workItemId);
-    } catch (error) {
-      console.debug("Kunne ikke hente prosjekter:", error);
-    }
-
-    setHours((prev) => {
-      const updated = { ...prev };
-      const days = ["mon", "tue", "wed", "thu", "fri"];
-      for (const day of days) {
-        delete updated[`${workItemId}-${day}`];
-      }
-      return updated;
-    });
-    setVisibleProjects((prev) =>
-      prev.filter((project) => project.workItemId !== workItemId),
-    );
-  }
-
-  function buildAbsencePayload() {
-    const days = ["mon", "tue", "wed", "thu", "fri"];
-    const today = new Date();
-    const dayIndexMap: Record<string, number> = {
-      mon: 0,
-      tue: 1,
-      wed: 2,
-      thu: 3,
-      fri: 4,
-    };
-
-    const result: {
-      projectId: number;
-      workItemId: number;
-      workItemTitle: string;
-      projectName: string;
-      missingHours: Record<string, number>;
-    }[] = [];
-
-    for (const day of days) {
-      const dayDate = new Date(startDate);
-      dayDate.setDate(startDate.getDate() + dayIndexMap[day]);
-      if (dayDate > today) continue;
-
-      const totalWorked = visibleProjects.reduce(
-        (sum, project) => sum + getNumericValue(project.workItemId, day),
-        0,
-      );
-
-      if (totalWorked >= 7.5) continue;
-
-      const missing = parseFloat((7.5 - totalWorked).toFixed(1));
-
-      const responsibleProject = visibleProjects.find(
-        (p) => !excludedFromAbsence[`${p.workItemId}-${day}`],
-      );
-
-      if (!responsibleProject) continue;
-
-      const existing = result.find(
-        (r) => r.workItemId === responsibleProject.workItemId,
-      );
-
-      if (existing) {
-        existing.missingHours[day] = missing;
-      } else {
-        result.push({
-          projectId: responsibleProject.id,
-          workItemId: responsibleProject.workItemId,
-          workItemTitle: responsibleProject.workItemTitle ?? "",
-          projectName: responsibleProject.name,
-          missingHours: { [day]: missing },
-        });
-      }
-    }
-    return result;
-  }
-
-  function toggleExcludedFromAbsence(workItemId: number, day: string) {
-    const key = `${workItemId}-${day}`;
-    setExcludedFromAbsence((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
-  }
-
-  function navigateToAbsence() {
-    const days = ["mon", "tue", "wed", "thu", "fri"];
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
-    const dayIndexMap: Record<string, number> = {
-      mon: 0,
-      tue: 1,
-      wed: 2,
-      thu: 3,
-      fri: 4,
-    };
-    const dayLabels: Record<string, string> = {
-      mon: "Mandag",
-      tue: "Tirsdag",
-      wed: "Onsdag",
-      thu: "Torsdag",
-      fri: "Fredag",
-    };
-
-    const conflictingDays: string[] = [];
-    for (const day of days) {
-      const dayDate = new Date(startDate);
-      dayDate.setDate(startDate.getDate() + dayIndexMap[day]);
-      if (dayDate > today) continue;
-
-      const totalWorked = visibleProjects.reduce(
-        (sum, project) => sum + getNumericValue(project.workItemId, day),
-        0,
-      );
-
-      if (totalWorked >= 7.5) continue;
-
-      const eligbleProjects = visibleProjects.filter(
-        (p) => !excludedFromAbsence[`${p.workItemId}-${day}`],
-      );
-      if (eligbleProjects.length > 1) {
-        conflictingDays.push(day);
-      }
-    }
-
-    if (conflictingDays.length > 0) {
-      const conflictNames = conflictingDays.map((d) => dayLabels[d]).join(", ");
-      alert(
-        `Flere prosjekter konkurrerer om fravær for: ${conflictNames}.\n\nHøyreklikk på dagen du ikke vil registrere fravær for å eksludere den.`,
-      );
-      setShowAbsencePrompt(true);
-      return;
-    }
-
-    const payload = buildAbsencePayload();
-    sessionStorage.setItem("absencePayload", JSON.stringify(payload));
-    navigate("/absence");
-  }
-
-  function addSelectedProject() {
-    const projectId = Number(selectedProjectId);
-    const projectToAdd = projects.find((project) => project.id === projectId);
-
-    if (!projectToAdd || selectedWorkItemId.length === 0) return;
-
-    for (const workItemId of selectedWorkItemId) {
-      const workItemToAdd = workItems.find((w) => w.id === workItemId);
-      if (!workItemToAdd) continue;
-
-      const alreadyExists = visibleProjects.some(
-        (project) => project.workItemId === workItemId,
-      );
-      if (alreadyExists) continue;
-
-      setVisibleProjects((prev) => [
-        ...prev,
-        { ...projectToAdd, workItemId, workItemTitle: workItemToAdd.title },
-      ]);
-    }
-
-    setIsAddModalOpen(false);
-    setSelectedProjectId("");
-    setSelectedWorkItemId([]);
-    setWorkItems([]);
-  }
-
-  // Save the project to the database
-  async function handleSave() {
-    const userId = 1;
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
-    const dayIndexMap: Record<string, number> = {
-      mon: 0,
-      tue: 1,
-      wed: 2,
-      thu: 3,
-      fri: 4,
-    };
-
-    try {
-      for (const project of visibleProjects) {
-        await saveTimeEntries(userId, weekStart, project.workItemId, hours);
-      }
-    } catch (error) {
-      console.error("Feil ved lagring:", error);
-      alert("Noe gikk galt ved lagring. Sjekk konsollen.");
-      return;
-    }
-
-    const days = ["mon", "tue", "wed", "thu", "fri"];
-    const passedDaysWithMissingHours = days.filter((day) => {
-      const dayDate = new Date(startDate);
-      dayDate.setDate(startDate.getDate() + dayIndexMap[day]);
-      if (dayDate > today) return false;
-      const totalWorked = visibleProjects.reduce(
-        (sum, project) => sum + getNumericValue(project.workItemId, day),
-        0,
-      );
-      return totalWorked < 7.5;
-    });
-
-    if (passedDaysWithMissingHours.length === 0) {
-      alert("Timer lagret!");
-      return;
-    }
-
-    const dayLabels: Record<string, string> = {
-      mon: "Mandag",
-      tue: "Tirsdag",
-      wed: "Onsdag",
-      thu: "Torsdag",
-      fri: "Fredag",
-    };
-    const dayNames = passedDaysWithMissingHours
-      .map((d) => dayLabels[d])
-      .join(", ");
-    const confirm = window.confirm(
-      `Timer lagret! Du har ikke registrert 7,5 timer for: ${dayNames}.\n\nØnsker du å registrere fravær for disse dagene?`,
-    );
-
-    if (!confirm) {
-      setShowAbsencePrompt(true);
-      return;
-    }
-
-    const conflictingDays: string[] = [];
-    for (const day of passedDaysWithMissingHours) {
-      const eligbleProjects = visibleProjects.filter(
-        (p) => !excludedFromAbsence[`${p.workItemId}-${day}`],
-      );
-      if (eligbleProjects.length > 1) {
-        conflictingDays.push(day);
-      }
-    }
-
-    if (conflictingDays.length > 0) {
-      const conflictNames = conflictingDays.map((d) => dayLabels[d]).join(", ");
-      alert(
-        `Flere prosjekter konkurrerer om fravær for: ${conflictNames}.\n\nHøyreklikk på dagen du ikke vil registrere fravær for å eksludere den.`,
-      );
-      setShowAbsencePrompt(true);
-      return;
-    }
-    navigateToAbsence();
-  }
-
-  async function handleExportExcel() {
-    try {
-      const blob = await exportTimesheetExcel(weekStart);
-
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-
-      link.href = url;
-      link.download = `timesheet-${weekStart}.xlsx`;
-
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Excel-eksport feilet:", error);
-      alert("Kunne ikke eksportere timeliste til Excel");
-    }
-  }
-
-  async function handleExportInvoiceBasis() {
-    try {
-      const blob = await exportInvoiceBasisExcel(weekStart);
-
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-
-      link.href = url;
-      link.download = `fakturagrunnlag-${weekStart}.xlsx`;
-
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Eksport av fakturagrunnlag feilet:", error);
-      alert("Kunne ikke eksportere fakturagrunnlag");
-    }
-  }
-
-  useEffect(() => {
-    if (hoursError) {
-      const timer = setTimeout(() => setHoursError(null), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [hoursError]);
+  const { handleExportExcel, handleExportInvoiceBasis } = useTimesheetExport({
+    weekStart,
+  });
 
   return (
     <div className="page">
@@ -737,7 +367,15 @@ export function TimesheetPage() {
                   Registrer fravær?
                 </button>
               )}
-              <button className="save-btn" type="button" onClick={handleSave}>
+              <button
+                className="save-btn"
+                type="button"
+                onClick={handleSave}
+                style={{
+                  opacity: hasUnsavedChanges ? 1 : 0.4,
+                  transition: "opacity 0.3s ease",
+                }}
+              >
                 Lagre
               </button>
               <button
@@ -815,18 +453,7 @@ export function TimesheetPage() {
                 onChange={async (e) => {
                   setSelectedProjectId(e.target.value);
                   setSelectedWorkItemId([]);
-                  if (e.target.value) {
-                    try {
-                      const items = await fetchWorkItems(
-                        Number(e.target.value),
-                      );
-                      setWorkItems(items);
-                    } catch (error) {
-                      console.error("Kunne ikke hente arbeidsoppgaver:", error);
-                    }
-                  } else {
-                    setWorkItems([]);
-                  }
+                  await loadWorkItemsForProject(e.target.value);
                 }}
               >
                 <option value="">Velg prosjekt...</option>
