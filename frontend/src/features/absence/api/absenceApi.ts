@@ -1,6 +1,6 @@
 import { api } from "../../../shared/api/client.ts";
 import axios from "axios";
-import type { AbsencePayloadEntry } from "../pages/AbsencePage.tsx";
+import type { AbsencePayloadEntry } from "../hooks/useAbsence.ts";
 
 function formatDate(date: Date): string {
   const year = date.getFullYear();
