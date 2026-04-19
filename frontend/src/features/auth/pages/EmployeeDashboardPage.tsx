@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { Clock3, CalendarX2, Settings, LogOut } from "lucide-react";
+import { Clock3, CalendarX2, Settings } from "lucide-react";
 import TopBar from "../../../shared/components/TopBar";
-import { logout, getAuthUser } from "../hooks/useAuth";
+import { getAuthUser } from "../hooks/useAuth";
 import "../../../shared/styles/EmployeeDashboardPage.css";
 
 type DashboardCard = {
@@ -14,6 +14,7 @@ type DashboardCard = {
 export default function EmployeeDashboardPage() {
   const navigate = useNavigate();
   const user = getAuthUser();
+  const firstName = user?.displayName?.split(" ")[0] || "der";
 
   const cards: DashboardCard[] = [
     {
@@ -36,11 +37,6 @@ export default function EmployeeDashboardPage() {
     },
   ];
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login", { replace: true });
-  };
-
   return (
     <div className="employee-dashboard-page">
       <div className="employee-dashboard-shell">
@@ -48,28 +44,12 @@ export default function EmployeeDashboardPage() {
 
         <section className="employee-dashboard-card-wrap">
           <div className="employee-dashboard-header">
-            <div>
-              <p className="employee-dashboard-kicker">TIMEOPPFØLGING</p>
-              <h1>Oversikt</h1>
-              <p className="employee-dashboard-subtitle">
-                Velg hva du vil jobbe med.
-              </p>
-            </div>
-
-            <div className="employee-dashboard-user-actions">
-              <span className="employee-dashboard-user-name">
-                {user?.displayName || "Bruker"}
-              </span>
-
-              <button
-                type="button"
-                className="employee-dashboard-logout-button"
-                onClick={handleLogout}
-              >
-                <LogOut size={18} />
-                <span>Logg ut</span>
-              </button>
-            </div>
+            <p className="employee-dashboard-kicker">TIMEOPPFØLGING</p>
+            <h1>Hei, {firstName}</h1>
+            <p className="employee-dashboard-subtitle">
+              Her kan du føre timer, registrere fravær og administrere kontoen
+              din.
+            </p>
           </div>
 
           <div className="employee-dashboard-grid">

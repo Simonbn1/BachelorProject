@@ -24,10 +24,6 @@
 }
 
 .employee-dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 24px;
   margin-bottom: 28px;
 }
 
@@ -54,46 +50,6 @@
   font-size: 1.02rem;
   line-height: 1.65;
   color: rgba(233, 238, 255, 0.78);
-}
-
-.employee-dashboard-user-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.employee-dashboard-user-name {
-  color: rgba(233, 238, 255, 0.86);
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.employee-dashboard-logout-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 42px;
-  padding: 10px 14px;
-  color: #f5f7ff;
-  font: inherit;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.055);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
-  cursor: pointer;
-  transition:
-    transform 0.18s ease,
-    background 0.18s ease,
-    border-color 0.18s ease,
-    box-shadow 0.18s ease;
-}
-
-.employee-dashboard-logout-button:hover {
-  transform: translateY(-1px);
-  background: rgba(255, 255, 255, 0.09);
-  border-color: rgba(160, 176, 255, 0.18);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
 }
 
 .employee-dashboard-grid {
@@ -181,15 +137,6 @@
 }
 
 @media (max-width: 760px) {
-  .employee-dashboard-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .employee-dashboard-user-actions {
-    justify-content: space-between;
-  }
-
   .employee-dashboard-grid {
     grid-template-columns: 1fr;
   }
