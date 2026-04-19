@@ -22,11 +22,79 @@
   position: relative;
 }
 
+.page-intro {
+  margin-bottom: 22px;
+}
+
+.page-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding: 10px 14px;
+  color: #eef2ff;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.page-back-button:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(150, 168, 255, 0.24);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.24);
+}
+
+.page-back-button:active {
+  transform: translateY(0);
+}
+
+.page-back-button:focus-visible {
+  outline: 2px solid rgba(143, 160, 255, 0.7);
+  outline-offset: 3px;
+}
+
+.page-kicker {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(226, 232, 255, 0.68);
+}
+
+.page-title {
+  margin: 0;
+  font-size: clamp(2.2rem, 4vw, 3.6rem);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #f5f7ff;
+}
+
+.page-subtitle {
+  margin-top: 12px;
+  max-width: 700px;
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: rgba(233, 238, 255, 0.78);
+}
+
 .timesheet-card {
   background: rgba(30, 35, 70, 0.86);
   border-radius: 18px;
   padding: 28px 26px 22px;
   backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 18px 60px rgba(0, 0, 0, 0.42);
   color: white;
@@ -62,6 +130,10 @@
   align-items: center;
   justify-content: center;
   font-size: 1.2rem;
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease;
 }
 
 .week-icon:hover {
@@ -83,6 +155,12 @@
   color: rgba(255, 255, 255, 0.55);
   font-size: 0.85rem;
   text-align: center;
+}
+
+.timesheet-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .timesheet-progress {
@@ -187,6 +265,7 @@ textarea.dark-input:focus {
   color: rgba(255, 80, 80, 0.7);
   cursor: pointer;
   font-size: 1.1rem;
+  transition: color 0.18s ease;
 }
 
 .delete-btn:hover {
@@ -198,6 +277,15 @@ textarea.dark-input:focus {
   justify-content: space-between;
   align-items: center;
   margin-top: 18px;
+  gap: 16px;
+}
+
+.timesheet-actions-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .add-project {
@@ -208,7 +296,9 @@ textarea.dark-input:focus {
   border-radius: 10px;
   color: white;
   cursor: pointer;
-  transition: 0.18s ease;
+  transition:
+    0.18s ease,
+    transform 0.18s ease;
 }
 
 .add-project:hover {
@@ -222,6 +312,7 @@ textarea.dark-input:focus {
   inset: 0;
   background: rgba(8, 12, 24, 0.52);
   backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   z-index: 1000;
   display: flex;
   justify-content: center;
@@ -241,6 +332,10 @@ textarea.dark-input:focus {
   color: white;
 }
 
+.modal-content--calendar {
+  width: fit-content;
+}
+
 .close-btn {
   position: absolute;
   top: 16px;
@@ -252,6 +347,9 @@ textarea.dark-input:focus {
   height: 34px;
   border-radius: 8px;
   cursor: pointer;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease;
 }
 
 .close-btn:hover {
@@ -307,7 +405,9 @@ textarea.dark-input {
   border-radius: 10px;
   color: white;
   cursor: pointer;
-  transition: 0.3s ease;
+  transition:
+    0.3s ease,
+    transform 0.18s ease;
 }
 
 .save-btn--saved {
@@ -318,12 +418,17 @@ textarea.dark-input {
 .save-btn:hover {
   background: linear-gradient(90deg, #c600ff, #6a5cff);
   border-color: transparent;
+  transform: translateY(-1px);
 }
 
 .modal-divider {
   border: none;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   margin: 16px 0;
+}
+
+.day-input-wrapper {
+  position: relative;
 }
 
 .overtime-indicator {
@@ -357,10 +462,6 @@ textarea.dark-input {
   vertical-align: middle;
 }
 
-.day-input-wrapper {
-  position: relative;
-}
-
 .input-excluded {
   opacity: 0.3;
   cursor: not-allowed;
@@ -372,20 +473,84 @@ textarea.dark-input {
   margin: 8px 16px;
 }
 
-.timesheet-actions-right {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
 .absence-prompt-btn {
   border-color: rgba(198, 0, 255, 0.6);
 }
 
-.modal-content--calendar {
-  width: fit-content;
-}
-
 .modal-week-title {
   margin: 0 0 16px;
+}
+
+@media (max-width: 1200px) {
+  .timesheet-columns,
+  .project-row {
+    grid-template-columns: 200px repeat(5, minmax(68px, 1fr)) 110px 40px;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 980px) {
+  .page {
+    padding: 18px 18px 32px;
+  }
+
+  .timesheet-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .timesheet-progress-wrap {
+    justify-content: flex-start;
+  }
+
+  .timesheet-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .timesheet-actions-right {
+    justify-content: flex-start;
+  }
+
+  .timesheet-card {
+    overflow-x: auto;
+  }
+
+  .timesheet-columns,
+  .project-row {
+    min-width: 900px;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .page-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .page-back-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .input-group-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .input-group-row label {
+    width: auto;
+  }
+
+  .dark-input {
+    width: 100%;
+  }
+
+  .modal-content {
+    padding: 22px 18px;
+  }
 }

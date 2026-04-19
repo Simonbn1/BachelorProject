@@ -1,7 +1,9 @@
 import TopBar from "../../../shared/components/TopBar";
+import "../styles/TimesheetPage.css";
 import "../styles/TimesheetHeader.css";
 import { DatePicker, type DatesRangeValue } from "@mantine/dates";
 import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import MultiSelectDropdown from "../components/MultiSelectDropdown.tsx";
 import { useTimesheet } from "../hooks/useTimesheet.ts";
 import { useTimesheetActions } from "../hooks/useTimesheetActions.ts";
@@ -9,6 +11,8 @@ import { useAbsenceNavigation } from "../hooks/useAbsenceNavigation.ts";
 import { useTimesheetExport } from "../hooks/useTimesheetExport.ts";
 
 export function TimesheetPage() {
+  const navigate = useNavigate();
+
   const {
     projects,
     visibleProjects,
@@ -98,6 +102,25 @@ export function TimesheetPage() {
       <div className="timesheet-shell">
         <TopBar />
 
+        <div className="page-intro">
+          <button
+            type="button"
+            className="page-back-button"
+            onClick={() => navigate("/dashboard")}
+          >
+            ← Tilbake til oversikt
+          </button>
+
+          <div className="page-intro-text">
+            <p className="page-kicker">TIMEOPPFØLGING</p>
+            <h1 className="page-title">Timeføring</h1>
+            <p className="page-subtitle">
+              Registrer timer, følg ukeoversikten og eksporter grunnlag ved
+              behov.
+            </p>
+          </div>
+        </div>
+
         <section className="timesheet-card">
           <div className="timesheet-header">
             <div className="timesheet-header-left">
@@ -135,7 +158,7 @@ export function TimesheetPage() {
             <div className="timesheet-progress-wrap">
               <div className="timesheet-progress">
                 <div className="progress-text">
-                  {weekTotal.toFixed(1).replace(".", ",")} /{""}
+                  {weekTotal.toFixed(1).replace(".", ",")} /{" "}
                   {weeklyTarget.toFixed(1).replace(".", ",")}
                   {overtimeTotal > 0 && (
                     <span className="overtime-badge">
@@ -172,6 +195,7 @@ export function TimesheetPage() {
                   Oppgave: {project.workItemTitle ?? `Prosjekt #${project.id}`}
                 </span>
               </div>
+
               <div className="day-input-wrapper">
                 {isOvertime(project.workItemId, "mon") && (
                   <span className="overtime-indicator">
@@ -182,7 +206,6 @@ export function TimesheetPage() {
                     t
                   </span>
                 )}
-
                 <input
                   value={hours[`${project.workItemId}-mon`] ?? ""}
                   placeholder="0,0"
@@ -200,6 +223,7 @@ export function TimesheetPage() {
                   }
                 />
               </div>
+
               <div className="day-input-wrapper">
                 {isOvertime(project.workItemId, "tue") && (
                   <span className="overtime-indicator">
@@ -227,6 +251,7 @@ export function TimesheetPage() {
                   }
                 />
               </div>
+
               <div className="day-input-wrapper">
                 {isOvertime(project.workItemId, "wed") && (
                   <span className="overtime-indicator">
@@ -254,6 +279,7 @@ export function TimesheetPage() {
                   }
                 />
               </div>
+
               <div className="day-input-wrapper">
                 {isOvertime(project.workItemId, "thu") && (
                   <span className="overtime-indicator">
@@ -309,6 +335,7 @@ export function TimesheetPage() {
                   }
                 />
               </div>
+
               <div className="total">
                 {getRowTotal(project.workItemId).toFixed(1).replace(".", ",")}
               </div>
@@ -323,7 +350,9 @@ export function TimesheetPage() {
               </button>
             </div>
           ))}
+
           {hoursError && <p className="hours-error">{hoursError}</p>}
+
           <div className="timesheet-actions">
             <button
               className="add-project"
@@ -332,6 +361,7 @@ export function TimesheetPage() {
             >
               + Legg til nytt prosjekt
             </button>
+
             <div className="timesheet-actions-right">
               {showAbsencePrompt && (
                 <button
@@ -342,6 +372,7 @@ export function TimesheetPage() {
                   Registrer fravær?
                 </button>
               )}
+
               <button
                 className={
                   hasUnsavedChanges ? "save-btn" : "save-btn save-btn--saved"
@@ -351,6 +382,7 @@ export function TimesheetPage() {
               >
                 Lagre
               </button>
+
               <button
                 className="add-project"
                 type="button"
@@ -454,6 +486,7 @@ export function TimesheetPage() {
                 />
               </div>
             )}
+
             <div className="action-buttons">
               <button
                 className="save-btn"
