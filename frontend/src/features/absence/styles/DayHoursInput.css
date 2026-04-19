@@ -1,44 +1,44 @@
 .day-hours-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .day-hours-row {
-    display: flex;
-    gap: 8px;
-    align-items: center;
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 .day-hours-cell {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
 }
 
 .day-hours-missing {
-    font-size: 0.7rem;
-    color: #f59e0b;
+  font-size: 0.7rem;
+  color: #f59e0b;
 }
 
 .day-hours-input {
-    width: 70px;
-    text-align: center;
+  width: 70px;
+  text-align: center;
 }
 
 .day-hours-input--locked {
-    opacity: 0.35;
-    cursor: not-allowed;
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 .day-hours-total {
-    width: 100px;
-    text-align: center;
+  width: 100px;
+  text-align: center;
 }
 
 .day-hours-error {
-    color: #f59e0b;
-    font-size: 0.85rem;
-    margin: 4px 0 0;
+  color: #f59e0b;
+  font-size: 0.85rem;
+  margin: 4px 0 0;
 }
