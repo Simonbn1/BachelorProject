@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "../styles/DayHoursInput.css";
 
 const DAYS = [
   { key: "mon", label: "Man" },
@@ -53,60 +54,36 @@ export default function DayHoursInput({
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-      <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+    <div className="day-hours-wrapper">
+      <div className="day-hours-row">
         {DAYS.map(({ key, label }) => {
           const isLocked = hasAbsenceParams && !(key in lockedDays);
           const missing = lockedDays[key];
           return (
-            <div
-              key={key}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "4px",
-                alignItems: "center",
-              }}
-            >
+            <div key={key} className="day-hours-cell">
               {hasAbsenceParams && missing !== undefined && (
-                <span
-                  style={{
-                    fontSize: "0.7rem",
-                    color: "#f59e0b",
-                  }}
-                >
+                <span className="day-hours-missing">
                   mangler {String(missing).replace(".", ",")}t
                 </span>
               )}
               <input
-                className="dark-input"
+                className={`dark-input day-hours-input${isLocked ? " day-hours-input--locked" : ""}`}
                 value={hours[getKey(key)] ?? ""}
                 onChange={(e) => handleDayChange(key, e.target.value)}
                 placeholder={label}
                 disabled={isLocked}
-                style={{
-                  width: "70px",
-                  textAlign: "center",
-                  opacity: isLocked ? 0.35 : 1,
-                  cursor: isLocked ? "not-allowed" : "text",
-                }}
               />
             </div>
           );
         })}
         <input
-          className="dark-input"
+          className="dark-input day-hours-total"
           placeholder="Totalt"
           readOnly
           value={total > 0 ? total : ""}
-          style={{ width: "100px", textAlign: "center" }}
         />
       </div>
-      {hoursError && (
-        <p style={{ color: "#f59e0b", fontSize: "0.85rem", margin: "4px 0 0" }}>
-          {hoursError}
-        </p>
-      )}
+      {hoursError && <p className="day-hours-error">{hoursError}</p>}
     </div>
   );
 }
