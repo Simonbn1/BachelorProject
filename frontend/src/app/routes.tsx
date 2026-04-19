@@ -3,6 +3,7 @@ import { TimesheetPage } from "../features/timesheets/pages/TimesheetPage.tsx";
 import AbsencePage from "../features/absence/pages/AbsencePage.tsx";
 import LoginPage from "../features/auth/pages/LoginPage.tsx";
 import RegisterPage from "../features/auth/pages/RegisterPage.tsx";
+import EmployeeDashboardPage from "../features/auth/pages/EmployeeDashboardPage.tsx";
 import ProtectedRoute from "../features/auth/components/ProtectedRoute.tsx";
 import AdminGuard from "../features/admin/components/AdminGuard";
 import AdminDashboardPage from "../features/admin/pages/AdminDashboardPage";
@@ -22,6 +23,14 @@ export const router = createBrowserRouter([
   {
     path: "/register",
     element: <RegisterPage />,
+  },
+  {
+    path: "/dashboard",
+    element: (
+      <ProtectedRoute>
+        <EmployeeDashboardPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/timesheet",

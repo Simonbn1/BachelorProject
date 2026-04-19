@@ -1,0 +1,196 @@
+.employee-dashboard-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(90, 110, 255, 0.16),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at top right,
+      rgba(118, 76, 255, 0.1),
+      transparent 24%
+    ),
+    linear-gradient(135deg, #131827 0%, #1d2336 45%, #252c42 100%);
+  color: #f5f7ff;
+}
+
+.employee-dashboard-shell {
+  padding: 20px;
+}
+
+.employee-dashboard-card-wrap {
+  margin-top: 22px;
+}
+
+.employee-dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.employee-dashboard-kicker {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(226, 232, 255, 0.68);
+}
+
+.employee-dashboard-header h1 {
+  margin: 0;
+  font-size: clamp(2.2rem, 4vw, 3.6rem);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.employee-dashboard-subtitle {
+  margin-top: 12px;
+  max-width: 680px;
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: rgba(233, 238, 255, 0.78);
+}
+
+.employee-dashboard-user-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.employee-dashboard-user-name {
+  color: rgba(233, 238, 255, 0.86);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.employee-dashboard-logout-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 10px 14px;
+  color: #f5f7ff;
+  font: inherit;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.employee-dashboard-logout-button:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(160, 176, 255, 0.18);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+}
+
+.employee-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.employee-dashboard-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  min-height: 240px;
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 24px;
+  background: rgba(16, 21, 36, 0.72);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: #f5f7ff;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+.employee-dashboard-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(154, 170, 255, 0.24);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.34);
+  background: rgba(19, 26, 44, 0.82);
+}
+
+.employee-dashboard-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: rgba(124, 144, 255, 0.12);
+  border: 1px solid rgba(154, 170, 255, 0.16);
+  color: #dce4ff;
+  flex-shrink: 0;
+}
+
+.employee-dashboard-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 30ch;
+}
+
+.employee-dashboard-card-body h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #f7f9ff;
+}
+
+.employee-dashboard-card-body p {
+  margin: 0;
+  color: rgba(226, 232, 255, 0.76);
+  line-height: 1.6;
+}
+
+.employee-dashboard-card-link {
+  margin-top: auto;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #dbe3ff;
+  opacity: 0.92;
+}
+
+@media (max-width: 1100px) {
+  .employee-dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .employee-dashboard-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .employee-dashboard-user-actions {
+    justify-content: space-between;
+  }
+
+  .employee-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}

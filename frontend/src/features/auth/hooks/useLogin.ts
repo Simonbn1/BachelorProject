@@ -27,7 +27,7 @@ export function useLogin() {
       if (res.user.roles.includes("ADMIN")) {
         navigate("/admin", { replace: true });
       } else {
-        navigate("/timesheet", { replace: true });
+        navigate("/dashboard", { replace: true });
       }
     } catch (err) {
       console.error(err);
