@@ -8,6 +8,7 @@ import AdminGuard from "../features/admin/components/AdminGuard";
 import AdminDashboardPage from "../features/admin/pages/AdminDashboardPage";
 import AdminTimesheetsPage from "../features/admin/pages/AdminTimesheetPage";
 import AdminEmployeesPage from "../features/admin/pages/AdminEmployeesPage";
+import AdminProjectsPage from "../features/admin/pages/AdminProjectsPage";
 
 export const router = createBrowserRouter([
   {
@@ -59,7 +60,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/admin/projects",
-        element: <div>Prosjekter kommer</div>,
+        element: <AdminProjectsPage />,
       },
     ],
   },
