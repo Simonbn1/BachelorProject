@@ -149,6 +149,9 @@ export default function AbsencePage() {
             selectedWorkItemIds={selectedWorkItemIds}
             onWorkItemIdsChange={setSelectedWorkItemIds}
             onFillWeek={handleFillWeek}
+            onRemoveWorkItem={(id) =>
+              setSelectedWorkItemIds((prev) => prev.filter((wId) => wId !== id))
+            }
           />
         </section>
       </div>

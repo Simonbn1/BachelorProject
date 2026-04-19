@@ -11,3 +11,15 @@ textarea.dark-input:focus {
   box-shadow: 0 0 0 3px rgba(198, 0, 255, 0.15);
   outline: none;
 }
+
+.date-range-label {
+  padding-top: 12px;
+}
+
+.date-range-picker {
+  width: 400px;
+}
+
+.date-range-row {
+  align-items: flex-start;
+}

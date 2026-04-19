@@ -42,8 +42,8 @@ export default function DateRangeInput({
   }
 
   return (
-    <div className="input-group-row" style={{ alignItems: "flex-start" }}>
-      <label style={{ paddingTop: "12px" }}>Periode:</label>
+    <div className="input-group-row date-range-row">
+      <label className="date-range-label">Periode:</label>
       <DatePickerInput
         type="range"
         placeholder="Velg periode..."
@@ -52,7 +52,7 @@ export default function DateRangeInput({
         locale="nb"
         weekendDays={[0, 6]}
         numberOfColumns={2}
-        style={{ width: "400px" }}
+        className="date-range-picker"
         styles={{
           input: {
             backgroundColor: "#2e335a",

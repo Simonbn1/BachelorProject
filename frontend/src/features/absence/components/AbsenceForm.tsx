@@ -4,6 +4,8 @@ import "../styles/calendar.css";
 import DateRangeInput from "./DateRangeInput.tsx";
 import DayHoursInput from "./DayHoursInput.tsx";
 import MultiSelectDropdown from "../../timesheets/components/MultiSelectDropdown.tsx";
+import "../styles/AbsenceForm.css";
+import { Trash2 } from "lucide-react";
 
 type AbsenceFormProps = {
   hours: Record<string, string>;
@@ -24,6 +26,7 @@ type AbsenceFormProps = {
   selectedWorkItemIds?: number[];
   onWorkItemIdsChange: (id: number[]) => void;
   onFillWeek: () => void;
+  onRemoveWorkItem?: (id: number) => void;
 };
 
 export default function AbsenceForm({
@@ -45,6 +48,7 @@ export default function AbsenceForm({
   selectedWorkItemIds,
   onWorkItemIdsChange,
   onFillWeek,
+  onRemoveWorkItem,
 }: AbsenceFormProps) {
   useEffect(() => {
     if (absenceType !== "VACATION" && absenceType !== "LEAVE") {
@@ -113,39 +117,23 @@ export default function AbsenceForm({
           onRangeChange={onRangeChange}
         />
       ) : (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "12px",
-            maxHeight: "150px",
-            overflowY: "auto",
-          }}
-        >
+        <div className="absence-hours-list">
           {(selectedWorkItemIds ?? []).length > 0 ? (
             <>
               {(selectedWorkItemIds ?? []).map((wId, index) => {
                 const workItem = workItems.find((w) => w.id === wId);
                 return (
-                  <div key={wId} className="input-group-row">
+                  <div
+                    key={wId}
+                    className="input-group-row absence-workitem-row"
+                  >
                     {index === 0 ? (
                       <label>Timer denne uka:</label>
                     ) : (
                       <label>&nbsp;</label>
                     )}
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "4px",
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: "0.85rem",
-                          color: "rgba(255,255,255,0,6)",
-                        }}
-                      >
+                    <div className="absence-workitem-details">
+                      <span className="absence-workitem-label">
                         {projects.find((p) => p.id === projectId)?.name} -{" "}
                         {workItem?.title}
                       </span>
@@ -157,6 +145,14 @@ export default function AbsenceForm({
                         workItemId={wId}
                       />
                     </div>
+                    <button
+                      className="delete-btn"
+                      type="button"
+                      aria-label="Fjern arbeidsoppgave"
+                      onClick={() => onRemoveWorkItem?.(wId)}
+                    >
+                      <Trash2 size={22} />
+                    </button>
                   </div>
                 );
               })}
@@ -173,7 +169,7 @@ export default function AbsenceForm({
             </div>
           )}
           {!hideProjectFields && (
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <div className="absence-fill-week">
               <button
                 className="add-project"
                 type="button"
@@ -187,7 +183,7 @@ export default function AbsenceForm({
       )}
 
       <hr className="modal-divider" />
-      <div style={{ display: "flex", gap: "40px", marginTop: "16px" }}>
+      <div className="absence-description-row">
         <div className="input-group-row">
           <label>Beskrivelse:</label>
           <textarea
@@ -200,7 +196,7 @@ export default function AbsenceForm({
       </div>
       <div className="timesheet-actions">
         <div />
-        <div style={{ display: "flex", gap: "40px" }}>
+        <div className="absence-save-row">
           <div />
           <button className="save-btn" type="button" onClick={onSave}>
             Lagre Fravær

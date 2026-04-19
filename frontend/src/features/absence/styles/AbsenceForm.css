@@ -1,0 +1,43 @@
+.absence-hours-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.absence-workitem-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.absence-workitem-label {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.absence-fill-week {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.absence-description-row {
+  display: flex;
+  gap: 40px;
+  margin-top: 16px;
+}
+
+.absence-save-row {
+  display: flex;
+  gap: 40px;
+}
+
+.absence-workitem-row {
+  align-items: center;
+}
+
+.absence-workitem-row .delete-btn {
+  align-self: center;
+  margin-top: 20px;
+}
