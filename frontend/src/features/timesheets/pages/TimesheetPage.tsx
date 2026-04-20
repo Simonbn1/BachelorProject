@@ -108,15 +108,14 @@ export function TimesheetPage() {
             className="page-back-button"
             onClick={() => navigate("/dashboard")}
           >
-            ← Tilbake til oversikt
+            ← ← Oversikt
           </button>
 
           <div className="page-intro-text">
             <p className="page-kicker">TIMEOPPFØLGING</p>
             <h1 className="page-title">Timeføring</h1>
             <p className="page-subtitle">
-              Registrer timer, følg ukeoversikten og eksporter grunnlag ved
-              behov.
+              Registrer timer for uken og følg totalen din.
             </p>
           </div>
         </div>
