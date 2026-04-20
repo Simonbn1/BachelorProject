@@ -108,7 +108,7 @@ export function TimesheetPage() {
             className="page-back-button"
             onClick={() => navigate("/dashboard")}
           >
-            ← ← Oversikt
+            ← Oversikt
           </button>
 
           <div className="page-intro-text">
