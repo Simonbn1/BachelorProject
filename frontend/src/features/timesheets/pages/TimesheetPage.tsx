@@ -103,15 +103,15 @@ export function TimesheetPage() {
         <TopBar />
 
         <div className="page-intro">
-          <button
-            type="button"
-            className="page-back-button"
-            onClick={() => navigate("/dashboard")}
-          >
-            ← Oversikt
-          </button>
-
           <div className="page-intro-text">
+            <button
+              type="button"
+              className="page-back-button"
+              onClick={() => navigate("/dashboard")}
+            >
+              ← Oversikt
+            </button>
+
             <p className="page-kicker">TIMEOPPFØLGING</p>
             <h1 className="page-title">Timeføring</h1>
             <p className="page-subtitle">
