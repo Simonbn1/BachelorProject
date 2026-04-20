@@ -24,6 +24,12 @@ export default function EmployeeDashboardPage() {
       icon: Clock3,
     },
     {
+      title: "Lagrede timer",
+      description: "Se og rediger lagrede timer.",
+      path: "/timesheet",
+      icon: Clock3,
+    },
+    {
       title: "Fravær",
       description: "Registrer ferie, sykdom og annet fravær.",
       path: "/absence",
