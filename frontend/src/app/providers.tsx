@@ -12,7 +12,7 @@ export default function Providers() {
   return (
     <MantineProvider theme={theme} defaultColorScheme="dark">
       <ToastProvider>
-        <RouterProvider router={router} />;
+        <RouterProvider router={router} />
       </ToastProvider>
     </MantineProvider>
   );
