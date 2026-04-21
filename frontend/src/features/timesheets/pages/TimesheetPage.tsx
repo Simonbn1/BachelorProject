@@ -20,6 +20,7 @@ type TimesheetPageProps = {
   title?: string;
   subtitle?: string;
   onCloseEmbedded?: () => void;
+  weekStartOverride?: string;
 };
 
 export function TimesheetPage({
@@ -31,10 +32,12 @@ export function TimesheetPage({
   hideCalendarButton = false,
   title = "Timeføring",
   subtitle = "Registrer timer for uken og følg totalen din.",
+  weekStartOverride,
 }: TimesheetPageProps) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const weekStartFromUrl = searchParams.get("weekStart");
+  const effectiveWeekStart = weekStartOverride ?? weekStartFromUrl;
 
   const {
     projects,
@@ -73,7 +76,7 @@ export function TimesheetPage({
     overtimeTotal,
     getNumericValue,
     getRowTotal,
-  } = useTimesheet(weekStartFromUrl);
+  } = useTimesheet(effectiveWeekStart);
 
   const { navigateToAbsence } = useAbsenceNavigation({
     visibleProjects,

@@ -133,11 +133,6 @@ export default function SavedTimesheetsPage() {
     setSelectedTimesheet(null);
   }
 
-  async function handleModalSaved() {
-    setActionMessage("Timesheet ble oppdatert.");
-    await loadTimesheets();
-  }
-
   async function handleModalResubmitted() {
     setActionMessage("Timesheet ble sendt inn på nytt.");
     await loadTimesheets();
@@ -272,7 +267,6 @@ export default function SavedTimesheetsPage() {
         opened={editModalOpen}
         timesheet={selectedTimesheet}
         onClose={handleCloseModal}
-        onSaved={handleModalSaved}
         onResubmitted={handleModalResubmitted}
       />
     </div>
