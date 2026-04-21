@@ -1,6 +1,7 @@
 package no.timeforing.BachelorProject.timesheet.api;
 
 import no.timeforing.BachelorProject.timesheet.domain.Timesheet;
+import no.timeforing.BachelorProject.timesheet.dto.SavedTimesheetResponse;
 import no.timeforing.BachelorProject.timesheet.dto.SubmitTimesheetRequest;
 import no.timeforing.BachelorProject.timesheet.application.TimesheetService;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -13,13 +14,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/timesheets")
 public class TimesheetController {
 
     private final TimesheetService timesheetService;
-
     private final TimesheetExportService exportService;
 
     public TimesheetController(TimesheetService timesheetService,
@@ -32,6 +33,18 @@ public class TimesheetController {
     public Timesheet submit(@RequestBody SubmitTimesheetRequest req, JwtAuthenticationToken auth) {
         Long effectiveUserId = effectiveUserId(req.userId, auth);
         return timesheetService.submitTimesheet(effectiveUserId, req.weekStart);
+    }
+
+    @GetMapping("/me/drafts")
+    public List<SavedTimesheetResponse> getDrafts(JwtAuthenticationToken auth) {
+        Long userId = Long.valueOf(auth.getToken().getSubject());
+        return timesheetService.getDraftTimesheets(userId);
+    }
+
+    @DeleteMapping("/{timesheetId}")
+    public void deleteTimesheet(@PathVariable Long timesheetId, JwtAuthenticationToken auth) {
+        Long userId = Long.valueOf(auth.getToken().getSubject());
+        timesheetService.deleteTimesheet(userId, timesheetId);
     }
 
     private Long effectiveUserId(Long requestedUserId, JwtAuthenticationToken auth) {

@@ -1,4 +1,8 @@
 import { api } from "../../../shared/api/client";
+import type {
+  SavedTimesheet,
+  SubmitTimesheetRequest,
+} from "../types/timesheet";
 
 export async function fetchTimeEntries(userId: number, weekStart: string) {
   const response = await api.get("api/time-entries", {
@@ -80,4 +84,18 @@ export async function exportInvoiceBasisExcel(
   });
 
   return response.data;
+}
+
+export async function fetchDraftTimesheets(): Promise<SavedTimesheet[]> {
+  const response = await api.get("/api/timesheets/me/drafts");
+  return response.data;
+}
+
+export async function submitTimesheet(payload: SubmitTimesheetRequest) {
+  const response = await api.post("/api/timesheets/submit", payload);
+  return response.data;
+}
+
+export async function deleteTimesheet(timesheetId: number) {
+  await api.delete(`/api/timesheets/${timesheetId}`);
 }

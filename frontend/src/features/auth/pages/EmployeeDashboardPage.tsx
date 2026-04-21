@@ -26,7 +26,7 @@ export default function EmployeeDashboardPage() {
     {
       title: "Lagrede timer",
       description: "Se og rediger lagrede timer.",
-      path: "/timesheet",
+      path: "/timesheets/saved",
       icon: Clock3,
     },
     {

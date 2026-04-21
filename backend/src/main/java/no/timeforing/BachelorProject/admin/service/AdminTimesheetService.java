@@ -8,6 +8,7 @@ import no.timeforing.BachelorProject.admin.api.dto.AdminTimesheetDetailResponse;
 import no.timeforing.BachelorProject.admin.api.dto.AdminTimesheetSummaryResponse;
 import no.timeforing.BachelorProject.timesheet.domain.TimeEntry;
 import no.timeforing.BachelorProject.timesheet.domain.Timesheet;
+import no.timeforing.BachelorProject.timesheet.domain.enums.TimesheetStatus;
 import no.timeforing.BachelorProject.timesheet.repository.TimeEntryRepository;
 import no.timeforing.BachelorProject.timesheet.repository.TimesheetRepository;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,16 @@ public class AdminTimesheetService {
     }
 
     public List<AdminTimesheetSummaryResponse> getTimesheetsForWeek(LocalDate weekStart) {
-        List<Timesheet> timesheets = timesheetRepository.findAllByWeekStart(weekStart);
+        List<TimesheetStatus> visibleStatuses = List.of(
+                TimesheetStatus.SENT,
+                TimesheetStatus.APPROVED,
+                TimesheetStatus.REJECTED
+        );
+
+        List<Timesheet> timesheets = timesheetRepository.findAllByWeekStartAndStatusIn(
+                weekStart,
+                visibleStatuses
+        );
 
         return timesheets.stream()
                 .map(timesheet -> {
