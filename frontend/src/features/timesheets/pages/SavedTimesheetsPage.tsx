@@ -67,9 +67,8 @@ export default function SavedTimesheetsPage() {
   const [error, setError] = useState("");
   const [actionMessage, setActionMessage] = useState("");
 
-  const [selectedTimesheetId, setSelectedTimesheetId] = useState<number | null>(
-    null,
-  );
+  const [selectedTimesheet, setSelectedTimesheet] =
+    useState<MyTimesheet | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
 
   async function loadTimesheets() {
@@ -124,14 +123,14 @@ export default function SavedTimesheetsPage() {
     }
   }
 
-  function handleOpen(timesheetId: number) {
-    setSelectedTimesheetId(timesheetId);
+  function handleOpen(timesheet: MyTimesheet) {
+    setSelectedTimesheet(timesheet);
     setEditModalOpen(true);
   }
 
   function handleCloseModal() {
     setEditModalOpen(false);
-    setSelectedTimesheetId(null);
+    setSelectedTimesheet(null);
   }
 
   async function handleModalSaved() {
@@ -226,7 +225,7 @@ export default function SavedTimesheetsPage() {
                       <button
                         type="button"
                         className="saved-timesheets-action"
-                        onClick={() => handleOpen(item.timesheetId)}
+                        onClick={() => handleOpen(item)}
                       >
                         {item.status === "APPROVED" ? "Vis" : "Åpne"}
                       </button>
@@ -255,7 +254,7 @@ export default function SavedTimesheetsPage() {
                         <button
                           type="button"
                           className="saved-timesheets-action saved-timesheets-action--primary"
-                          onClick={() => handleOpen(item.timesheetId)}
+                          onClick={() => handleOpen(item)}
                         >
                           Rediger og send på nytt
                         </button>
@@ -271,7 +270,7 @@ export default function SavedTimesheetsPage() {
 
       <TimesheetEditModal
         opened={editModalOpen}
-        timesheetId={selectedTimesheetId}
+        timesheet={selectedTimesheet}
         onClose={handleCloseModal}
         onSaved={handleModalSaved}
         onResubmitted={handleModalResubmitted}
