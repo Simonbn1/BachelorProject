@@ -201,7 +201,9 @@ export default function SavedTimesheetsPage() {
                   <td>{item.totalHours.toFixed(1)}</td>
                   <td>{item.hasAbsence ? "Ja" : "Nei"}</td>
                   <td>
-                    <span className="admin-status-pill">
+                    <span
+                      className={`admin-status-pill admin-status-pill--${item.status.toLowerCase()}`}
+                    >
                       {getStatusLabel(item.status)}
                     </span>
                     {item.managerComment && (
