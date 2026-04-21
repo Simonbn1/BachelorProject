@@ -28,12 +28,14 @@ export type AdminTimesheetDetail = {
   absences: {
     id: number;
     absenceDate: string;
-    type: "VACATION" | "SICKNESS" | "PERMISSION" | "OTHER";
+    type: "VACATION" | "SICKNESS" | "LEAVE" | "OTHER";
     hours: number;
     description?: string;
   }[];
 };
 
 export type AdminDecisionRequest = {
-  managerComment?: string;
+  userId: number;
+  weekStart: string;
+  comment?: string;
 };

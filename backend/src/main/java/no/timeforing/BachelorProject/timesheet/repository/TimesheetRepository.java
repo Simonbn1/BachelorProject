@@ -22,4 +22,6 @@ public interface TimesheetRepository extends JpaRepository<Timesheet, Long> {
             Long userId,
             TimesheetStatus status
     );
+
+    List<Timesheet> findAllByUserIdOrderByWeekStartDesc(Long userId);
 }

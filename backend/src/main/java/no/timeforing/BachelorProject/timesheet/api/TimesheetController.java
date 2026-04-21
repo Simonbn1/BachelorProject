@@ -1,6 +1,7 @@
 package no.timeforing.BachelorProject.timesheet.api;
 
 import no.timeforing.BachelorProject.timesheet.domain.Timesheet;
+import no.timeforing.BachelorProject.timesheet.dto.MyTimesheetResponse;
 import no.timeforing.BachelorProject.timesheet.dto.SavedTimesheetResponse;
 import no.timeforing.BachelorProject.timesheet.dto.SubmitTimesheetRequest;
 import no.timeforing.BachelorProject.timesheet.application.TimesheetService;
@@ -35,10 +36,10 @@ public class TimesheetController {
         return timesheetService.submitTimesheet(effectiveUserId, req.weekStart);
     }
 
-    @GetMapping("/me/drafts")
-    public List<SavedTimesheetResponse> getDrafts(JwtAuthenticationToken auth) {
+    @GetMapping("/me")
+    public List<MyTimesheetResponse> getMyTimesheets(JwtAuthenticationToken auth) {
         Long userId = Long.valueOf(auth.getToken().getSubject());
-        return timesheetService.getDraftTimesheets(userId);
+        return timesheetService.getMyTimesheets(userId);
     }
 
     @DeleteMapping("/{timesheetId}")

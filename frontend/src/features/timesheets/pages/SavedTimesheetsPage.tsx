@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   deleteTimesheet,
-  fetchDraftTimesheets,
+  fetchMyTimesheets,
   submitTimesheet,
 } from "../api/timesheetsApi";
-import type { SavedTimesheet } from "../types/timesheet";
+import type { MyTimesheet } from "../types/timesheet";
 
 function formatWeekRange(weekStart: string) {
   const start = new Date(`${weekStart}T00:00:00`);
@@ -43,12 +43,12 @@ function getWeekLabel(weekStart: string) {
   return `Uke ${weekNo}`;
 }
 
-function getStatusLabel(status: SavedTimesheet["status"]) {
+function getStatusLabel(status: MyTimesheet["status"]) {
   switch (status) {
     case "NOT_SENT":
       return "Ikke sendt";
     case "SENT":
-      return "Sendt";
+      return "Til behandling";
     case "APPROVED":
       return "Godkjent";
     case "REJECTED":
@@ -61,27 +61,27 @@ function getStatusLabel(status: SavedTimesheet["status"]) {
 export default function SavedTimesheetsPage() {
   const navigate = useNavigate();
 
-  const [items, setItems] = useState<SavedTimesheet[]>([]);
+  const [items, setItems] = useState<MyTimesheet[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [actionMessage, setActionMessage] = useState("");
 
-  async function loadDrafts() {
+  async function loadTimesheets() {
     try {
       setLoading(true);
       setError("");
-      const data = await fetchDraftTimesheets();
+      const data = await fetchMyTimesheets();
       setItems(data);
     } catch (err) {
       console.error(err);
-      setError("Kunne ikke hente lagrede timer.");
+      setError("Kunne ikke hente dine timesheets.");
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    loadDrafts();
+    loadTimesheets();
   }, []);
 
   async function handleSubmit(weekStart: string) {
@@ -90,7 +90,7 @@ export default function SavedTimesheetsPage() {
       setActionMessage("");
       await submitTimesheet({ weekStart });
       setActionMessage("Timesheet sendt til godkjenning.");
-      await loadDrafts();
+      await loadTimesheets();
     } catch (err) {
       console.error(err);
       setError("Kunne ikke sende inn timesheet.");
@@ -110,8 +110,8 @@ export default function SavedTimesheetsPage() {
       setError("");
       setActionMessage("");
       await deleteTimesheet(timesheetId);
-      setActionMessage("Lagret timesheet ble slettet.");
-      await loadDrafts();
+      setActionMessage("Timesheet ble slettet.");
+      await loadTimesheets();
     } catch (err) {
       console.error(err);
       setError("Kunne ikke slette timesheet.");
@@ -135,15 +135,15 @@ export default function SavedTimesheetsPage() {
           </button>
 
           <p className="admin-eyebrow">TIMEOPPFØLGING</p>
-          <h1>Lagrede timer</h1>
+          <h1>Mine timer</h1>
           <p className="admin-subtitle">
-            Se lagrede utkast, åpne dem igjen, send inn eller slett.
+            Se egne utkast og innsendinger, åpne dem igjen og følg statusen.
           </p>
         </div>
       </div>
 
       {loading && (
-        <div className="admin-info-card">Laster lagrede timer...</div>
+        <div className="admin-info-card">Laster dine timesheets...</div>
       )}
 
       {!loading && error && <div className="admin-error-card">{error}</div>}
@@ -156,8 +156,8 @@ export default function SavedTimesheetsPage() {
         <div className="admin-empty-state">
           <div className="admin-empty-state-icon">🕘</div>
           <div>
-            <h2>Ingen lagrede timer</h2>
-            <p>Du har ingen lagrede timesheets som ikke er sendt inn enda.</p>
+            <h2>Ingen timesheets funnet</h2>
+            <p>Du har ingen registrerte timesheets enda.</p>
           </div>
         </div>
       )}
@@ -187,38 +187,57 @@ export default function SavedTimesheetsPage() {
                     <span className="admin-status-pill">
                       {getStatusLabel(item.status)}
                     </span>
+                    {item.managerComment && (
+                      <div
+                        style={{
+                          marginTop: "8px",
+                          fontSize: "0.9rem",
+                          opacity: 0.8,
+                        }}
+                      >
+                        Kommentar: {item.managerComment}
+                      </div>
+                    )}
                   </td>
                   <td>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "10px",
-                        flexWrap: "wrap",
-                      }}
-                    >
+                    <div className="saved-timesheets-actions">
                       <button
                         type="button"
-                        className="admin-action-button"
+                        className="saved-timesheets-action"
                         onClick={() => handleOpen(item.weekStart)}
                       >
-                        Åpne
+                        {item.status === "APPROVED" ? "Vis" : "Åpne"}
                       </button>
 
-                      <button
-                        type="button"
-                        className="admin-action-button"
-                        onClick={() => handleSubmit(item.weekStart)}
-                      >
-                        Send inn
-                      </button>
+                      {item.status === "NOT_SENT" && (
+                        <>
+                          <button
+                            type="button"
+                            className="saved-timesheets-action saved-timesheets-action--primary"
+                            onClick={() => handleSubmit(item.weekStart)}
+                          >
+                            Send inn
+                          </button>
 
-                      <button
-                        type="button"
-                        className="admin-action-button"
-                        onClick={() => handleDelete(item.timesheetId)}
-                      >
-                        Slett
-                      </button>
+                          <button
+                            type="button"
+                            className="saved-timesheets-action saved-timesheets-action--danger"
+                            onClick={() => handleDelete(item.timesheetId)}
+                          >
+                            Slett
+                          </button>
+                        </>
+                      )}
+
+                      {item.status === "REJECTED" && (
+                        <button
+                          type="button"
+                          className="saved-timesheets-action saved-timesheets-action--primary"
+                          onClick={() => handleOpen(item.weekStart)}
+                        >
+                          Rediger og send på nytt
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

@@ -8,6 +8,7 @@ import no.timeforing.BachelorProject.absence.repository.AbsenceRepository;
 import no.timeforing.BachelorProject.timesheet.domain.TimeEntry;
 import no.timeforing.BachelorProject.timesheet.domain.Timesheet;
 import no.timeforing.BachelorProject.timesheet.domain.enums.TimesheetStatus;
+import no.timeforing.BachelorProject.timesheet.dto.MyTimesheetResponse;
 import no.timeforing.BachelorProject.timesheet.dto.SavedTimesheetResponse;
 import no.timeforing.BachelorProject.timesheet.repository.TimeEntryRepository;
 import no.timeforing.BachelorProject.timesheet.repository.TimesheetRepository;
@@ -47,7 +48,7 @@ public class TimesheetServiceImpl implements TimesheetService {
                             .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
                     Timesheet ts = new Timesheet(user, weekStart);
-                    ts.setStatus(TimesheetStatus.NOT_SENT); // 🔥 viktig fix
+                    ts.setStatus(TimesheetStatus.NOT_SENT);
 
                     return timesheetRepository.save(ts);
                 });
@@ -62,24 +63,18 @@ public class TimesheetServiceImpl implements TimesheetService {
         }
 
         ts.setStatus(TimesheetStatus.SENT);
+        ts.setManagerComment(null);
         return timesheetRepository.save(ts);
     }
 
     @Override
-    public List<SavedTimesheetResponse> getDraftTimesheets(Long userId) {
-        List<Timesheet> drafts =
-                timesheetRepository.findAllByUserIdAndStatusOrderByWeekStartDesc(
-                        userId,
-                        TimesheetStatus.NOT_SENT
-                );
+    public List<MyTimesheetResponse> getMyTimesheets(Long userId) {
+        List<Timesheet> timesheets = timesheetRepository.findAllByUserIdOrderByWeekStartDesc(userId);
 
-        return drafts.stream()
+        return timesheets.stream()
                 .map(timesheet -> {
-                    List<TimeEntry> entries =
-                            timeEntryRepository.findAllByTimesheetId(timesheet.getId());
-
-                    List<Absence> absences =
-                            absenceRepository.findByTimesheetId(timesheet.getId());
+                    List<TimeEntry> entries = timeEntryRepository.findAllByTimesheetId(timesheet.getId());
+                    List<Absence> absences = absenceRepository.findByTimesheetId(timesheet.getId());
 
                     double totalHours = Math.round(
                             entries.stream()
@@ -89,12 +84,13 @@ public class TimesheetServiceImpl implements TimesheetService {
 
                     boolean hasAbsence = !absences.isEmpty();
 
-                    return new SavedTimesheetResponse(
+                    return new MyTimesheetResponse(
                             timesheet.getId(),
                             timesheet.getWeekStart(),
                             timesheet.getStatus().name(),
                             totalHours,
-                            hasAbsence
+                            hasAbsence,
+                            timesheet.getManagerComment()
                     );
                 })
                 .toList();

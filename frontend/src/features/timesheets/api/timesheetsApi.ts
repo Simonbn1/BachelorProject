@@ -1,18 +1,15 @@
 import { api } from "../../../shared/api/client";
-import type {
-  SavedTimesheet,
-  SubmitTimesheetRequest,
-} from "../types/timesheet";
+import type { MyTimesheet, SubmitTimesheetRequest } from "../types/timesheet";
 
 export async function fetchTimeEntries(userId: number, weekStart: string) {
-  const response = await api.get("api/time-entries", {
+  const response = await api.get("/api/time-entries", {
     params: { userId, weekStart },
   });
   return response.data;
 }
 
 export async function fetchWorkItems(projectId: number) {
-  const response = await api.get("api/work-items", {
+  const response = await api.get("/api/work-items", {
     params: { projectId },
   });
   return response.data;
@@ -23,7 +20,7 @@ export async function deleteTimeEntries(
   weekStart: string,
   workItemId: number,
 ) {
-  await api.delete("api/time-entries", {
+  await api.delete("/api/time-entries", {
     params: { userId, weekStart, workItemId },
   });
 }
@@ -86,8 +83,8 @@ export async function exportInvoiceBasisExcel(
   return response.data;
 }
 
-export async function fetchDraftTimesheets(): Promise<SavedTimesheet[]> {
-  const response = await api.get("/api/timesheets/me/drafts");
+export async function fetchMyTimesheets(): Promise<MyTimesheet[]> {
+  const response = await api.get("/api/timesheets/me");
   return response.data;
 }
 
