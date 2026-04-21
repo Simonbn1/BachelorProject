@@ -3,7 +3,7 @@ import "../styles/TimesheetPage.css";
 import "../styles/TimesheetHeader.css";
 import { DatePicker, type DatesRangeValue } from "@mantine/dates";
 import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import MultiSelectDropdown from "../components/MultiSelectDropdown.tsx";
 import { useTimesheet } from "../hooks/useTimesheet.ts";
 import { useTimesheetActions } from "../hooks/useTimesheetActions.ts";
@@ -12,6 +12,8 @@ import { useTimesheetExport } from "../hooks/useTimesheetExport.ts";
 
 export function TimesheetPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const weekStartFromUrl = searchParams.get("weekStart");
 
   const {
     projects,
@@ -50,7 +52,7 @@ export function TimesheetPage() {
     overtimeTotal,
     getNumericValue,
     getRowTotal,
-  } = useTimesheet();
+  } = useTimesheet(weekStartFromUrl);
 
   const { navigateToAbsence } = useAbsenceNavigation({
     visibleProjects,
