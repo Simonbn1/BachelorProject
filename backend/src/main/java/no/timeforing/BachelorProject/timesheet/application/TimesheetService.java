@@ -12,5 +12,7 @@ public interface TimesheetService {
 
     List<MyTimesheetResponse> getMyTimesheets(Long userId);
 
+    Timesheet withdrawTimesheet(Long userId, Long timesheetId);
+
     void deleteTimesheet(Long userId, Long timesheetId);
 }

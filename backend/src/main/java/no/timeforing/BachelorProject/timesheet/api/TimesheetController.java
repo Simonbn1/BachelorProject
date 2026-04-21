@@ -42,6 +42,15 @@ public class TimesheetController {
         return timesheetService.getMyTimesheets(userId);
     }
 
+    @PostMapping("/{timesheetId}/withdraw")
+    public Timesheet withdrawTimesheet(
+            @PathVariable Long timesheetId,
+            JwtAuthenticationToken auth
+    ) {
+        Long userId = Long.valueOf(auth.getToken().getSubject());
+        return timesheetService.withdrawTimesheet(userId, timesheetId);
+    }
+
     @DeleteMapping("/{timesheetId}")
     public void deleteTimesheet(@PathVariable Long timesheetId, JwtAuthenticationToken auth) {
         Long userId = Long.valueOf(auth.getToken().getSubject());

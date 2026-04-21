@@ -68,6 +68,25 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
+    public Timesheet withdrawTimesheet(Long userId, Long timesheetId) {
+        Timesheet ts = timesheetRepository.findById(timesheetId)
+                .orElseThrow(() -> new IllegalArgumentException("Timesheet not found."));
+
+        if (!ts.getUser().getId().equals(userId)) {
+            throw new IllegalStateException("You cannot withdraw another user's timesheet.");
+        }
+
+        if (ts.getStatus() != TimesheetStatus.SENT) {
+            throw new IllegalStateException("Only submitted timesheets can be withdrawn.");
+        }
+
+        ts.setStatus(TimesheetStatus.NOT_SENT);
+        ts.setManagerComment(null);
+
+        return timesheetRepository.save(ts);
+    }
+
+    @Override
     public List<MyTimesheetResponse> getMyTimesheets(Long userId) {
         List<Timesheet> timesheets = timesheetRepository.findAllByUserIdOrderByWeekStartDesc(userId);
 
