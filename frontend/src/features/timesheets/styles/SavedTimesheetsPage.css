@@ -76,3 +76,13 @@
   color: #d1d5db;
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
+
+.saved-timesheets-action--secondary {
+  background: rgba(120, 160, 255, 0.12);
+  border: 1px solid rgba(120, 160, 255, 0.24);
+  color: #cfe0ff;
+}
+
+.saved-timesheets-action--secondary:hover {
+  background: rgba(120, 160, 255, 0.18);
+}

@@ -4,6 +4,7 @@ import {
   deleteTimesheet,
   fetchMyTimesheets,
   submitTimesheet,
+  withdrawTimesheet,
 } from "../api/timesheetsApi";
 import type { MyTimesheet } from "../types/timesheet";
 import TimesheetEditModal from "../components/TimesheetEditModal";
@@ -100,6 +101,27 @@ export default function SavedTimesheetsPage() {
     } catch (err) {
       console.error(err);
       setError("Kunne ikke sende inn timesheet.");
+    }
+  }
+
+  async function handleWithdraw(timesheetId: number) {
+    const confirmed = window.confirm(
+      "Vil du trekke tilbake denne innsendingen? Da kan du redigere eller slette den igjen.",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setError("");
+      setActionMessage("");
+      await withdrawTimesheet(timesheetId);
+      setActionMessage("Timesheet ble trukket tilbake.");
+      await loadTimesheets();
+    } catch (err) {
+      console.error(err);
+      setError("Kunne ikke trekke tilbake timesheet.");
     }
   }
 
@@ -206,6 +228,7 @@ export default function SavedTimesheetsPage() {
                     >
                       {getStatusLabel(item.status)}
                     </span>
+
                     {item.managerComment && (
                       <div
                         style={{
@@ -218,15 +241,49 @@ export default function SavedTimesheetsPage() {
                       </div>
                     )}
                   </td>
+
                   <td>
                     <div className="saved-timesheets-actions">
-                      <button
-                        type="button"
-                        className="saved-timesheets-action"
-                        onClick={() => handleOpen(item)}
-                      >
-                        {item.status === "APPROVED" ? "Vis" : "Åpne"}
-                      </button>
+                      {(item.status === "NOT_SENT" ||
+                        item.status === "REJECTED") && (
+                        <button
+                          type="button"
+                          className="saved-timesheets-action"
+                          onClick={() => handleOpen(item)}
+                        >
+                          Åpne
+                        </button>
+                      )}
+
+                      {item.status === "SENT" && (
+                        <>
+                          <button
+                            type="button"
+                            className="saved-timesheets-action"
+                            onClick={() => handleOpen(item)}
+                          >
+                            Vis
+                          </button>
+
+                          <button
+                            type="button"
+                            className="saved-timesheets-action saved-timesheets-action--secondary"
+                            onClick={() => handleWithdraw(item.timesheetId)}
+                          >
+                            Trekk tilbake
+                          </button>
+                        </>
+                      )}
+
+                      {item.status === "APPROVED" && (
+                        <button
+                          type="button"
+                          className="saved-timesheets-action"
+                          onClick={() => handleOpen(item)}
+                        >
+                          Vis
+                        </button>
+                      )}
 
                       {item.status === "NOT_SENT" && (
                         <>
