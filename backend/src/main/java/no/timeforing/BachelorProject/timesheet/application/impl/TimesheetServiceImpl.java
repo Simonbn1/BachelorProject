@@ -113,6 +113,8 @@ public class TimesheetServiceImpl implements TimesheetService {
             throw new IllegalArgumentException("Only NOT_SENT timesheets can be deleted");
         }
 
+        timeEntryRepository.deleteAll(timeEntryRepository.findAllByTimesheetId(timesheetId));
+        absenceRepository.deleteAll(absenceRepository.findByTimesheetId(timesheetId));
         timesheetRepository.delete(ts);
     }
 }
