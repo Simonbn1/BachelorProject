@@ -7,6 +7,7 @@ import {
 } from "../api/timesheetsApi";
 import type { MyTimesheet } from "../types/timesheet";
 import TimesheetEditModal from "../components/TimesheetEditModal";
+import "../styles/SavedTimesheetsPage.css";
 
 function formatWeekRange(weekStart: string) {
   const start = new Date(`${weekStart}T00:00:00`);

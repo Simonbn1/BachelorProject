@@ -1,0 +1,45 @@
+.saved-timesheets-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.saved-timesheets-action {
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: #eef2ff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.saved-timesheets-action:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Primary (Send inn / Rediger) */
+.saved-timesheets-action--primary {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border: none;
+  color: white;
+}
+
+.saved-timesheets-action--primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Danger (Slett) */
+.saved-timesheets-action--danger {
+  background: rgba(255, 80, 100, 0.15);
+  border: 1px solid rgba(255, 80, 100, 0.3);
+  color: #ffccd5;
+}
+
+.saved-timesheets-action--danger:hover {
+  background: rgba(255, 80, 100, 0.25);
+}
