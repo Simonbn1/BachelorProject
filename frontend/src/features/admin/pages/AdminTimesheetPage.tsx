@@ -1,8 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminOverviewTable from "../components/AdminOverviewTable";
-import { fetchAdminTimesheets } from "../api/adminApi";
-import type { AdminTimesheetSummary } from "../types/admin";
+import {
+  approveTimesheet,
+  fetchAdminTimesheetDetail,
+  fetchAdminTimesheets,
+  rejectTimesheet,
+} from "../api/adminApi";
+import type {
+  AdminTimesheetDetail,
+  AdminTimesheetSummary,
+} from "../types/admin";
 import "../../../shared/styles/admin.css";
 
 function getCurrentWeekValue() {
@@ -52,24 +60,93 @@ export default function AdminTimesheetPage() {
   const [selectedTimesheetId, setSelectedTimesheetId] = useState<number | null>(
     null,
   );
+  const [detail, setDetail] = useState<AdminTimesheetDetail | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [decisionLoading, setDecisionLoading] = useState(false);
+  const [rejectComment, setRejectComment] = useState("");
+
+  async function loadOverview() {
+    try {
+      setLoading(true);
+      setError("");
+      const data = await fetchAdminTimesheets(weekStart);
+      setItems(data);
+    } catch (err) {
+      console.error(err);
+      setError("Kunne ikke hente oversikten.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function load() {
+    loadOverview();
+  }, [weekStart]);
+
+  useEffect(() => {
+    async function loadDetail() {
+      if (selectedTimesheetId === null) {
+        setDetail(null);
+        setRejectComment("");
+        return;
+      }
+
       try {
-        setLoading(true);
-        setError("");
-        const data = await fetchAdminTimesheets(weekStart);
-        setItems(data);
+        setDetailLoading(true);
+        const data = await fetchAdminTimesheetDetail(selectedTimesheetId);
+        setDetail(data);
+        setRejectComment(data.managerComment ?? "");
       } catch (err) {
         console.error(err);
-        setError("Kunne ikke hente oversikten.");
+        setError("Kunne ikke hente timesheet-detaljer.");
       } finally {
-        setLoading(false);
+        setDetailLoading(false);
       }
     }
 
-    load();
-  }, [weekStart]);
+    loadDetail();
+  }, [selectedTimesheetId]);
+
+  async function handleApprove() {
+    if (!detail) return;
+
+    try {
+      setDecisionLoading(true);
+      await approveTimesheet({
+        userId: detail.userId,
+        weekStart: detail.weekStart,
+      });
+      await loadOverview();
+      const updated = await fetchAdminTimesheetDetail(detail.timesheetId);
+      setDetail(updated);
+    } catch (err) {
+      console.error(err);
+      setError("Kunne ikke godkjenne timesheet.");
+    } finally {
+      setDecisionLoading(false);
+    }
+  }
+
+  async function handleReject() {
+    if (!detail) return;
+
+    try {
+      setDecisionLoading(true);
+      await rejectTimesheet({
+        userId: detail.userId,
+        weekStart: detail.weekStart,
+        comment: rejectComment,
+      });
+      await loadOverview();
+      const updated = await fetchAdminTimesheetDetail(detail.timesheetId);
+      setDetail(updated);
+    } catch (err) {
+      console.error(err);
+      setError("Kunne ikke avslå timesheet.");
+    } finally {
+      setDecisionLoading(false);
+    }
+  }
 
   return (
     <div className="admin-page">
@@ -100,6 +177,7 @@ export default function AdminTimesheetPage() {
               const value = e.target.value;
               setSelectedWeek(value);
               setWeekStart(weekValueToMonday(value));
+              setSelectedTimesheetId(null);
             }}
           />
         </div>
@@ -126,10 +204,89 @@ export default function AdminTimesheetPage() {
         </div>
       )}
 
-      {selectedTimesheetId !== null && (
+      {detailLoading && (
+        <div className="admin-info-card">Laster detaljvisning...</div>
+      )}
+
+      {detail && !detailLoading && (
         <div className="admin-info-card">
-          Valgt timesheet id: {selectedTimesheetId}. Neste steg er å koble på
-          detaljvisning her.
+          <h2 style={{ marginTop: 0 }}>{detail.userName}</h2>
+          <p>Status: {detail.status}</p>
+          <p>Uke: {detail.weekStart}</p>
+          <p>Totalt: {detail.totalHours.toFixed(1)} timer</p>
+
+          <h3>Timer</h3>
+          {detail.entries.length === 0 ? (
+            <p>Ingen førte timer.</p>
+          ) : (
+            <div>
+              {detail.entries.map((entry) => (
+                <div key={entry.id} style={{ marginBottom: "10px" }}>
+                  <strong>{entry.projectName}</strong> – {entry.workItemTitle} –{" "}
+                  {entry.entryDate} – {entry.hours}t
+                  {entry.description && <div>{entry.description}</div>}
+                </div>
+              ))}
+            </div>
+          )}
+
+          <h3>Fravær</h3>
+          {detail.absences.length === 0 ? (
+            <p>Ingen registrert fravær.</p>
+          ) : (
+            <div>
+              {detail.absences.map((absence) => (
+                <div key={absence.id} style={{ marginBottom: "10px" }}>
+                  <strong>{absence.type}</strong> – {absence.absenceDate} –{" "}
+                  {absence.hours}t
+                  {absence.description && <div>{absence.description}</div>}
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div style={{ marginTop: "20px" }}>
+            <label htmlFor="rejectComment">Kommentar ved avslag</label>
+            <textarea
+              id="rejectComment"
+              value={rejectComment}
+              onChange={(e) => setRejectComment(e.target.value)}
+              rows={4}
+              style={{
+                width: "100%",
+                marginTop: "8px",
+                borderRadius: "12px",
+                padding: "12px",
+              }}
+            />
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              gap: "12px",
+              marginTop: "20px",
+              flexWrap: "wrap",
+            }}
+          >
+            <button
+              type="button"
+              className="admin-action-button"
+              onClick={handleApprove}
+              disabled={decisionLoading}
+            >
+              Godkjenn
+            </button>
+
+            <button
+              type="button"
+              className="admin-action-button"
+              onClick={handleReject}
+              disabled={decisionLoading}
+            >
+              Avslå
+            </button>
+          </div>
         </div>
       )}
     </div>
