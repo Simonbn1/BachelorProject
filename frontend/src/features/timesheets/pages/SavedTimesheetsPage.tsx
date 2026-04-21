@@ -6,6 +6,7 @@ import {
   submitTimesheet,
 } from "../api/timesheetsApi";
 import type { MyTimesheet } from "../types/timesheet";
+import TimesheetEditModal from "../components/TimesheetEditModal";
 
 function formatWeekRange(weekStart: string) {
   const start = new Date(`${weekStart}T00:00:00`);
@@ -66,6 +67,11 @@ export default function SavedTimesheetsPage() {
   const [error, setError] = useState("");
   const [actionMessage, setActionMessage] = useState("");
 
+  const [selectedTimesheetId, setSelectedTimesheetId] = useState<number | null>(
+    null,
+  );
+  const [editModalOpen, setEditModalOpen] = useState(false);
+
   async function loadTimesheets() {
     try {
       setLoading(true);
@@ -118,8 +124,24 @@ export default function SavedTimesheetsPage() {
     }
   }
 
-  function handleOpen(weekStart: string) {
-    navigate(`/timesheet?weekStart=${weekStart}`);
+  function handleOpen(timesheetId: number) {
+    setSelectedTimesheetId(timesheetId);
+    setEditModalOpen(true);
+  }
+
+  function handleCloseModal() {
+    setEditModalOpen(false);
+    setSelectedTimesheetId(null);
+  }
+
+  async function handleModalSaved() {
+    setActionMessage("Timesheet ble oppdatert.");
+    await loadTimesheets();
+  }
+
+  async function handleModalResubmitted() {
+    setActionMessage("Timesheet ble sendt inn på nytt.");
+    await loadTimesheets();
   }
 
   return (
@@ -204,7 +226,7 @@ export default function SavedTimesheetsPage() {
                       <button
                         type="button"
                         className="saved-timesheets-action"
-                        onClick={() => handleOpen(item.weekStart)}
+                        onClick={() => handleOpen(item.timesheetId)}
                       >
                         {item.status === "APPROVED" ? "Vis" : "Åpne"}
                       </button>
@@ -233,7 +255,7 @@ export default function SavedTimesheetsPage() {
                         <button
                           type="button"
                           className="saved-timesheets-action saved-timesheets-action--primary"
-                          onClick={() => handleOpen(item.weekStart)}
+                          onClick={() => handleOpen(item.timesheetId)}
                         >
                           Rediger og send på nytt
                         </button>
@@ -246,6 +268,14 @@ export default function SavedTimesheetsPage() {
           </table>
         </div>
       )}
+
+      <TimesheetEditModal
+        opened={editModalOpen}
+        timesheetId={selectedTimesheetId}
+        onClose={handleCloseModal}
+        onSaved={handleModalSaved}
+        onResubmitted={handleModalResubmitted}
+      />
     </div>
   );
 }
