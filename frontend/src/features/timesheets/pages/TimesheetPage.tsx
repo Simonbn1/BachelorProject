@@ -10,7 +10,28 @@ import { useTimesheetActions } from "../hooks/useTimesheetActions.ts";
 import { useAbsenceNavigation } from "../hooks/useAbsenceNavigation.ts";
 import { useTimesheetExport } from "../hooks/useTimesheetExport.ts";
 
-export function TimesheetPage() {
+type TimesheetPageProps = {
+  embedded?: boolean;
+  hideTopBar?: boolean;
+  hideBackButton?: boolean;
+  hideWeekNavigation?: boolean;
+  hideExports?: boolean;
+  hideCalendarButton?: boolean;
+  title?: string;
+  subtitle?: string;
+  onCloseEmbedded?: () => void;
+};
+
+export function TimesheetPage({
+  embedded = false,
+  hideTopBar = false,
+  hideBackButton = false,
+  hideWeekNavigation = false,
+  hideExports = false,
+  hideCalendarButton = false,
+  title = "Timeføring",
+  subtitle = "Registrer timer for uken og følg totalen din.",
+}: TimesheetPageProps) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const weekStartFromUrl = searchParams.get("weekStart");
@@ -99,60 +120,92 @@ export function TimesheetPage() {
     visibleProjects,
   });
 
-  return (
-    <div className="page">
-      <div className="timesheet-shell">
-        <TopBar />
+  const showTopBar = !embedded && !hideTopBar;
+  const showBackButton = !embedded && !hideBackButton;
+  const showWeekNavigation = !embedded && !hideWeekNavigation;
+  const showCalendarButton = !embedded && !hideCalendarButton;
+  const showExports = !embedded && !hideExports;
 
-        <div className="page-intro">
+  return (
+    <div className={embedded ? "page page--embedded" : "page"}>
+      <div
+        className={
+          embedded
+            ? "timesheet-shell timesheet-shell--embedded"
+            : "timesheet-shell"
+        }
+      >
+        {showTopBar && <TopBar />}
+
+        <div
+          className={
+            embedded ? "page-intro page-intro--embedded" : "page-intro"
+          }
+        >
           <div className="page-intro-text">
-            <button
-              type="button"
-              className="page-back-button"
-              onClick={() => navigate("/dashboard")}
-            >
-              ← Oversikt
-            </button>
+            {showBackButton && (
+              <button
+                type="button"
+                className="page-back-button"
+                onClick={() => navigate("/dashboard")}
+              >
+                ← Oversikt
+              </button>
+            )}
 
             <p className="page-kicker">TIMEOPPFØLGING</p>
-            <h1 className="page-title">Timeføring</h1>
-            <p className="page-subtitle">
-              Registrer timer for uken og følg totalen din.
-            </p>
+            <h1 className="page-title">{title}</h1>
+            <p className="page-subtitle">{subtitle}</p>
           </div>
         </div>
 
-        <section className="timesheet-card">
+        <section
+          className={
+            embedded
+              ? "timesheet-card timesheet-card--embedded"
+              : "timesheet-card"
+          }
+        >
           <div className="timesheet-header">
             <div className="timesheet-header-left">
               <div className="week-nav-group">
-                <button
-                  className="week-icon"
-                  type="button"
-                  onClick={() => setIsCalendarOpen(true)}
-                >
-                  🗓
-                </button>
+                {showCalendarButton && (
+                  <button
+                    className="week-icon"
+                    type="button"
+                    onClick={() => setIsCalendarOpen(true)}
+                  >
+                    🗓
+                  </button>
+                )}
+
                 <div>
                   <div className="week-nav">
-                    <button
-                      className="add-project week-nav-btn"
-                      type="button"
-                      onClick={goToPreviousWeek}
-                    >
-                      <ChevronLeft size={16} />
-                    </button>
+                    {showWeekNavigation && (
+                      <button
+                        className="add-project week-nav-btn"
+                        type="button"
+                        onClick={goToPreviousWeek}
+                      >
+                        <ChevronLeft size={16} />
+                      </button>
+                    )}
+
                     <h5>Uke {weekNumber}</h5>
-                    <button
-                      className="add-project week-nav-btn"
-                      type="button"
-                      onClick={goToNextWeek}
-                    >
-                      <ChevronRight size={16} />
-                    </button>
+
+                    {showWeekNavigation && (
+                      <button
+                        className="add-project week-nav-btn"
+                        type="button"
+                        onClick={goToNextWeek}
+                      >
+                        <ChevronRight size={16} />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
+
               <div className="week-subtitle">{weekLabel}</div>
             </div>
 
@@ -167,11 +220,12 @@ export function TimesheetPage() {
                     </span>
                   )}
                 </div>
+
                 <div className="progress-bar">
                   <div
                     className="progress-fill"
                     style={{ width: `${progressPercent}%` }}
-                  ></div>
+                  />
                 </div>
               </div>
             </div>
@@ -384,27 +438,31 @@ export function TimesheetPage() {
                 Lagre
               </button>
 
-              <button
-                className="add-project"
-                type="button"
-                onClick={handleExportExcel}
-              >
-                Eksporter Excel
-              </button>
+              {showExports && (
+                <>
+                  <button
+                    className="add-project"
+                    type="button"
+                    onClick={handleExportExcel}
+                  >
+                    Eksporter Excel
+                  </button>
 
-              <button
-                className="add-project"
-                type="button"
-                onClick={handleExportInvoiceBasis}
-              >
-                Eksporter fakturagrunnlag
-              </button>
+                  <button
+                    className="add-project"
+                    type="button"
+                    onClick={handleExportInvoiceBasis}
+                  >
+                    Eksporter fakturagrunnlag
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </section>
       </div>
 
-      {isCalendarOpen && (
+      {!embedded && isCalendarOpen && (
         <div
           className="wireframe-modal"
           onClick={() => setIsCalendarOpen(false)}
@@ -434,7 +492,7 @@ export function TimesheetPage() {
 
       {isAddModalOpen && (
         <div className="wireframe-modal">
-          <div className="modal-content">
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <button
               className="close-btn"
               type="button"

@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { api } from "../../../shared/api/client";
+import type { MyTimesheet } from "../types/timesheet";
 import "../styles/TimesheetEditModal.css";
 
 type TimesheetStatus = "NOT_SENT" | "SENT" | "APPROVED" | "REJECTED";
@@ -31,7 +33,6 @@ type AbsenceItem = {
 type TimesheetDetail = {
   timesheetId: number;
   weekStart: string;
-  weekEnd?: string;
   status: TimesheetStatus;
   managerComment?: string | null;
   rows: TimeEntryRow[];
@@ -41,10 +42,37 @@ type TimesheetDetail = {
 
 type Props = {
   opened: boolean;
-  timesheetId: number | null;
+  timesheet: MyTimesheet | null;
   onClose: () => void;
-  onSaved?: () => void;
-  onResubmitted?: () => void;
+  onSaved?: () => void | Promise<void>;
+  onResubmitted?: () => void | Promise<void>;
+};
+
+type ProjectApi = {
+  id: number;
+  name: string;
+  customer?: string;
+  workItems?: {
+    id: number;
+    title: string;
+    externalId?: string;
+  }[];
+};
+
+type TimeEntryApi = {
+  id?: number;
+  entryDate: string;
+  hours: number;
+  description?: string;
+  workItemId?: number;
+  workItem?: {
+    id: number;
+    title: string;
+    project?: {
+      id: number;
+      name: string;
+    };
+  };
 };
 
 const dayKeys = [
@@ -54,6 +82,7 @@ const dayKeys = [
   "thursday",
   "friday",
 ] as const;
+
 type DayKey = (typeof dayKeys)[number];
 
 const dayLabels: Record<DayKey, string> = {
@@ -80,7 +109,7 @@ function formatStatus(status: TimesheetStatus) {
 }
 
 function formatDateRange(weekStart: string) {
-  const start = new Date(weekStart);
+  const start = new Date(`${weekStart}T00:00:00`);
   const end = new Date(start);
   end.setDate(start.getDate() + 4);
 
@@ -93,13 +122,14 @@ function formatDateRange(weekStart: string) {
 }
 
 function getWeekNumber(dateString: string) {
-  const date = new Date(dateString);
+  const date = new Date(`${dateString}T00:00:00`);
   const target = new Date(
     Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
   );
   const dayNum = target.getUTCDay() || 7;
   target.setUTCDate(target.getUTCDate() + 4 - dayNum);
   const yearStart = new Date(Date.UTC(target.getUTCFullYear(), 0, 1));
+
   return Math.ceil(
     ((target.getTime() - yearStart.getTime()) / 86400000 + 1) / 7,
   );
@@ -118,9 +148,76 @@ function emptyRow(): TimeEntryRow {
   };
 }
 
+function getDayKeyFromDate(entryDate: string): DayKey | null {
+  const date = new Date(`${entryDate}T00:00:00`);
+  const day = date.getDay();
+
+  if (day === 1) return "monday";
+  if (day === 2) return "tuesday";
+  if (day === 3) return "wednesday";
+  if (day === 4) return "thursday";
+  if (day === 5) return "friday";
+
+  return null;
+}
+
+function buildWorkItems(projects: ProjectApi[]): WorkItemOption[] {
+  return projects.flatMap((project) =>
+    (project.workItems ?? []).map((workItem) => ({
+      id: workItem.id,
+      title: workItem.title,
+      projectName: project.name,
+    })),
+  );
+}
+
+function buildRowsFromEntries(
+  entries: TimeEntryApi[],
+  availableWorkItems: WorkItemOption[],
+): TimeEntryRow[] {
+  const rowsMap = new Map<number, TimeEntryRow>();
+
+  for (const entry of entries) {
+    const workItemId = entry.workItem?.id ?? entry.workItemId;
+
+    if (!workItemId) {
+      continue;
+    }
+
+    if (!rowsMap.has(workItemId)) {
+      const fallback = availableWorkItems.find(
+        (item) => item.id === workItemId,
+      );
+
+      rowsMap.set(workItemId, {
+        workItemId,
+        workItemTitle: entry.workItem?.title ?? fallback?.title ?? "",
+        projectName:
+          entry.workItem?.project?.name ?? fallback?.projectName ?? "",
+        monday: 0,
+        tuesday: 0,
+        wednesday: 0,
+        thursday: 0,
+        friday: 0,
+      });
+    }
+
+    const row = rowsMap.get(workItemId)!;
+    const dayKey = getDayKeyFromDate(entry.entryDate);
+
+    if (!dayKey) {
+      continue;
+    }
+
+    row[dayKey] = entry.hours ?? 0;
+  }
+
+  return Array.from(rowsMap.values());
+}
+
 export default function TimesheetEditModal({
   opened,
-  timesheetId,
+  timesheet,
   onClose,
   onSaved,
   onResubmitted,
@@ -134,7 +231,7 @@ export default function TimesheetEditModal({
   const [absences, setAbsences] = useState<AbsenceItem[]>([]);
 
   useEffect(() => {
-    if (!opened || !timesheetId) return;
+    if (!opened || !timesheet) return;
 
     let ignore = false;
 
@@ -142,27 +239,45 @@ export default function TimesheetEditModal({
       try {
         setLoading(true);
         setError("");
+        setDetail(null);
+        setRows([]);
+        setAbsences([]);
 
-        const response = await fetch(`/api/timesheets/${timesheetId}`, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        if (!timesheet) return;
 
-        if (!response.ok) {
-          throw new Error("Kunne ikke hente timeføring.");
-        }
-
-        const data: TimesheetDetail = await response.json();
+        const [entriesResponse, projectsResponse] = await Promise.all([
+          api.get<TimeEntryApi[]>("/api/time-entries", {
+            params: { weekStart: timesheet.weekStart },
+          }),
+          api.get<ProjectApi[]>("/api/projects"),
+        ]);
 
         if (ignore) return;
 
-        setDetail(data);
-        setRows(data.rows?.length ? data.rows : [emptyRow()]);
-        setAbsences(data.absences ?? []);
+        const availableWorkItems = buildWorkItems(projectsResponse.data ?? []);
+        const mappedRows = buildRowsFromEntries(
+          entriesResponse.data ?? [],
+          availableWorkItems,
+        );
+
+        const safeRows = mappedRows.length > 0 ? mappedRows : [emptyRow()];
+
+        setDetail({
+          timesheetId: timesheet.timesheetId,
+          weekStart: timesheet.weekStart,
+          status: timesheet.status,
+          managerComment: timesheet.managerComment ?? null,
+          rows: safeRows,
+          absences: [],
+          availableWorkItems,
+        });
+
+        setRows(safeRows);
+        setAbsences([]);
       } catch (err) {
+        console.error(err);
         if (!ignore) {
-          setError(err instanceof Error ? err.message : "Noe gikk galt.");
+          setError("Kunne ikke hente timeføring.");
         }
       } finally {
         if (!ignore) {
@@ -176,7 +291,7 @@ export default function TimesheetEditModal({
     return () => {
       ignore = true;
     };
-  }, [opened, timesheetId]);
+  }, [opened, timesheet]);
 
   const totalHours = useMemo(() => {
     return rows.reduce((sum, row) => {
@@ -236,90 +351,98 @@ export default function TimesheetEditModal({
     );
   }
 
-  async function handleSave() {
-    if (!detail) return;
+  async function persistRows() {
+    if (!timesheet) return;
 
+    const uniqueWorkItemIds = Array.from(
+      new Set(rows.map((row) => row.workItemId).filter(Boolean)),
+    ) as number[];
+
+    for (const workItemId of uniqueWorkItemIds) {
+      await api.delete("/api/time-entries", {
+        params: {
+          workItemId,
+          weekStart: timesheet.weekStart,
+        },
+      });
+    }
+
+    const start = new Date(`${timesheet.weekStart}T00:00:00`);
+
+    for (const row of rows) {
+      if (!row.workItemId) {
+        continue;
+      }
+
+      const values = [
+        { offset: 0, hours: row.monday },
+        { offset: 1, hours: row.tuesday },
+        { offset: 2, hours: row.wednesday },
+        { offset: 3, hours: row.thursday },
+        { offset: 4, hours: row.friday },
+      ];
+
+      for (const value of values) {
+        if (!value.hours || value.hours <= 0) {
+          continue;
+        }
+
+        const entryDate = new Date(start);
+        entryDate.setDate(start.getDate() + value.offset);
+        const entryDateStr = entryDate.toISOString().split("T")[0];
+
+        await api.post("/api/time-entries", {
+          weekStart: timesheet.weekStart,
+          workItemId: row.workItemId,
+          entryDate: entryDateStr,
+          hours: value.hours,
+        });
+      }
+    }
+  }
+
+  async function handleSave() {
     try {
       setSaving(true);
       setError("");
 
-      const response = await fetch(`/api/timesheets/${detail.timesheetId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          rows,
-          absences,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Kunne ikke lagre endringer.");
-      }
-
-      onSaved?.();
+      await persistRows();
+      await onSaved?.();
       onClose();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Noe gikk galt ved lagring.",
-      );
+      console.error(err);
+      setError("Kunne ikke lagre endringer.");
     } finally {
       setSaving(false);
     }
   }
 
   async function handleResubmit() {
-    if (!detail) return;
+    if (!timesheet) return;
 
     try {
       setSubmitting(true);
       setError("");
 
-      const saveResponse = await fetch(
-        `/api/timesheets/${detail.timesheetId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            rows,
-            absences,
-          }),
-        },
-      );
+      await persistRows();
 
-      if (!saveResponse.ok) {
-        throw new Error("Kunne ikke lagre før innsending.");
-      }
+      await api.post("/api/timesheets/submit", {
+        weekStart: timesheet.weekStart,
+      });
 
-      const submitResponse = await fetch(
-        `/api/timesheets/${detail.timesheetId}/submit`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      if (!submitResponse.ok) {
-        throw new Error("Kunne ikke sende inn på nytt.");
-      }
-
-      onResubmitted?.();
+      await onResubmitted?.();
       onClose();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Noe gikk galt ved ny innsending.",
-      );
+      console.error(err);
+      setError("Kunne ikke sende inn på nytt.");
     } finally {
       setSubmitting(false);
     }
   }
 
   if (!opened) return null;
+
+  const titleWeekStart = detail?.weekStart ?? timesheet?.weekStart;
 
   return (
     <div className="timesheet-modal-overlay" onClick={onClose}>
@@ -334,8 +457,8 @@ export default function TimesheetEditModal({
           <div>
             <div className="timesheet-modal__eyebrow">TIMEOPPFØLGING</div>
             <h2 id="timesheet-modal-title" className="timesheet-modal__title">
-              {detail
-                ? `Uke ${getWeekNumber(detail.weekStart)} • ${formatDateRange(detail.weekStart)}`
+              {titleWeekStart
+                ? `Uke ${getWeekNumber(titleWeekStart)} • ${formatDateRange(titleWeekStart)}`
                 : "Laster timeføring..."}
             </h2>
           </div>
@@ -349,12 +472,16 @@ export default function TimesheetEditModal({
           </button>
         </div>
 
-        {detail && (
+        {(detail || timesheet) && (
           <div className="timesheet-modal__meta">
             <span
-              className={`timesheet-status timesheet-status--${detail.status.toLowerCase()}`}
+              className={`timesheet-status timesheet-status--${(detail?.status ?? timesheet?.status ?? "NOT_SENT").toLowerCase()}`}
             >
-              {formatStatus(detail.status)}
+              {formatStatus(
+                (detail?.status ??
+                  timesheet?.status ??
+                  "NOT_SENT") as TimesheetStatus,
+              )}
             </span>
 
             <span className="timesheet-total">
@@ -363,13 +490,13 @@ export default function TimesheetEditModal({
           </div>
         )}
 
-        {detail?.managerComment && (
+        {(detail?.managerComment ?? timesheet?.managerComment) && (
           <div className="timesheet-modal__comment">
             <div className="timesheet-modal__comment-label">
               Kommentar fra admin
             </div>
             <div className="timesheet-modal__comment-text">
-              {detail.managerComment}
+              {detail?.managerComment ?? timesheet?.managerComment}
             </div>
           </div>
         )}
@@ -522,6 +649,6 @@ export default function TimesheetEditModal({
   );
 }
 
-function FragmentRow({ children }: { children: React.ReactNode }) {
+function FragmentRow({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
