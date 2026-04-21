@@ -216,11 +216,11 @@ export default function AdminTimesheetPage() {
           <p>Totalt: {detail.totalHours.toFixed(1)} timer</p>
 
           <h3>Timer</h3>
-          {detail.entries.length === 0 ? (
+          {detail.timeEntries.length === 0 ? (
             <p>Ingen førte timer.</p>
           ) : (
             <div>
-              {detail.entries.map((entry) => (
+              {detail.timeEntries.map((entry) => (
                 <div key={entry.id} style={{ marginBottom: "10px" }}>
                   <strong>{entry.projectName}</strong> – {entry.workItemTitle} –{" "}
                   {entry.entryDate} – {entry.hours}t

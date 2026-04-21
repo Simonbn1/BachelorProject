@@ -15,9 +15,9 @@ export type AdminTimesheetDetail = {
   weekStart: string;
   status: "NOT_SENT" | "SENT" | "APPROVED" | "REJECTED";
   totalHours: number;
-  managerComment?: string;
+  managerComment?: string | null;
   employeeComment?: string;
-  entries: {
+  timeEntries: {
     id: number;
     entryDate: string;
     projectName: string;
