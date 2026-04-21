@@ -10,6 +10,7 @@ import AdminDashboardPage from "../features/admin/pages/AdminDashboardPage";
 import AdminTimesheetsPage from "../features/admin/pages/AdminTimesheetPage";
 import AdminEmployeesPage from "../features/admin/pages/AdminEmployeesPage";
 import AdminProjectsPage from "../features/admin/pages/AdminProjectsPage";
+import SavedTimesheetsPage from "../features/timesheets/pages/SavedTimesheetsPage.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -37,6 +38,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <TimesheetPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/timesheets/saved",
+    element: (
+      <ProtectedRoute>
+        <SavedTimesheetsPage />
       </ProtectedRoute>
     ),
   },
