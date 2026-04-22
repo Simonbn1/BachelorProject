@@ -121,6 +121,7 @@ export function TimesheetPage({
   const { handleExportExcel, handleExportInvoiceBasis } = useTimesheetExport({
     weekStart,
     visibleProjects,
+    hours,
   });
 
   const showTopBar = !embedded && !hideTopBar;
