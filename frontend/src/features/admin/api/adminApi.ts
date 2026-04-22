@@ -24,15 +24,13 @@ export async function fetchAdminTimesheetDetail(
 }
 
 export async function approveTimesheet(
-  timesheetId: number,
   body: AdminDecisionRequest,
 ): Promise<void> {
-  await api.post(`/api/admin/timesheets/${timesheetId}/approve`, body);
+  await api.post("/api/approvals/approve", body);
 }
 
 export async function rejectTimesheet(
-  timesheetId: number,
   body: AdminDecisionRequest,
 ): Promise<void> {
-  await api.post(`/api/admin/timesheets/${timesheetId}/reject`, body);
+  await api.post("/api/approvals/reject", body);
 }

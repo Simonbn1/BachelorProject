@@ -15,9 +15,9 @@ export type AdminTimesheetDetail = {
   weekStart: string;
   status: "NOT_SENT" | "SENT" | "APPROVED" | "REJECTED";
   totalHours: number;
-  managerComment?: string;
+  managerComment?: string | null;
   employeeComment?: string;
-  entries: {
+  timeEntries: {
     id: number;
     entryDate: string;
     projectName: string;
@@ -28,12 +28,14 @@ export type AdminTimesheetDetail = {
   absences: {
     id: number;
     absenceDate: string;
-    type: "VACATION" | "SICKNESS" | "PERMISSION" | "OTHER";
+    type: "VACATION" | "SICKNESS" | "LEAVE" | "OTHER";
     hours: number;
     description?: string;
   }[];
 };
 
 export type AdminDecisionRequest = {
-  managerComment?: string;
+  userId: number;
+  weekStart: string;
+  comment?: string;
 };

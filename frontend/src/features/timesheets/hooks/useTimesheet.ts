@@ -10,7 +10,7 @@ export type ProjectWithWorkItem = Project & {
   workItemTitle: string;
 };
 
-export function useTimesheet() {
+export function useTimesheet(initialWeekStart?: string | null) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [visibleProjects, setVisibleProjects] = useState<ProjectWithWorkItem[]>(
     [],
@@ -31,14 +31,13 @@ export function useTimesheet() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const { weekStart, weekLabel, weekNumber, goToPreviousWeek, goToNextWeek } =
-    useTimesheetWeek();
+    useTimesheetWeek(initialWeekStart);
 
   const startDate = parseLocalDate(weekStart);
   const endDate = new Date(startDate);
   endDate.setDate(startDate.getDate() + 4);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     setHours({});
     setVisibleProjects([]);
     setShowAbsencePrompt(false);
@@ -71,12 +70,14 @@ export function useTimesheet() {
             5: "fri",
           };
           const day = dayKeys[dayIndex];
+
           if (day) {
             loadedHours[`${workItemId}-${day}`] = String(entry.hours).replace(
               ".",
               ",",
             );
           }
+
           loadedWorkItems.set(workItemId, { projectId, title: workItemTitle });
         }
 
@@ -98,6 +99,7 @@ export function useTimesheet() {
         console.error("Kunne ikke hente timeføringer:", error);
       }
     }
+
     loadEntries();
   }, [weekStart, projects]);
 
@@ -140,7 +142,6 @@ export function useTimesheet() {
   const overtimeTotal = Math.max(0, weekTotal - weeklyTarget);
 
   return {
-    // State
     projects,
     visibleProjects,
     setVisibleProjects,
@@ -164,7 +165,6 @@ export function useTimesheet() {
     setHoursError,
     hasUnsavedChanges,
     setHasUnsavedChanges,
-    // week
     weekStart,
     weekLabel,
     weekNumber,
@@ -172,12 +172,10 @@ export function useTimesheet() {
     endDate,
     goToPreviousWeek,
     goToNextWeek,
-    // Computed
     weekTotal,
     weeklyTarget,
     progressPercent,
     overtimeTotal,
-    // Helpers
     getNumericValue,
     getRowTotal,
   };

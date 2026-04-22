@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function getMonday(date: Date): Date {
   const d = new Date(date);
@@ -21,8 +21,7 @@ function formatWeekLabel(date: Date): string {
   end.setDate(end.getDate() + 4);
   return `${date.getDate()}. ${date.toLocaleString("nb-NO", {
     month: "long",
-  })} 
-        - ${end.getDate()}. ${end.toLocaleString("nb-NO", { month: "long" })}`;
+  })} - ${end.getDate()}. ${end.toLocaleString("nb-NO", { month: "long" })}`;
 }
 
 function getWeekNumber(date: Date): number {
@@ -46,10 +45,16 @@ export function parseLocalDate(dateStr: string): Date {
   return new Date(year, month - 1, day);
 }
 
-export function useTimesheetWeek() {
+export function useTimesheetWeek(initialWeekStart?: string | null) {
   const [currentWeek, setCurrentWeek] = useState<Date>(() =>
-    getMonday(new Date()),
+    initialWeekStart ? parseLocalDate(initialWeekStart) : getMonday(new Date()),
   );
+
+  useEffect(() => {
+    if (initialWeekStart) {
+      setCurrentWeek(parseLocalDate(initialWeekStart));
+    }
+  }, [initialWeekStart]);
 
   function goToPreviousWeek() {
     setCurrentWeek((prev) => {
@@ -72,7 +77,7 @@ export function useTimesheetWeek() {
     weekStart: formatWeekStart(currentWeek),
     weekLabel: formatWeekLabel(currentWeek),
     weekNumber: getWeekNumber(currentWeek),
-    goToPreviousWeek: goToPreviousWeek,
-    goToNextWeek: goToNextWeek,
+    goToPreviousWeek,
+    goToNextWeek,
   };
 }
