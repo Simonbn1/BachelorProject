@@ -151,16 +151,13 @@ export function useTimesheetActions({
       fri: 4,
     };
 
-    try {
-      for (const project of visibleProjects) {
-        await saveTimeEntries(userId, weekStart, project.workItemId, hours);
-      }
-      setHasUnsavedChanges(false);
-    } catch (error) {
-      console.error("Feil ved lagring:", error);
-      showToast("error", "Feil ved lagring", "Noe gikk galt. Sjekk konsollen");
-      return;
-    }
+    const dayLabels: Record<string, string> = {
+      mon: "Mandag",
+      tue: "Tirsdag",
+      wed: "Onsdag",
+      thu: "Torsdag",
+      fri: "Fredag",
+    };
 
     const days = ["mon", "tue", "wed", "thu", "fri"];
     const passedDaysWithMissingHours = days.filter((day) => {
@@ -174,18 +171,36 @@ export function useTimesheetActions({
       return totalWorked < 8;
     });
 
+    try {
+      for (const project of visibleProjects) {
+        await saveTimeEntries(userId, weekStart, project.workItemId, hours);
+      }
+      setHasUnsavedChanges(false);
+    } catch (error) {
+      console.error("Feil ved lagring:", error);
+      showToast(
+        "error",
+        "Feil ved lagring",
+        "Noe gikk galt. Sjekk konsollen",
+        true,
+      );
+      return;
+    }
+
+    if (visibleProjects.length === 0) {
+      showToast(
+        "warning",
+        "Ingen prosjekter",
+        "Legg til et prosjekt før du lagrer.",
+      );
+      return;
+    }
+
     if (passedDaysWithMissingHours.length === 0) {
       showToast("success", "Timer lagret!");
       return;
     }
 
-    const dayLabels: Record<string, string> = {
-      mon: "Mandag",
-      tue: "Tirsdag",
-      wed: "Onsdag",
-      thu: "Torsdag",
-      fri: "Fredag",
-    };
     const dayNames = passedDaysWithMissingHours
       .map((d) => dayLabels[d])
       .join(", ");
@@ -193,6 +208,7 @@ export function useTimesheetActions({
       "warning",
       "Timer lagret!",
       `Timer lagret! Du har ikke registrert 8 timer for: ${dayNames}.`,
+      true,
     );
     setShowAbsencePrompt(true);
     return;

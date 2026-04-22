@@ -43,7 +43,12 @@ export function useRegister() {
       }
     } catch (err) {
       console.error(err);
-      showToast("error", "Register failed");
+      showToast(
+        "error",
+        "Registrering feilet",
+        "E-postadressen er ikke godkjent. Kun Accenture-kontoer har tilgang til systemet.",
+        true,
+      );
     }
   };
 

@@ -32,7 +32,12 @@ export function useAbsenceSave({
     const isRangeBased = absenceType === "VACATION" || absenceType === "LEAVE";
 
     if (!absenceType) {
-      showToast("warning", "Mangler årsak", "Velg årsak til fravær først.");
+      showToast(
+        "warning",
+        "Mangler årsak",
+        "Velg årsak til fravær først.",
+        true,
+      );
       return;
     }
 
@@ -50,23 +55,28 @@ export function useAbsenceSave({
           error instanceof Error
             ? error.message
             : "Noe gikk galt. Sjekk konsollen";
-        showToast("error", "Feil ved lagring", message);
+        showToast("error", "Feil ved lagring", message, true);
       }
       return;
     }
 
     if (!projectId) {
-      showToast("warning", "Mangler prosjekt", "Velg et prosjekt først.");
+      showToast("warning", "Mangler prosjekt", "Velg et prosjekt først.", true);
       return;
     }
 
     if (isRangeBased && (!selectedStartDate || !selectedEndDate)) {
-      showToast("warning", "Mangler periode", "Velg en periode først.");
+      showToast("warning", "Mangler periode", "Velg en periode først.", true);
       return;
     }
 
     if (!isRangeBased && Object.keys(hours).length === 0) {
-      showToast("warning", "Mangler timer", "Fyll inn timer for minst en dag.");
+      showToast(
+        "warning",
+        "Mangler timer",
+        "Fyll inn timer for minst en dag.",
+        true,
+      );
       return;
     }
 
@@ -75,6 +85,7 @@ export function useAbsenceSave({
         "warning",
         "Mangler arbeidsoppgave",
         "Velg en arbeidsoppgave først.",
+        true,
       );
       return;
     }
@@ -104,7 +115,7 @@ export function useAbsenceSave({
         error instanceof Error
           ? error.message
           : "Noe gikk galt. Sjekk konsollen";
-      showToast("error", "Feil ved lagring", message);
+      showToast("error", "Feil ved lagring", message, true);
     }
   }
 

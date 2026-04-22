@@ -7,18 +7,26 @@ type ToastData = {
   type: ToastType;
   title: string;
   message?: string;
+  persistent?: boolean;
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
   const showToast = useCallback(
-    (type: ToastType, title: string, message?: string) => {
+    (
+      type: ToastType,
+      title: string,
+      message?: string,
+      persistent?: boolean,
+    ) => {
       const id = Date.now();
       setToasts((prev) => [...prev, { id, type, title, message }]);
-      setTimeout(() => {
-        setToasts((prev) => prev.filter((t) => t.id !== id));
-      }, 4000);
+      if (!persistent) {
+        setTimeout(() => {
+          setToasts((prev) => prev.filter((t) => t.id !== id));
+        }, 7000);
+      }
     },
     [],
   );

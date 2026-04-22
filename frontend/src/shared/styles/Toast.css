@@ -13,13 +13,13 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 14px 16px;
+  padding: 16px 20px;
   border-radius: 12px;
-  min-width: 300px;
-  max-width: 420px;
+  min-width: 360px;
+  max-width: 480px;
   background: rgba(30, 35, 70, 0.97);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
   animation: toast-in 0.25s ease;
 }
 
@@ -64,19 +64,21 @@
 
 .toast-title {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
   color: white;
 }
 .toast-message {
   margin: 4px 0 0;
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .toast-icon {
-  margin-top: 1px;
+  margin-top: 2px;
   flex-shrink: 0;
+  width: 20px;
+  height: 20px;
 }
 
 .toast-close {

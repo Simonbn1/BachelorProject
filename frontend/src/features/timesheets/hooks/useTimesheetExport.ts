@@ -3,28 +3,45 @@ import {
   exportTimesheetExcel,
 } from "../api/timesheetsApi.ts";
 import { useToasts } from "../../../shared/hooks/useToasts.ts";
-import type { ProjectWithWorkItem } from "./useTimesheet.ts";
+import type { HoursState, ProjectWithWorkItem } from "./useTimesheet.ts";
 
 type UseTimesheetExportProps = {
   weekStart: string;
   visibleProjects: ProjectWithWorkItem[];
+  hours: HoursState;
 };
 
 export function useTimesheetExport({
   weekStart,
   visibleProjects,
+  hours,
 }: UseTimesheetExportProps) {
   const { showToast } = useToasts();
+  const hasHours = hours
+    ? Object.values(hours).some((v) => parseFloat(v.replace(",", ".")) > 0)
+    : false;
 
   async function handleExportExcel() {
     if (visibleProjects.length === 0) {
       showToast(
         "warning",
         "Ingen data",
-        "Legg til et prosjekt og registrer timer før du eksporterer.",
+        "Legg til et prosjekt før du eksporterer.",
+        true,
       );
       return;
     }
+
+    if (!hasHours) {
+      showToast(
+        "warning",
+        "Ingen Timer",
+        "registrer timer før du eksporterer.",
+        true,
+      );
+      return;
+    }
+
     try {
       const blob = await exportTimesheetExcel(weekStart);
 
@@ -45,6 +62,7 @@ export function useTimesheetExport({
         "error",
         "Eksport feilet",
         "Kunne ikke eksportere timeliste til Excel",
+        true,
       );
     }
   }
@@ -54,7 +72,17 @@ export function useTimesheetExport({
       showToast(
         "warning",
         "Ingen data",
-        "Legg til et prosjekt og registrer timer før du eksporterer.",
+        "Legg til et prosjekt før du eksporterer.",
+        true,
+      );
+      return;
+    }
+
+    if (!hasHours) {
+      showToast(
+        "warning",
+        "Ingen Timer",
+        "registrer timer før du eksporterer.",
       );
       return;
     }
@@ -78,6 +106,7 @@ export function useTimesheetExport({
         "error",
         "Eksport feilet",
         "Kunne ikke eksportere fakturagrunnlag",
+        true,
       );
     }
   }

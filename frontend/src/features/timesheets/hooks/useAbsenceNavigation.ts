@@ -123,6 +123,7 @@ export function useAbsenceNavigation({
         "warning",
         "Konflikt",
         `Flere prosjekter konkurrerer om fravær for: ${conflictNames}.\n\nHøyreklikk på dagen du ikke vil registrere fravær for å eksludere den.`,
+        true,
       );
       setShowAbsencePrompt(true);
       return;
