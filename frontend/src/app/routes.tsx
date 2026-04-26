@@ -11,6 +11,7 @@ import AdminTimesheetsPage from "../features/admin/pages/AdminTimesheetPage";
 import AdminEmployeesPage from "../features/admin/pages/AdminEmployeesPage";
 import AdminProjectsPage from "../features/admin/pages/AdminProjectsPage";
 import SavedTimesheetsPage from "../features/timesheets/pages/SavedTimesheetsPage.tsx";
+import AdminExportPage from "../features/admin/pages/AdminExportPage.tsx";
 
 export const router = createBrowserRouter([
   {
@@ -70,7 +71,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/admin/export",
-        element: <div>Eksport kommer</div>,
+        element: <AdminExportPage />,
       },
       {
         path: "/admin/employees",

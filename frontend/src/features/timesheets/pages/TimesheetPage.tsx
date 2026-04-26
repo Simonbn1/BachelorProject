@@ -28,7 +28,7 @@ export function TimesheetPage({
   hideTopBar = false,
   hideBackButton = false,
   hideWeekNavigation = false,
-  hideExports = false,
+  hideExports = true,
   hideCalendarButton = false,
   title = "Timeføring",
   subtitle = "Registrer timer for uken og følg totalen din.",
