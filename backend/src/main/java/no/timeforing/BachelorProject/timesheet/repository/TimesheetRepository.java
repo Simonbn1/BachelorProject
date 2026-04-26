@@ -15,10 +15,16 @@ public interface TimesheetRepository extends JpaRepository<Timesheet, Long> {
 
     List<Timesheet> findByWeekStartAndStatus(LocalDate weekStart, TimesheetStatus status);
 
+    List<Timesheet> findAllByWeekStartAndStatusIn(
+            LocalDate weekStart,
+            Collection<TimesheetStatus> statuses
+    );
+
     List<Timesheet> findAllByUserIdAndStatusOrderByWeekStartDesc(
             Long userId,
             TimesheetStatus status
     );
 
     List<Timesheet> findAllByUserIdOrderByWeekStartDesc(Long userId);
+
 }
