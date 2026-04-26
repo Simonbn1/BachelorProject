@@ -34,3 +34,12 @@ export async function rejectTimesheet(
 ): Promise<void> {
   await api.post("/api/approvals/reject", body);
 }
+
+export async function exportAdminInvoiceBasisExcel(weekStart: string) {
+  const response = await api.get("/api/admin/export/invoice-basis", {
+    params: { weekStart },
+    responseType: "blob",
+  });
+
+  return response.data;
+}

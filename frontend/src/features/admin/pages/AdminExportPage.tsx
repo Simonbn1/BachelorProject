@@ -1,7 +1,7 @@
 import TopBar from "../../../shared/components/TopBar";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { exportInvoiceBasisExcel } from "../../timesheets/api/timesheetsApi";
+import { exportAdminInvoiceBasisExcel } from "../api/adminApi";
 import { useToasts } from "../../../shared/hooks/useToasts";
 import "../../../shared/styles/AdminExportPage.css";
 
@@ -17,6 +17,57 @@ function getMondayOfCurrentWeek() {
   return monday.toISOString().split("T")[0];
 }
 
+function getIsoWeek(date: Date) {
+  const temp = new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
+  );
+  const day = temp.getUTCDay() || 7;
+
+  temp.setUTCDate(temp.getUTCDate() + 4 - day);
+
+  const yearStart = new Date(Date.UTC(temp.getUTCFullYear(), 0, 1));
+  const week = Math.ceil(
+    ((temp.getTime() - yearStart.getTime()) / 86400000 + 1) / 7,
+  );
+
+  return {
+    year: temp.getUTCFullYear(),
+    week,
+  };
+}
+
+function toWeekInputValue(weekStart: string) {
+  const date = new Date(`${weekStart}T00:00:00`);
+  const { year, week } = getIsoWeek(date);
+
+  return `${year}-W${String(week).padStart(2, "0")}`;
+}
+
+function getMondayFromWeekValue(weekValue: string) {
+  const [yearText, weekText] = weekValue.split("-W");
+  const year = Number(yearText);
+  const week = Number(weekText);
+
+  const jan4 = new Date(year, 0, 4);
+  const jan4Day = jan4.getDay() || 7;
+
+  const monday = new Date(jan4);
+  monday.setDate(jan4.getDate() - jan4Day + 1 + (week - 1) * 7);
+  monday.setHours(0, 0, 0, 0);
+
+  return monday.toISOString().split("T")[0];
+}
+
+function formatWeekLabel(weekStart: string) {
+  const start = new Date(`${weekStart}T00:00:00`);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+
+  const { week } = getIsoWeek(start);
+
+  return `Uke ${week} (${start.toLocaleDateString("nb-NO")} - ${end.toLocaleDateString("nb-NO")})`;
+}
+
 export default function AdminExportPage() {
   const navigate = useNavigate();
   const { showToast } = useToasts();
@@ -28,7 +79,7 @@ export default function AdminExportPage() {
     try {
       setLoading(true);
 
-      const blob = await exportInvoiceBasisExcel(weekStart);
+      const blob = await exportAdminInvoiceBasisExcel(weekStart);
 
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -50,7 +101,6 @@ export default function AdminExportPage() {
       );
     } catch (error) {
       console.error("Eksport av fakturagrunnlag feilet:", error);
-
       showToast(
         "error",
         "Eksport feilet",
@@ -96,11 +146,17 @@ export default function AdminExportPage() {
 
             <input
               id="weekStart"
-              type="date"
-              value={weekStart}
-              onChange={(e) => setWeekStart(e.target.value)}
+              type="week"
+              value={toWeekInputValue(weekStart)}
+              onChange={(e) =>
+                setWeekStart(getMondayFromWeekValue(e.target.value))
+              }
               className="admin-export-input"
             />
+
+            <span className="admin-export-week-label">
+              {formatWeekLabel(weekStart)}
+            </span>
 
             <button
               type="button"
