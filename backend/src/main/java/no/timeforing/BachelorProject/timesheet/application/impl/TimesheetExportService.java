@@ -10,6 +10,7 @@ import java.util.Map;
 
 import no.timeforing.BachelorProject.timesheet.domain.TimeEntry;
 import no.timeforing.BachelorProject.timesheet.domain.Timesheet;
+import no.timeforing.BachelorProject.timesheet.domain.enums.TimesheetStatus;
 import no.timeforing.BachelorProject.timesheet.repository.TimeEntryRepository;
 import no.timeforing.BachelorProject.timesheet.repository.TimesheetRepository;
 import org.apache.poi.ss.usermodel.*;
@@ -75,9 +76,9 @@ public class TimesheetExportService {
                 createCell(row, 1, entry.getHours(), numberStyle);
                 createCell(row, 2, entry.getOvertimeHours(), numberStyle);
                 createCell(row, 3, safe(entry.getDescription()), textStyle);
-                createCell(row, 4, entry.getWorkItem().getId(), textStyle);
-                createCell(row, 5, safe(entry.getWorkItem().getTitle()), textStyle);
-                createCell(row, 6, safe(entry.getWorkItem().getProject().getName()), textStyle);
+                createCell(row, 4, getWorkItemId(entry), textStyle);
+                createCell(row, 5, getWorkItemTitle(entry), textStyle);
+                createCell(row, 6, getProjectName(entry), textStyle);
 
                 totalHours += entry.getHours();
                 totalOvertime += entry.getOvertimeHours();
@@ -101,18 +102,43 @@ public class TimesheetExportService {
         Timesheet ts = getTimesheet(userId, weekStart);
         List<TimeEntry> entries = getSortedEntries(ts);
 
+        return createInvoiceBasisWorkbook(weekStart, entries);
+    }
+
+    public byte[] exportAdminInvoiceBasisExcel(LocalDate weekStart) {
+        List<Timesheet> timesheets = timesheetRepository
+                .findByWeekStartAndStatus(weekStart, TimesheetStatus.APPROVED);
+
+        if (timesheets.isEmpty()) {
+            throw new RuntimeException("No approved timesheets found for weekStart: " + weekStart);
+        }
+
+        List<TimeEntry> entries = timesheets.stream()
+                .flatMap(ts -> timeEntryRepository.findByTimesheetId(ts.getId()).stream())
+                .sorted(
+                        Comparator.comparing(TimeEntry::getEntryDate)
+                                .thenComparing(this::getProjectName)
+                                .thenComparing(this::getWorkItemTitle)
+                )
+                .toList();
+
+        return createInvoiceBasisWorkbook(weekStart, entries);
+    }
+
+    private byte[] createInvoiceBasisWorkbook(LocalDate weekStart, List<TimeEntry> entries) {
         Map<String, InvoiceLine> grouped = new LinkedHashMap<>();
 
         for (TimeEntry entry : entries) {
-            String projectName = safe(entry.getWorkItem().getProject().getName());
-            String workItemTitle = safe(entry.getWorkItem().getTitle());
-            String key = projectName + "||" + workItemTitle;
+            String projectName = getProjectName(entry);
+            Long workItemId = getWorkItemId(entry);
+            String workItemTitle = getWorkItemTitle(entry);
+            String key = projectName + "||" + workItemId + "||" + workItemTitle;
 
             grouped.computeIfAbsent(
                     key,
                     k -> new InvoiceLine(
                             projectName,
-                            entry.getWorkItem().getId(),
+                            workItemId,
                             workItemTitle
                     )
             ).addHours(entry.getHours(), entry.getOvertimeHours());
@@ -187,9 +213,33 @@ public class TimesheetExportService {
         List<TimeEntry> entries = timeEntryRepository.findByTimesheetId(ts.getId());
         entries.sort(
                 Comparator.comparing(TimeEntry::getEntryDate)
-                        .thenComparing(e -> e.getWorkItem().getId())
+                        .thenComparing(this::getWorkItemId, Comparator.nullsLast(Long::compareTo))
         );
         return entries;
+    }
+
+    private String getProjectName(TimeEntry entry) {
+        if (entry.getWorkItem() == null || entry.getWorkItem().getProject() == null) {
+            return "Ukjent prosjekt";
+        }
+
+        return safe(entry.getWorkItem().getProject().getName());
+    }
+
+    private String getWorkItemTitle(TimeEntry entry) {
+        if (entry.getWorkItem() == null) {
+            return "Ukjent oppgave";
+        }
+
+        return safe(entry.getWorkItem().getTitle());
+    }
+
+    private Long getWorkItemId(TimeEntry entry) {
+        if (entry.getWorkItem() == null) {
+            return null;
+        }
+
+        return entry.getWorkItem().getId();
     }
 
     private String safe(String value) {
