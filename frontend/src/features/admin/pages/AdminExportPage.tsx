@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { exportInvoiceBasisExcel } from "../../timesheets/api/timesheetsApi";
 import { useToasts } from "../../../shared/hooks/useToasts";
-import "../styles/AdminExportPage.css";
+import "../../../shared/styles/AdminExportPage.css";
 
 function getMondayOfCurrentWeek() {
   const today = new Date();

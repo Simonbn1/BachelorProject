@@ -1,0 +1,50 @@
+.admin-export-shell {
+  max-width: 1360px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.admin-export-card {
+  margin-top: 40px;
+  padding: 32px;
+  border-radius: 28px;
+  background: rgba(12, 17, 34, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-export-header h2 {
+  margin: 0 0 8px;
+  color: #f8fafc;
+  font-size: 28px;
+}
+
+.admin-export-header p {
+  margin: 0;
+  color: #a8b0c7;
+}
+
+.admin-export-form {
+  margin-top: 28px;
+  display: flex;
+  align-items: end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.admin-export-form label {
+  display: block;
+  margin-bottom: 8px;
+  color: #a8b0c7;
+  font-weight: 700;
+}
+
+.admin-export-input {
+  height: 52px;
+  min-width: 220px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: #f8fafc;
+  font-size: 16px;
+}
