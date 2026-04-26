@@ -1,4 +1,3 @@
-import TopBar from "../../../shared/components/TopBar";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { exportAdminInvoiceBasisExcel } from "../api/adminApi";
@@ -122,8 +121,6 @@ export default function AdminExportPage() {
   return (
     <div className="page">
       <div className="admin-export-shell">
-        <TopBar />
-
         <div className="page-intro">
           <button
             type="button"
