@@ -5,33 +5,39 @@ import { exportAdminInvoiceBasisExcel } from "../api/adminApi";
 import { useToasts } from "../../../shared/hooks/useToasts";
 import "../../../shared/styles/AdminExportPage.css";
 
+function formatLocalDate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
 function getMondayOfCurrentWeek() {
   const today = new Date();
-  const day = today.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
+  const day = today.getDay() || 7;
 
   const monday = new Date(today);
-  monday.setDate(today.getDate() + diff);
+  monday.setDate(today.getDate() - day + 1);
   monday.setHours(0, 0, 0, 0);
 
-  return monday.toISOString().split("T")[0];
+  return formatLocalDate(monday);
 }
 
 function getIsoWeek(date: Date) {
-  const temp = new Date(
-    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
-  );
-  const day = temp.getUTCDay() || 7;
+  const temp = new Date(date.getTime());
+  temp.setHours(0, 0, 0, 0);
 
-  temp.setUTCDate(temp.getUTCDate() + 4 - day);
+  const day = temp.getDay() || 7;
+  temp.setDate(temp.getDate() + 4 - day);
 
-  const yearStart = new Date(Date.UTC(temp.getUTCFullYear(), 0, 1));
+  const yearStart = new Date(temp.getFullYear(), 0, 1);
   const week = Math.ceil(
     ((temp.getTime() - yearStart.getTime()) / 86400000 + 1) / 7,
   );
 
   return {
-    year: temp.getUTCFullYear(),
+    year: temp.getFullYear(),
     week,
   };
 }
@@ -55,7 +61,7 @@ function getMondayFromWeekValue(weekValue: string) {
   monday.setDate(jan4.getDate() - jan4Day + 1 + (week - 1) * 7);
   monday.setHours(0, 0, 0, 0);
 
-  return monday.toISOString().split("T")[0];
+  return formatLocalDate(monday);
 }
 
 function formatWeekLabel(weekStart: string) {
@@ -101,6 +107,7 @@ export default function AdminExportPage() {
       );
     } catch (error) {
       console.error("Eksport av fakturagrunnlag feilet:", error);
+
       showToast(
         "error",
         "Eksport feilet",
