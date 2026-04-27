@@ -18,7 +18,9 @@ export default function TopBar() {
   return (
     <nav className="topbar">
       <div className="topbar-left">
-        <div className="topbar-brand">accenture</div>
+        <div className="topbar-brand">
+          accenture<span>&gt;</span>
+        </div>
       </div>
 
       <div className="topbar-right">
