@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
+import AppLayout from "./AppLayout";
 import { TimesheetPage } from "../features/timesheets/pages/TimesheetPage.tsx";
 import AbsencePage from "../features/absence/pages/AbsencePage.tsx";
 import LoginPage from "../features/auth/pages/LoginPage.tsx";
@@ -14,77 +15,39 @@ import SavedTimesheetsPage from "../features/timesheets/pages/SavedTimesheetsPag
 import AdminExportPage from "../features/admin/pages/AdminExportPage.tsx";
 
 export const router = createBrowserRouter([
+  { path: "/", element: <Navigate to="/login" replace /> },
+  { path: "/login", element: <LoginPage /> },
+  { path: "/register", element: <RegisterPage /> },
+
   {
-    path: "/",
-    element: <Navigate to="/login" replace />,
-  },
-  {
-    path: "/login",
-    element: <LoginPage />,
-  },
-  {
-    path: "/register",
-    element: <RegisterPage />,
-  },
-  {
-    path: "/dashboard",
     element: (
       <ProtectedRoute>
-        <EmployeeDashboardPage />
+        <AppLayout />
       </ProtectedRoute>
     ),
+    children: [
+      { path: "/dashboard", element: <EmployeeDashboardPage /> },
+      { path: "/timesheet", element: <TimesheetPage /> },
+      { path: "/timesheets/saved", element: <SavedTimesheetsPage /> },
+      { path: "/absence", element: <AbsencePage /> },
+    ],
   },
-  {
-    path: "/timesheet",
-    element: (
-      <ProtectedRoute>
-        <TimesheetPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/timesheets/saved",
-    element: (
-      <ProtectedRoute>
-        <SavedTimesheetsPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/absence",
-    element: (
-      <ProtectedRoute>
-        <AbsencePage />
-      </ProtectedRoute>
-    ),
-  },
+
   {
     element: <AdminGuard />,
     children: [
       {
-        path: "/admin",
-        element: <AdminDashboardPage />,
-      },
-      {
-        path: "/admin/timesheets",
-        element: <AdminTimesheetsPage />,
-      },
-      {
-        path: "/admin/export",
-        element: <AdminExportPage />,
-      },
-      {
-        path: "/admin/employees",
-        element: <AdminEmployeesPage />,
-      },
-      {
-        path: "/admin/projects",
-        element: <AdminProjectsPage />,
+        element: <AppLayout />,
+        children: [
+          { path: "/admin", element: <AdminDashboardPage /> },
+          { path: "/admin/timesheets", element: <AdminTimesheetsPage /> },
+          { path: "/admin/export", element: <AdminExportPage /> },
+          { path: "/admin/employees", element: <AdminEmployeesPage /> },
+          { path: "/admin/projects", element: <AdminProjectsPage /> },
+        ],
       },
     ],
   },
-  {
-    path: "*",
-    element: <Navigate to="/login" replace />,
-  },
+
+  { path: "*", element: <Navigate to="/login" replace /> },
 ]);

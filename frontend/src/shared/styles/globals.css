@@ -1,3 +1,7 @@
+html {
+  scrollbar-gutter: stable;
+}
+
 html,
 body,
 #root {
@@ -12,6 +16,7 @@ body,
 }
 
 body {
+  overflow-y: scroll;
   background: #0a1020;
   font-family:
     Inter,
@@ -21,4 +26,17 @@ body {
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
+}
+
+.app-page {
+  min-height: 100vh;
+  padding: 1px 0 48px;
+  background:
+    radial-gradient(circle at 80% 0%, rgba(161, 0, 255, 0.12), transparent 30%),
+    linear-gradient(135deg, #151927 0%, #22283d 52%, #141827 100%);
+}
+
+.app-shell {
+  width: min(100% - 64px, 1760px);
+  margin: 0 auto;
 }
