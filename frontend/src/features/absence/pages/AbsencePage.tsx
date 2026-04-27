@@ -1,4 +1,3 @@
-import TopBar from "../../../shared/components/TopBar.tsx";
 import "../../../features/timesheets/styles/TimesheetPage.css";
 import AbsenceForm from "../components/AbsenceForm.tsx";
 import { useAbsence } from "../hooks/useAbsence.ts";
@@ -63,7 +62,6 @@ export default function AbsencePage() {
   return (
     <div className="page">
       <div className="timesheet-shell">
-        <TopBar />
         <section className="timesheet-card">
           <div className="timesheet-header">
             <div className="timesheet-header-left">
@@ -75,6 +73,7 @@ export default function AbsencePage() {
                 >
                   🗓
                 </button>
+
                 <div>
                   <div className="week-nav">
                     <button
@@ -84,7 +83,9 @@ export default function AbsencePage() {
                     >
                       <ChevronLeft size={16} />
                     </button>
+
                     <h5>Uke {weekNumber}</h5>
+
                     <button
                       className="add-project week-nav-btn"
                       type="button"
@@ -95,27 +96,31 @@ export default function AbsencePage() {
                   </div>
                 </div>
               </div>
+
               <div className="week-subtitle">{weekLabel}</div>
             </div>
 
             <div className="timesheet-progress-wrap">
               <div className="timesheet-progress">
                 <div className="progress-text">
-                  {weekTotal.toFixed(1).replace(".", ",")} /{""}
+                  {weekTotal.toFixed(1).replace(".", ",")} /{" "}
                   {weeklyTarget.toFixed(1).replace(".", ",")}
                 </div>
+
                 <div className="progress-bar">
                   <div
                     className="progress-fill"
                     style={{ width: `${progressPercent}%` }}
-                  ></div>
+                  />
                 </div>
               </div>
             </div>
           </div>
+
           {absencePayload && (
             <div className="absence-payload-summary">
               <p className="absence-payload-label">Fravær registreres for:</p>
+
               {absencePayload.map((entry) => (
                 <div key={entry.workItemId} className="absence-payload-entry">
                   <strong>{entry.projectName}</strong> - {entry.workItemTitle}
@@ -130,6 +135,7 @@ export default function AbsencePage() {
               ))}
             </div>
           )}
+
           <AbsenceForm
             hours={hours}
             absenceType={absenceType}
@@ -155,6 +161,7 @@ export default function AbsencePage() {
           />
         </section>
       </div>
+
       {isCalendarOpen && (
         <div
           className="wireframe-modal"
@@ -171,7 +178,9 @@ export default function AbsencePage() {
             >
               x
             </button>
+
             <h5 className="modal-week-title">Uke {weekNumber}</h5>
+
             <DatePicker
               type="range"
               value={[startDate, endDate] as DatesRangeValue}
