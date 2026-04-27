@@ -21,6 +21,21 @@ type TimesheetPageProps = {
   weekStartOverride?: string;
 };
 
+function getStatusLabel(status: string | null) {
+  switch (status) {
+    case "SENT":
+      return "Til behandling";
+    case "APPROVED":
+      return "Godkjent";
+    case "REJECTED":
+      return "Avvist";
+    case "NOT_SENT":
+      return "Ikke sendt";
+    default:
+      return null;
+  }
+}
+
 export function TimesheetPage({
   embedded = false,
   hideBackButton = false,
@@ -60,6 +75,8 @@ export function TimesheetPage({
     setHoursError,
     hasUnsavedChanges,
     setHasUnsavedChanges,
+    timesheetStatus,
+    isLocked,
     weekStart,
     weekLabel,
     weekNumber,
@@ -134,7 +151,11 @@ export function TimesheetPage({
   const showWeekNavigation = !embedded && !hideWeekNavigation;
   const showCalendarButton = !embedded && !hideCalendarButton;
   const showExports = !embedded && !hideExports;
-  const showSubmitButton = !embedded;
+  const showSubmitButton = !embedded && !isLocked;
+  const showDraftButton = !isLocked;
+  const showAddProjectButton = !isLocked;
+  const showDeleteButton = !isLocked;
+  const statusLabel = getStatusLabel(timesheetStatus);
 
   return (
     <div className={embedded ? "page page--embedded" : "page"}>
@@ -170,6 +191,14 @@ export function TimesheetPage({
               : "timesheet-card"
           }
         >
+          {statusLabel && (
+            <div
+              className={`timesheet-status-banner timesheet-status-banner--${timesheetStatus?.toLowerCase()}`}
+            >
+              Status: {statusLabel}
+            </div>
+          )}
+
           <div className="timesheet-header">
             <div className="timesheet-header-left">
               <div className="week-nav-group">
@@ -270,10 +299,12 @@ export function TimesheetPage({
                   <input
                     value={hours[`${project.workItemId}-${day}`] ?? ""}
                     placeholder="0,0"
+                    disabled={isLocked}
                     onChange={(e) =>
                       handleChange(project.workItemId, day, e.target.value)
                     }
                     onContextMenu={(e) => {
+                      if (isLocked) return;
                       e.preventDefault();
                       toggleExcludedFromAbsence(project.workItemId, day);
                     }}
@@ -290,30 +321,42 @@ export function TimesheetPage({
                 {getRowTotal(project.workItemId).toFixed(1).replace(".", ",")}
               </div>
 
-              <button
-                className="delete-btn"
-                type="button"
-                aria-label="Slett rad"
-                onClick={() => removeProject(project.workItemId)}
-              >
-                <Trash2 size={22} />
-              </button>
+              {showDeleteButton && (
+                <button
+                  className="delete-btn"
+                  type="button"
+                  aria-label="Slett rad"
+                  onClick={() => removeProject(project.workItemId)}
+                >
+                  <Trash2 size={22} />
+                </button>
+              )}
             </div>
           ))}
 
           {hoursError && <p className="hours-error">{hoursError}</p>}
 
           <div className="timesheet-actions">
-            <button
-              className="add-project"
-              type="button"
-              onClick={() => setIsAddModalOpen(true)}
-            >
-              + Legg til nytt prosjekt
-            </button>
+            {showAddProjectButton ? (
+              <button
+                className="add-project"
+                type="button"
+                onClick={() => setIsAddModalOpen(true)}
+              >
+                + Legg til nytt prosjekt
+              </button>
+            ) : (
+              <button
+                className="add-project"
+                type="button"
+                onClick={() => navigate("/timesheets/saved")}
+              >
+                Gå til Mine timer
+              </button>
+            )}
 
             <div className="timesheet-actions-right">
-              {showAbsencePrompt && (
+              {!isLocked && showAbsencePrompt && (
                 <button
                   className="add-project absence-prompt-btn"
                   type="button"
@@ -323,15 +366,17 @@ export function TimesheetPage({
                 </button>
               )}
 
-              <button
-                className={
-                  hasUnsavedChanges ? "save-btn" : "save-btn save-btn--saved"
-                }
-                type="button"
-                onClick={handleSave}
-              >
-                Lagre kladd
-              </button>
+              {showDraftButton && (
+                <button
+                  className={
+                    hasUnsavedChanges ? "save-btn" : "save-btn save-btn--saved"
+                  }
+                  type="button"
+                  onClick={handleSave}
+                >
+                  Lagre kladd
+                </button>
+              )}
 
               {showSubmitButton && (
                 <button
@@ -397,7 +442,7 @@ export function TimesheetPage({
         </div>
       )}
 
-      {isAddModalOpen && (
+      {isAddModalOpen && !isLocked && (
         <div className="wireframe-modal">
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <button
