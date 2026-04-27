@@ -63,7 +63,6 @@ export default function TimesheetEditModal({
         <div className="timesheet-modal__page-body">
           <TimesheetPage
             embedded
-            hideTopBar
             hideBackButton
             hideWeekNavigation
             hideExports
