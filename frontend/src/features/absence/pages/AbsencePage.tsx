@@ -6,8 +6,11 @@ import { useAbsenceFillWeek } from "../hooks/useAbsenceFillWeek.ts";
 import "../styles/AbsencePage.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DatePicker, type DatesRangeValue } from "@mantine/dates";
+import { useNavigate } from "react-router-dom";
 
 export default function AbsencePage() {
+  const navigate = useNavigate();
+
   const {
     hours,
     setHours,
@@ -62,6 +65,24 @@ export default function AbsencePage() {
   return (
     <div className="page">
       <div className="timesheet-shell">
+        <div className="page-intro">
+          <div className="page-intro-text">
+            <button
+              type="button"
+              className="page-back-button"
+              onClick={() => navigate("/dashboard")}
+            >
+              ← Tilbake til oversikt
+            </button>
+
+            <p className="page-kicker">TIMEOPPFØLGING</p>
+            <h1 className="page-title">Fravær</h1>
+            <p className="page-subtitle">
+              Registrer ferie, sykdom eller annet fravær.
+            </p>
+          </div>
+        </div>
+
         <section className="timesheet-card">
           <div className="timesheet-header">
             <div className="timesheet-header-left">
