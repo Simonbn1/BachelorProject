@@ -3,6 +3,7 @@ import { useState } from "react";
 import { exportAdminInvoiceBasisExcel } from "../api/adminApi";
 import { useToasts } from "../../../shared/hooks/useToasts";
 import "../../../shared/styles/admin.css";
+import "../../../shared/styles/AdminExportPage.css";
 
 function formatLocalDate(date: Date) {
   const year = date.getFullYear();
@@ -138,29 +139,41 @@ export default function AdminExportPage() {
         </div>
       </div>
 
-      <div className="admin-filter-card" style={{ maxWidth: 420 }}>
-        <label htmlFor="weekStart">Uke</label>
-
-        <input
-          id="weekStart"
-          type="week"
-          value={toWeekInputValue(weekStart)}
-          onChange={(e) => setWeekStart(getMondayFromWeekValue(e.target.value))}
-        />
-
-        <div style={{ marginTop: 10, marginBottom: 16 }}>
-          {formatWeekLabel(weekStart)}
+      <section className="admin-export-card">
+        <div className="admin-export-header">
+          <h2>Eksport</h2>
+          <p>Velg uke og hent ut fakturagrunnlag.</p>
         </div>
 
-        <button
-          type="button"
-          className="admin-secondary-button"
-          onClick={handleExportInvoiceBasis}
-          disabled={loading}
-        >
-          {loading ? "Eksporterer..." : "Eksporter fakturagrunnlag"}
-        </button>
-      </div>
+        <div className="admin-export-form">
+          <div>
+            <label htmlFor="weekStart">Uke</label>
+
+            <input
+              id="weekStart"
+              type="week"
+              value={toWeekInputValue(weekStart)}
+              onChange={(e) =>
+                setWeekStart(getMondayFromWeekValue(e.target.value))
+              }
+              className="admin-export-input"
+            />
+          </div>
+
+          <span className="admin-export-week-label">
+            {formatWeekLabel(weekStart)}
+          </span>
+
+          <button
+            type="button"
+            className="admin-secondary-button"
+            onClick={handleExportInvoiceBasis}
+            disabled={loading}
+          >
+            {loading ? "Eksporterer..." : "Eksporter fakturagrunnlag"}
+          </button>
+        </div>
+      </section>
     </div>
   );
 }
