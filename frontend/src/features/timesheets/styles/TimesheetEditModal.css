@@ -24,21 +24,21 @@
 
 .timesheet-modal__close {
   position: absolute;
-  top: 18px;
-  right: 18px;
-  z-index: 5;
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
+  top: -16px;
+  right: -16px;
+  z-index: 20;
+
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #151b33;
   color: #eef2ff;
+
   cursor: pointer;
   font-size: 1rem;
-}
-
-.timesheet-modal__close:hover {
-  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
 }
 
 .timesheet-modal__error-banner {
