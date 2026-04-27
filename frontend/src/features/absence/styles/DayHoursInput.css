@@ -1,19 +1,19 @@
 .day-hours-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .day-hours-row {
   display: flex;
-  gap: 8px;
-  align-items: center;
+  gap: 10px;
+  align-items: flex-end;
 }
 
 .day-hours-cell {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   align-items: center;
 }
 
@@ -23,8 +23,10 @@
 }
 
 .day-hours-input {
-  width: 70px;
+  width: 64px;
+  height: 42px;
   text-align: center;
+  border-radius: 10px;
 }
 
 .day-hours-input--locked {
@@ -33,7 +35,8 @@
 }
 
 .day-hours-total {
-  width: 100px;
+  width: 90px;
+  height: 42px;
   text-align: center;
 }
 

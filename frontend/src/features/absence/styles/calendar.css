@@ -17,7 +17,7 @@ textarea.dark-input:focus {
 }
 
 .date-range-picker {
-  width: 400px;
+  width: min(400px, 100%);
 }
 
 .date-range-row {

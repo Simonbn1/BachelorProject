@@ -1,15 +1,16 @@
 .absence-hours-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-height: 150px;
+  gap: 18px;
+  max-height: 180px;
   overflow-y: auto;
 }
 
 .absence-workitem-details {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
+  flex: 1;
 }
 
 .absence-workitem-label {
@@ -20,6 +21,7 @@
 .absence-fill-week {
   display: flex;
   justify-content: flex-end;
+  margin-top: 10px;
 }
 
 .absence-description-row {
@@ -34,10 +36,11 @@
 }
 
 .absence-workitem-row {
-  align-items: center;
+  align-items: flex-start;
+  gap: 16px;
 }
 
 .absence-workitem-row .delete-btn {
   align-self: center;
-  margin-top: 20px;
+  margin-top: 26px;
 }
