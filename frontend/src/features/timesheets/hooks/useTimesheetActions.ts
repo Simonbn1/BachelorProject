@@ -52,9 +52,7 @@ export function useTimesheetActions({
   setHoursError,
   setHasUnsavedChanges,
   setIsAddModalOpen,
-  setShowAbsencePrompt,
   weekStart,
-  startDate,
   getNumericValue,
   projects,
 }: UseTimesheetActionsProps) {
@@ -107,6 +105,7 @@ export function useTimesheetActions({
       }
       return updated;
     });
+
     setVisibleProjects((prev) =>
       prev.filter((project) => project.workItemId !== workItemId),
     );
@@ -139,43 +138,26 @@ export function useTimesheetActions({
     setWorkItems([]);
   }
 
-  async function handleSave() {
+  async function handleSave(): Promise<boolean> {
     const userId = 1;
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
-    const dayIndexMap: Record<string, number> = {
-      mon: 0,
-      tue: 1,
-      wed: 2,
-      thu: 3,
-      fri: 4,
-    };
 
-    const dayLabels: Record<string, string> = {
-      mon: "Mandag",
-      tue: "Tirsdag",
-      wed: "Onsdag",
-      thu: "Torsdag",
-      fri: "Fredag",
-    };
-
-    const days = ["mon", "tue", "wed", "thu", "fri"];
-    const passedDaysWithMissingHours = days.filter((day) => {
-      const dayDate = new Date(startDate);
-      dayDate.setDate(startDate.getDate() + dayIndexMap[day]);
-      if (dayDate > today) return false;
-      const totalWorked = visibleProjects.reduce(
-        (sum, project) => sum + getNumericValue(project.workItemId, day),
-        0,
+    if (visibleProjects.length === 0) {
+      showToast(
+        "warning",
+        "Ingen prosjekter",
+        "Legg til et prosjekt før du lagrer.",
       );
-      return totalWorked < 8;
-    });
+      return false;
+    }
 
     try {
       for (const project of visibleProjects) {
         await saveTimeEntries(userId, weekStart, project.workItemId, hours);
       }
+
       setHasUnsavedChanges(false);
+      showToast("success", "Timer lagret!");
+      return true;
     } catch (error) {
       console.error("Feil ved lagring:", error);
       showToast(
@@ -184,34 +166,8 @@ export function useTimesheetActions({
         "Noe gikk galt. Sjekk konsollen",
         true,
       );
-      return;
+      return false;
     }
-
-    if (visibleProjects.length === 0) {
-      showToast(
-        "warning",
-        "Ingen prosjekter",
-        "Legg til et prosjekt før du lagrer.",
-      );
-      return;
-    }
-
-    if (passedDaysWithMissingHours.length === 0) {
-      showToast("success", "Timer lagret!");
-      return;
-    }
-
-    const dayNames = passedDaysWithMissingHours
-      .map((d) => dayLabels[d])
-      .join(", ");
-    showToast(
-      "warning",
-      "Timer lagret!",
-      `Timer lagret! Du har ikke registrert 8 timer for: ${dayNames}.`,
-      true,
-    );
-    setShowAbsencePrompt(true);
-    return;
   }
 
   async function loadWorkItemsForProject(projectId: string) {
@@ -219,6 +175,7 @@ export function useTimesheetActions({
       setWorkItems([]);
       return;
     }
+
     try {
       const items = await fetchWorkItems(Number(projectId));
       setWorkItems(items);

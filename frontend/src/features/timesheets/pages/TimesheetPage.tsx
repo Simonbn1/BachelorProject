@@ -8,6 +8,7 @@ import { useTimesheet } from "../hooks/useTimesheet.ts";
 import { useTimesheetActions } from "../hooks/useTimesheetActions.ts";
 import { useAbsenceNavigation } from "../hooks/useAbsenceNavigation.ts";
 import { useTimesheetExport } from "../hooks/useTimesheetExport.ts";
+import { submitTimesheet } from "../api/timesheetsApi.ts";
 
 type TimesheetPageProps = {
   embedded?: boolean;
@@ -120,10 +121,20 @@ export function TimesheetPage({
     hours,
   });
 
+  async function handleSubmitTimesheet() {
+    const saved = await handleSave();
+
+    if (!saved) return;
+
+    await submitTimesheet({ weekStart });
+    navigate("/timesheets/saved");
+  }
+
   const showBackButton = !embedded && !hideBackButton;
   const showWeekNavigation = !embedded && !hideWeekNavigation;
   const showCalendarButton = !embedded && !hideCalendarButton;
   const showExports = !embedded && !hideExports;
+  const showSubmitButton = !embedded;
 
   return (
     <div className={embedded ? "page page--embedded" : "page"}>
@@ -244,145 +255,36 @@ export function TimesheetPage({
                 </span>
               </div>
 
-              <div className="day-input-wrapper">
-                {isOvertime(project.workItemId, "mon") && (
-                  <span className="overtime-indicator">
-                    +
-                    {(getNumericValue(project.workItemId, "mon") - 8)
-                      .toFixed(1)
-                      .replace(".", ",")}
-                    t
-                  </span>
-                )}
-                <input
-                  value={hours[`${project.workItemId}-mon`] ?? ""}
-                  placeholder="0,0"
-                  onChange={(e) =>
-                    handleChange(project.workItemId, "mon", e.target.value)
-                  }
-                  onContextMenu={(e) => {
-                    e.preventDefault();
-                    toggleExcludedFromAbsence(project.workItemId, "mon");
-                  }}
-                  className={
-                    excludedFromAbsence[`${project.workItemId}-mon`]
-                      ? "input-excluded"
-                      : ""
-                  }
-                />
-              </div>
+              {(["mon", "tue", "wed", "thu", "fri"] as const).map((day) => (
+                <div key={day} className="day-input-wrapper">
+                  {isOvertime(project.workItemId, day) && (
+                    <span className="overtime-indicator">
+                      +
+                      {(getNumericValue(project.workItemId, day) - 8)
+                        .toFixed(1)
+                        .replace(".", ",")}
+                      t
+                    </span>
+                  )}
 
-              <div className="day-input-wrapper">
-                {isOvertime(project.workItemId, "tue") && (
-                  <span className="overtime-indicator">
-                    +
-                    {(getNumericValue(project.workItemId, "tue") - 8)
-                      .toFixed(1)
-                      .replace(".", ",")}
-                    t
-                  </span>
-                )}
-                <input
-                  value={hours[`${project.workItemId}-tue`] ?? ""}
-                  placeholder="0,0"
-                  onChange={(e) =>
-                    handleChange(project.workItemId, "tue", e.target.value)
-                  }
-                  onContextMenu={(e) => {
-                    e.preventDefault();
-                    toggleExcludedFromAbsence(project.workItemId, "tue");
-                  }}
-                  className={
-                    excludedFromAbsence[`${project.workItemId}-tue`]
-                      ? "input-excluded"
-                      : ""
-                  }
-                />
-              </div>
-
-              <div className="day-input-wrapper">
-                {isOvertime(project.workItemId, "wed") && (
-                  <span className="overtime-indicator">
-                    +
-                    {(getNumericValue(project.workItemId, "wed") - 8)
-                      .toFixed(1)
-                      .replace(".", ",")}
-                    t
-                  </span>
-                )}
-                <input
-                  value={hours[`${project.workItemId}-wed`] ?? ""}
-                  placeholder="0,0"
-                  onChange={(e) =>
-                    handleChange(project.workItemId, "wed", e.target.value)
-                  }
-                  onContextMenu={(e) => {
-                    e.preventDefault();
-                    toggleExcludedFromAbsence(project.workItemId, "wed");
-                  }}
-                  className={
-                    excludedFromAbsence[`${project.workItemId}-wed`]
-                      ? "input-excluded"
-                      : ""
-                  }
-                />
-              </div>
-
-              <div className="day-input-wrapper">
-                {isOvertime(project.workItemId, "thu") && (
-                  <span className="overtime-indicator">
-                    +
-                    {(getNumericValue(project.workItemId, "thu") - 8)
-                      .toFixed(1)
-                      .replace(".", ",")}
-                    t
-                  </span>
-                )}
-                <input
-                  value={hours[`${project.workItemId}-thu`] ?? ""}
-                  placeholder="0,0"
-                  onChange={(e) =>
-                    handleChange(project.workItemId, "thu", e.target.value)
-                  }
-                  onContextMenu={(e) => {
-                    e.preventDefault();
-                    toggleExcludedFromAbsence(project.workItemId, "thu");
-                  }}
-                  className={
-                    excludedFromAbsence[`${project.workItemId}-thu`]
-                      ? "input-excluded"
-                      : ""
-                  }
-                />
-              </div>
-
-              <div className="day-input-wrapper">
-                {isOvertime(project.workItemId, "fri") && (
-                  <span className="overtime-indicator">
-                    +
-                    {(getNumericValue(project.workItemId, "fri") - 8)
-                      .toFixed(1)
-                      .replace(".", ",")}
-                    t
-                  </span>
-                )}
-                <input
-                  value={hours[`${project.workItemId}-fri`] ?? ""}
-                  placeholder="0,0"
-                  onChange={(e) =>
-                    handleChange(project.workItemId, "fri", e.target.value)
-                  }
-                  onContextMenu={(e) => {
-                    e.preventDefault();
-                    toggleExcludedFromAbsence(project.workItemId, "fri");
-                  }}
-                  className={
-                    excludedFromAbsence[`${project.workItemId}-fri`]
-                      ? "input-excluded"
-                      : ""
-                  }
-                />
-              </div>
+                  <input
+                    value={hours[`${project.workItemId}-${day}`] ?? ""}
+                    placeholder="0,0"
+                    onChange={(e) =>
+                      handleChange(project.workItemId, day, e.target.value)
+                    }
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      toggleExcludedFromAbsence(project.workItemId, day);
+                    }}
+                    className={
+                      excludedFromAbsence[`${project.workItemId}-${day}`]
+                        ? "input-excluded"
+                        : ""
+                    }
+                  />
+                </div>
+              ))}
 
               <div className="total">
                 {getRowTotal(project.workItemId).toFixed(1).replace(".", ",")}
@@ -428,8 +330,18 @@ export function TimesheetPage({
                 type="button"
                 onClick={handleSave}
               >
-                Lagre
+                Lagre kladd
               </button>
+
+              {showSubmitButton && (
+                <button
+                  className="save-btn"
+                  type="button"
+                  onClick={handleSubmitTimesheet}
+                >
+                  Send inn
+                </button>
+              )}
 
               {showExports && (
                 <>
@@ -471,7 +383,9 @@ export function TimesheetPage({
             >
               x
             </button>
+
             <h5 className="modal-week-title">Uke {weekNumber}</h5>
+
             <DatePicker
               type="range"
               value={[startDate, endDate] as DatesRangeValue}
