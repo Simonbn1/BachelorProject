@@ -1,5 +1,5 @@
 import type { AbsencePayloadEntry } from "./useAbsence.ts";
-import { saveAbsences, saveAbsencesFromPayload } from "../api/absenceApi.ts";
+import { saveAbsencesFromPayload } from "../api/absenceApi.ts";
 import { useToasts } from "../../../shared/hooks/useToasts.ts";
 
 type UseAbsenceSaveProps = {
@@ -15,21 +15,16 @@ type UseAbsenceSaveProps = {
 };
 
 export function useAbsenceSave({
-  hours,
   absenceType,
   description,
-  projectId,
   selectedStartDate,
   selectedEndDate,
-  selectedWorkItemIds,
   absencePayload,
-  days,
 }: UseAbsenceSaveProps) {
   const { showToast } = useToasts();
 
   async function handleSave() {
     const userId = Number(localStorage.getItem("userId") ?? "1");
-    const isRangeBased = absenceType === "VACATION" || absenceType === "LEAVE";
 
     if (!absenceType) {
       showToast(
@@ -41,81 +36,50 @@ export function useAbsenceSave({
       return;
     }
 
-    if (absencePayload) {
-      try {
-        await saveAbsencesFromPayload(
-          userId,
-          absenceType,
-          description,
-          absencePayload,
-        );
-        showToast("success", "Fravær lagret");
-      } catch (error) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : "Noe gikk galt. Sjekk konsollen";
-        showToast("error", "Feil ved lagring", message, true);
-      }
-      return;
-    }
-
-    if (!projectId) {
-      showToast("warning", "Mangler prosjekt", "Velg et prosjekt først.", true);
-      return;
-    }
-
-    if (isRangeBased && (!selectedStartDate || !selectedEndDate)) {
-      showToast("warning", "Mangler periode", "Velg en periode først.", true);
-      return;
-    }
-
-    if (!isRangeBased && Object.keys(hours).length === 0) {
+    if (!selectedStartDate || !selectedEndDate) {
       showToast(
         "warning",
-        "Mangler timer",
-        "Fyll inn timer for minst en dag.",
-        true,
-      );
-      return;
-    }
-
-    if (selectedWorkItemIds.length === 0) {
-      showToast(
-        "warning",
-        "Mangler arbeidsoppgave",
-        "Velg en arbeidsoppgave først.",
+        "Mangler periode",
+        "Velg en periode for søknaden først.",
         true,
       );
       return;
     }
 
     try {
-      for (const wId of selectedWorkItemIds) {
-        const workItemHours: Record<string, string> = {};
-        for (const day of days) {
-          const val = hours[`${wId}-${day}`];
-          if (val) workItemHours[day] = val;
-        }
-        await saveAbsences(
+      if (absencePayload) {
+        await saveAbsencesFromPayload(
           userId,
           absenceType,
           description,
-          projectId,
-          wId,
-          selectedStartDate,
-          selectedEndDate,
-          workItemHours,
-          isRangeBased,
+          absencePayload,
         );
+      } else {
+        /**
+         * Midlertidig løsning uten prosjekt/arbeidsoppgave:
+         * Bruker samme payload-funksjon, men bygger én søknads-entry.
+         * Backend må enten støtte null/0 workItemId senere,
+         * eller så må dere lage en egen absence application-endpoint.
+         */
+        await saveAbsencesFromPayload(userId, absenceType, description, [
+          {
+            projectId: 0,
+            projectName: "Fravær",
+            workItemId: 0,
+            workItemTitle: absenceType,
+            missingHours: {},
+          },
+        ]);
       }
-      showToast("success", "Fravær lagret!");
+
+      showToast("success", "Søknad sendt!");
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
           : "Noe gikk galt. Sjekk konsollen";
-      showToast("error", "Feil ved lagring", message, true);
+
+      showToast("error", "Feil ved innsending", message, true);
     }
   }
 
