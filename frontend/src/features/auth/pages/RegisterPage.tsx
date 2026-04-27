@@ -18,14 +18,24 @@ export default function RegisterPage() {
   } = useRegister();
 
   return (
-    <div className="register-page">
-      <div className="register-card">
-        <h2>Lag en konto</h2>
+    <div className="login-page">
+      <div className="login-card">
+        <div className="login-brand">
+          <div className="login-logo">
+            accenture<span>&gt;</span>
+          </div>
+          <p>Timeføring</p>
+        </div>
 
-        <form onSubmit={handleRegister}>
+        <div className="login-header">
+          <h1>Lag en konto</h1>
+          <p>Opprett bruker for å komme i gang med timeføring.</p>
+        </div>
+
+        <form onSubmit={handleRegister} className="login-form">
           <input
             type="text"
-            placeholder="Fullt navn (fornavn og etternavn)"
+            placeholder="Fullt navn"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             className={errorField === "name" ? "input-error" : ""}
@@ -33,7 +43,7 @@ export default function RegisterPage() {
 
           <input
             type="email"
-            placeholder="Email"
+            placeholder="navn@accenture.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className={errorField === "email" ? "input-error" : ""}
@@ -54,11 +64,12 @@ export default function RegisterPage() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             className={errorField === "confirmPassword" ? "input-error" : ""}
           />
-          <p>
-            Har du allerede en konto? <Link to="/login">Login</Link>
-          </p>
 
           {error && <p className="input-hint">{error}</p>}
+
+          <p className="login-register">
+            Har du allerede en konto? <Link to="/login">Logg inn</Link>
+          </p>
 
           <button type="submit">Registrer</button>
         </form>

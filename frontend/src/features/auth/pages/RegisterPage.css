@@ -1,108 +1,154 @@
-.register-page {
+.login-page {
   min-height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0d1228 0%, #161c3d 50%, #0f1a36 100%);
-  padding: 2rem;
+  align-items: center;
+  padding: 32px;
+
+  background:
+    radial-gradient(
+      circle at 25% 20%,
+      rgba(161, 0, 255, 0.18),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      rgba(79, 124, 255, 0.14),
+      transparent 28%
+    ),
+    linear-gradient(135deg, #151927 0%, #22283d 52%, #141827 100%);
 }
 
-.register-card {
+.login-card {
   width: 100%;
-  max-width: 440px;
-  padding: 2.5rem 2rem;
-  border-radius: 20px;
-  background: rgba(25, 31, 58, 0.78);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(14px);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
-}
+  max-width: 430px;
+  padding: 42px 40px 38px;
+  border-radius: 24px;
 
-.register-card h2 {
+  background: rgba(35, 40, 58, 0.88);
+  backdrop-filter: blur(18px);
+
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+
   color: white;
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 1.8rem;
-  text-align: center;
 }
 
-.register-card form {
+.login-brand {
+  margin-bottom: 32px;
+}
+
+.login-logo {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: #ffffff;
+}
+
+.login-logo span {
+  color: #a100ff;
+  margin-left: 3px;
+}
+
+.login-brand p {
+  margin: 6px 0 0;
+  color: #aeb6cc;
+  font-size: 14px;
+}
+
+.login-header h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+}
+
+.login-header p {
+  margin: 10px 0 28px;
+  color: #aeb6cc;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.login-form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 16px;
 }
 
-.register-card input {
+.login-card input {
   width: 100%;
-  padding: 0.95rem 1rem;
-  border-radius: 12px;
+  height: 54px;
+  padding: 0 16px;
+
+  border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.06);
-  color: white;
-  font-size: 0.95rem;
   outline: none;
-  transition: all 0.2s ease;
+
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  font-size: 15px;
+  box-sizing: border-box;
 }
 
-.register-card input::placeholder {
-  color: rgba(255, 255, 255, 0.45);
+.login-card input::placeholder {
+  color: rgba(255, 255, 255, 0.38);
 }
 
-.register-card input:focus {
-  border-color: rgba(123, 97, 255, 0.8);
-  box-shadow: 0 0 0 3px rgba(123, 97, 255, 0.15);
+.login-card input:focus {
+  border-color: rgba(161, 0, 255, 0.75);
+  box-shadow: 0 0 0 4px rgba(161, 0, 255, 0.16);
 }
 
-.register-card p {
-  margin-top: 0.6rem;
+.login-register {
+  margin: 4px 0 0;
   text-align: center;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.95rem;
+  color: #c7cede;
+  font-size: 14px;
 }
 
-.register-card a {
-  color: #caa7ff;
+.login-register a {
+  color: #c084fc;
+  font-weight: 700;
   text-decoration: none;
-  font-weight: 500;
 }
 
-.register-card a:hover {
+.login-register a:hover {
   text-decoration: underline;
 }
 
-.register-card button {
-  margin-top: 0.5rem;
+.login-card button {
   width: 100%;
-  padding: 0.95rem 1rem;
+  height: 56px;
+  margin-top: 4px;
+
   border: none;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #5d7cff, #6d4dff);
+  border-radius: 14px;
+
+  background: linear-gradient(135deg, #a100ff, #6d5dfc);
   color: white;
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 800;
+
   cursor: pointer;
+  box-shadow: 0 14px 34px rgba(109, 93, 252, 0.28);
   transition:
     transform 0.15s ease,
-    opacity 0.2s ease;
+    box-shadow 0.15s ease;
 }
 
-.register-card button:hover {
+.login-card button:hover {
   transform: translateY(-1px);
-  opacity: 0.95;
+  box-shadow: 0 18px 42px rgba(109, 93, 252, 0.38);
 }
 
-.register-card button:active {
-  transform: translateY(0);
-}
-
-.register-card .input-hint {
+.input-hint {
   color: #f59e0b;
-  font-size: 0.8rem;
-  margin: 4px 0 0;
-  text-align: left;
+  font-size: 0.85rem;
+  margin-top: -6px;
 }
 
 .input-error {
   border-color: #f59e0b !important;
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15) !important;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15) !important;
 }
