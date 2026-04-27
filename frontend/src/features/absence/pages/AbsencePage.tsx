@@ -5,6 +5,7 @@ import { useAbsenceSave } from "../hooks/useAbsenceSave.ts";
 import { useAbsenceFillWeek } from "../hooks/useAbsenceFillWeek.ts";
 import "../styles/AbsencePage.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { DatePicker, type DatesRangeValue } from "@mantine/dates";
 import { useNavigate } from "react-router-dom";
 
 export default function AbsencePage() {
@@ -25,8 +26,12 @@ export default function AbsencePage() {
     absencePayload,
     selectedWorkItemIds,
     setSelectedWorkItemIds,
+    isCalendarOpen,
+    setIsCalendarOpen,
     weekLabel,
     weekNumber,
+    startDate,
+    endDate,
     goToPreviousWeek,
     goToNextWeek,
     weekTotal,
@@ -73,7 +78,7 @@ export default function AbsencePage() {
             <p className="page-kicker">TIMEOPPFØLGING</p>
             <h1 className="page-title">Fravær</h1>
             <p className="page-subtitle">
-              Registrer sykdom, ferie, permisjon eller annet fravær.
+              Søk om ferie, permisjon eller annet planlagt fravær.
             </p>
           </div>
         </div>
@@ -82,6 +87,14 @@ export default function AbsencePage() {
           <div className="timesheet-header">
             <div className="timesheet-header-left">
               <div className="week-nav-group">
+                <button
+                  className="week-icon"
+                  type="button"
+                  onClick={() => setIsCalendarOpen(true)}
+                >
+                  🗓
+                </button>
+
                 <div>
                   <div className="week-nav">
                     <button
@@ -150,6 +163,36 @@ export default function AbsencePage() {
           />
         </section>
       </div>
+
+      {isCalendarOpen && (
+        <div
+          className="wireframe-modal"
+          onClick={() => setIsCalendarOpen(false)}
+        >
+          <div
+            className="modal-content modal-content--calendar"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="close-btn"
+              type="button"
+              onClick={() => setIsCalendarOpen(false)}
+            >
+              x
+            </button>
+
+            <h5 className="modal-week-title">Uke {weekNumber}</h5>
+
+            <DatePicker
+              type="range"
+              value={[startDate, endDate] as DatesRangeValue}
+              onChange={() => {}}
+              locale="nb"
+              firstDayOfWeek={1}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
