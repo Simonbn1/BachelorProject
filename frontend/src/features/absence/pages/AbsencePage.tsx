@@ -5,7 +5,6 @@ import { useAbsenceSave } from "../hooks/useAbsenceSave.ts";
 import { useAbsenceFillWeek } from "../hooks/useAbsenceFillWeek.ts";
 import "../styles/AbsencePage.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DatePicker, type DatesRangeValue } from "@mantine/dates";
 import { useNavigate } from "react-router-dom";
 
 export default function AbsencePage() {
@@ -26,12 +25,8 @@ export default function AbsencePage() {
     absencePayload,
     selectedWorkItemIds,
     setSelectedWorkItemIds,
-    isCalendarOpen,
-    setIsCalendarOpen,
     weekLabel,
     weekNumber,
-    startDate,
-    endDate,
     goToPreviousWeek,
     goToNextWeek,
     weekTotal,
@@ -78,7 +73,7 @@ export default function AbsencePage() {
             <p className="page-kicker">TIMEOPPFØLGING</p>
             <h1 className="page-title">Fravær</h1>
             <p className="page-subtitle">
-              Registrer ferie, sykdom eller annet fravær.
+              Registrer sykdom, ferie, permisjon eller annet fravær.
             </p>
           </div>
         </div>
@@ -87,14 +82,6 @@ export default function AbsencePage() {
           <div className="timesheet-header">
             <div className="timesheet-header-left">
               <div className="week-nav-group">
-                <button
-                  className="week-icon"
-                  type="button"
-                  onClick={() => setIsCalendarOpen(true)}
-                >
-                  🗓
-                </button>
-
                 <div>
                   <div className="week-nav">
                     <button
@@ -138,25 +125,6 @@ export default function AbsencePage() {
             </div>
           </div>
 
-          {absencePayload && (
-            <div className="absence-payload-summary">
-              <p className="absence-payload-label">Fravær registreres for:</p>
-
-              {absencePayload.map((entry) => (
-                <div key={entry.workItemId} className="absence-payload-entry">
-                  <strong>{entry.projectName}</strong> - {entry.workItemTitle}
-                  <span className="absence-payload-hours">
-                    (
-                    {Object.entries(entry.missingHours)
-                      .map(([day, h]) => `${day}: ${h}t`)
-                      .join(", ")}
-                    )
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-
           <AbsenceForm
             hours={hours}
             absenceType={absenceType}
@@ -172,7 +140,7 @@ export default function AbsencePage() {
             onSave={handleSave}
             lockedDays={absencePayload ? lockedDaysFromPayload : {}}
             hasAbsenceParams={!!absencePayload}
-            hideProjectFields={!!absencePayload}
+            hideProjectFields={true}
             selectedWorkItemIds={selectedWorkItemIds}
             onWorkItemIdsChange={setSelectedWorkItemIds}
             onFillWeek={handleFillWeek}
@@ -182,36 +150,6 @@ export default function AbsencePage() {
           />
         </section>
       </div>
-
-      {isCalendarOpen && (
-        <div
-          className="wireframe-modal"
-          onClick={() => setIsCalendarOpen(false)}
-        >
-          <div
-            className="modal-content modal-content--calendar"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className="close-btn"
-              type="button"
-              onClick={() => setIsCalendarOpen(false)}
-            >
-              x
-            </button>
-
-            <h5 className="modal-week-title">Uke {weekNumber}</h5>
-
-            <DatePicker
-              type="range"
-              value={[startDate, endDate] as DatesRangeValue}
-              onChange={() => {}}
-              locale="nb"
-              firstDayOfWeek={1}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }
