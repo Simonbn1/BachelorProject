@@ -164,8 +164,8 @@ export default function SavedTimesheetsPage() {
 
   return (
     <div className="admin-page">
+      <TopBar />
       <div className="admin-page-header">
-        <TopBar />
         <div className="admin-page-header-content">
           <button
             type="button"
