@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import TopBar from "../../../shared/components/TopBar";
 import { useNavigate } from "react-router-dom";
 import {
   deleteTimesheet,
@@ -164,7 +163,6 @@ export default function SavedTimesheetsPage() {
 
   return (
     <div className="admin-page">
-      <TopBar />
       <div className="admin-page-header">
         <div className="admin-page-header-content">
           <button

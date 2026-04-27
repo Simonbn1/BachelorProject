@@ -325,3 +325,21 @@
     width: 100%;
   }
 }
+
+.page--embedded {
+  padding: 0;
+  background: transparent;
+  min-height: auto;
+}
+
+.timesheet-shell--embedded {
+  max-width: 100%;
+  margin: 0;
+}
+
+.timesheet-card--embedded {
+  border-radius: 16px;
+  box-shadow: none;
+  border: none;
+  background: transparent;
+}
