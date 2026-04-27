@@ -20,10 +20,7 @@ function formatWeekRange(weekStart: string) {
     month: "long",
   };
 
-  const startText = start.toLocaleDateString("nb-NO", formatOptions);
-  const endText = end.toLocaleDateString("nb-NO", formatOptions);
-
-  return `${startText} - ${endText}`;
+  return `${start.toLocaleDateString("nb-NO", formatOptions)} - ${end.toLocaleDateString("nb-NO", formatOptions)}`;
 }
 
 function getWeekLabel(weekStart: string) {
@@ -109,9 +106,7 @@ export default function SavedTimesheetsPage() {
       "Vil du trekke tilbake denne innsendingen? Da kan du redigere eller slette den igjen.",
     );
 
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     try {
       setError("");
@@ -130,9 +125,7 @@ export default function SavedTimesheetsPage() {
       "Er du sikker på at du vil slette dette lagrede utkastet?",
     );
 
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     try {
       setError("");
@@ -162,38 +155,38 @@ export default function SavedTimesheetsPage() {
   }
 
   return (
-    <div className="admin-page">
-      <div className="admin-page-header">
-        <div className="admin-page-header-content">
-          <button
-            type="button"
-            className="page-back-button"
-            onClick={() => navigate("/dashboard")}
-          >
-            ← Tilbake til oversikt
-          </button>
+    <div className="saved-timesheets-page">
+      <div className="saved-timesheets-header">
+        <button
+          type="button"
+          className="page-back-button"
+          onClick={() => navigate("/dashboard")}
+        >
+          ← Tilbake til oversikt
+        </button>
 
-          <p className="admin-eyebrow">TIMEOPPFØLGING</p>
-          <h1>Mine timer</h1>
-          <p className="admin-subtitle">
-            Se egne utkast og innsendinger, åpne dem igjen og følg statusen.
-          </p>
-        </div>
+        <p className="saved-timesheets-eyebrow">TIMEOPPFØLGING</p>
+        <h1>Mine timer</h1>
+        <p className="saved-timesheets-subtitle">
+          Se egne utkast og innsendinger, åpne dem igjen og følg statusen.
+        </p>
       </div>
 
       {loading && (
-        <div className="admin-info-card">Laster dine timesheets...</div>
+        <div className="saved-timesheets-info">Laster dine timesheets...</div>
       )}
 
-      {!loading && error && <div className="admin-error-card">{error}</div>}
+      {!loading && error && (
+        <div className="saved-timesheets-error">{error}</div>
+      )}
 
       {!loading && !error && actionMessage && (
-        <div className="admin-info-card">{actionMessage}</div>
+        <div className="saved-timesheets-info">{actionMessage}</div>
       )}
 
       {!loading && !error && items.length === 0 && (
-        <div className="admin-empty-state">
-          <div className="admin-empty-state-icon">🕘</div>
+        <div className="saved-timesheets-empty">
+          <div className="saved-timesheets-empty-icon">🕘</div>
           <div>
             <h2>Ingen timesheets funnet</h2>
             <p>Du har ingen registrerte timesheets enda.</p>
@@ -202,8 +195,8 @@ export default function SavedTimesheetsPage() {
       )}
 
       {!loading && !error && items.length > 0 && (
-        <div className="admin-table-card">
-          <table className="admin-table">
+        <div className="saved-timesheets-table-card">
+          <table className="saved-timesheets-table">
             <thead>
               <tr>
                 <th>Uke</th>
@@ -222,21 +215,16 @@ export default function SavedTimesheetsPage() {
                   <td>{formatWeekRange(item.weekStart)}</td>
                   <td>{item.totalHours.toFixed(1)}</td>
                   <td>{item.hasAbsence ? "Ja" : "Nei"}</td>
+
                   <td>
                     <span
-                      className={`admin-status-pill admin-status-pill--${item.status.toLowerCase()}`}
+                      className={`saved-timesheets-status saved-timesheets-status--${item.status.toLowerCase()}`}
                     >
                       {getStatusLabel(item.status)}
                     </span>
 
                     {item.managerComment && (
-                      <div
-                        style={{
-                          marginTop: "8px",
-                          fontSize: "0.9rem",
-                          opacity: 0.8,
-                        }}
-                      >
+                      <div className="saved-timesheets-comment">
                         Kommentar: {item.managerComment}
                       </div>
                     )}
