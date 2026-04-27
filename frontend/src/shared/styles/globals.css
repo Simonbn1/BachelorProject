@@ -40,3 +40,20 @@ body {
   width: min(100% - 64px, 1760px);
   margin: 0 auto;
 }
+
+.app-page {
+  min-height: 100vh;
+  padding: 40px 0 56px;
+  background:
+    radial-gradient(circle at 80% 0%, rgba(161, 0, 255, 0.12), transparent 30%),
+    linear-gradient(135deg, #151927 0%, #22283d 52%, #141827 100%);
+}
+
+.app-shell {
+  width: min(100% - 64px, 1760px);
+  margin: 0 auto;
+}
+
+.app-content {
+  margin-top: 28px;
+}
