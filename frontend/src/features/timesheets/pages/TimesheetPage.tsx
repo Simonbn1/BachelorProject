@@ -1,4 +1,3 @@
-import TopBar from "../../../shared/components/TopBar";
 import "../styles/TimesheetPage.css";
 import "../styles/TimesheetHeader.css";
 import { DatePicker, type DatesRangeValue } from "@mantine/dates";
@@ -12,20 +11,17 @@ import { useTimesheetExport } from "../hooks/useTimesheetExport.ts";
 
 type TimesheetPageProps = {
   embedded?: boolean;
-  hideTopBar?: boolean;
   hideBackButton?: boolean;
   hideWeekNavigation?: boolean;
   hideExports?: boolean;
   hideCalendarButton?: boolean;
   title?: string;
   subtitle?: string;
-  onCloseEmbedded?: () => void;
   weekStartOverride?: string;
 };
 
 export function TimesheetPage({
   embedded = false,
-  hideTopBar = false,
   hideBackButton = false,
   hideWeekNavigation = false,
   hideExports = true,
@@ -124,7 +120,6 @@ export function TimesheetPage({
     hours,
   });
 
-  const showTopBar = !embedded && !hideTopBar;
   const showBackButton = !embedded && !hideBackButton;
   const showWeekNavigation = !embedded && !hideWeekNavigation;
   const showCalendarButton = !embedded && !hideCalendarButton;
@@ -139,13 +134,7 @@ export function TimesheetPage({
             : "timesheet-shell"
         }
       >
-        {showTopBar && <TopBar />}
-
-        <div
-          className={
-            embedded ? "page-intro page-intro--embedded" : "page-intro"
-          }
-        >
+        <div className="page-intro">
           <div className="page-intro-text">
             {showBackButton && (
               <button
