@@ -8,28 +8,38 @@ export default function LoginPage() {
   return (
     <div className="login-page">
       <div className="login-card">
-        <h2>Login</h2>
+        <div className="login-brand">
+          <div className="login-logo">
+            accenture<span>&gt;</span>
+          </div>
+          <p>Timeføring</p>
+        </div>
 
-        <form onSubmit={handleLogin}>
+        <div className="login-header">
+          <h1>Velkommen tilbake</h1>
+          <p>Logg inn for å føre timer og administrere uken din.</p>
+        </div>
+
+        <form onSubmit={handleLogin} className="login-form">
           <input
             type="email"
-            placeholder="Email"
+            placeholder="navn@accenture.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
 
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Passord"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          <p style={{ marginTop: "1rem", textAlign: "center" }}>
+          <p className="login-register">
             Ingen konto? <Link to="/register">Lag en</Link>
           </p>
 
-          <button type="submit">Login</button>
+          <button type="submit">Logg inn</button>
         </form>
       </div>
     </div>
