@@ -34,9 +34,6 @@ export default function AbsencePage() {
     endDate,
     goToPreviousWeek,
     goToNextWeek,
-    weekTotal,
-    weeklyTarget,
-    progressPercent,
     lockedDaysFromPayload,
     days,
     handleProjectChange,
@@ -119,22 +116,6 @@ export default function AbsencePage() {
               </div>
 
               <div className="week-subtitle">{weekLabel}</div>
-            </div>
-
-            <div className="timesheet-progress-wrap">
-              <div className="timesheet-progress">
-                <div className="progress-text">
-                  {weekTotal.toFixed(1).replace(".", ",")} /{" "}
-                  {weeklyTarget.toFixed(1).replace(".", ",")}
-                </div>
-
-                <div className="progress-bar">
-                  <div
-                    className="progress-fill"
-                    style={{ width: `${progressPercent}%` }}
-                  />
-                </div>
-              </div>
             </div>
           </div>
 
