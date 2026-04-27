@@ -13,6 +13,14 @@ const DAY_OFFSET: Record<DayKey, number> = {
   fri: 4,
 };
 
+function formatLocalDate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
 export async function fetchTimeEntries(userId: number, weekStart: string) {
   const response = await api.get("/api/time-entries", {
     params: { userId, weekStart },
@@ -50,13 +58,13 @@ export async function saveTimeEntries(
     const raw = hours[key] ?? "0";
     const parsedHours = Number.parseFloat(raw.replace(",", ".")) || 0;
 
-    if (parsedHours <= 0) {
-      continue;
-    }
+    if (parsedHours <= 0) continue;
 
     const entryDate = new Date(`${weekStart}T00:00:00`);
     entryDate.setDate(entryDate.getDate() + DAY_OFFSET[day]);
-    const entryDateStr = entryDate.toISOString().split("T")[0];
+
+    // 🔥 FIX: bruk lokal dato (unngår timezone-bug på fredag)
+    const entryDateStr = formatLocalDate(entryDate);
 
     await api.post("/api/time-entries", {
       userId,
