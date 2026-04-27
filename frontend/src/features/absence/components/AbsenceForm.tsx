@@ -81,7 +81,7 @@ export default function AbsenceForm({
 
         <div className="absence-save-row">
           <button className="save-btn" type="button" onClick={onSave}>
-            Lagre fravær
+            Send søknad
           </button>
         </div>
       </div>
