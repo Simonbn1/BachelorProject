@@ -4,9 +4,7 @@ import {
   FileSpreadsheet,
   Users,
   FolderKanban,
-  LogOut,
 } from "lucide-react";
-import { clearAuth, getAuthUser } from "../../auth/types/auth";
 import "../../../shared/styles/AdminDashboardPage.css";
 
 type DashboardCard = {
@@ -18,7 +16,6 @@ type DashboardCard = {
 
 export default function AdminDashboardPage() {
   const navigate = useNavigate();
-  const user = getAuthUser();
 
   const cards: DashboardCard[] = [
     {
@@ -49,31 +46,8 @@ export default function AdminDashboardPage() {
     },
   ];
 
-  const handleLogout = () => {
-    clearAuth();
-    navigate("/login", { replace: true });
-  };
-
   return (
     <div className="admin-dashboard-page">
-      <div className="admin-dashboard-topbar">
-        <div className="admin-dashboard-topbar-spacer" />
-        <div className="admin-dashboard-topbar-actions">
-          <span className="admin-dashboard-user">
-            {user?.displayName || "Admin"}
-          </span>
-
-          <button
-            type="button"
-            className="admin-dashboard-logout-button"
-            onClick={handleLogout}
-          >
-            <LogOut size={18} />
-            <span>Logg ut</span>
-          </button>
-        </div>
-      </div>
-
       <div className="admin-dashboard-header">
         <p className="admin-dashboard-kicker">TIMEOPPFØLGING</p>
         <h1 className="admin-dashboard-title">Oversikt</h1>

@@ -1,19 +1,8 @@
 .admin-page {
-  min-height: 100vh;
-  padding: 32px;
+  min-height: auto;
+  padding: 0;
+  background: transparent;
   color: #f5f7ff;
-  background:
-    radial-gradient(
-      circle at top left,
-      rgba(90, 110, 255, 0.16),
-      transparent 28%
-    ),
-    radial-gradient(
-      circle at top right,
-      rgba(118, 76, 255, 0.1),
-      transparent 24%
-    ),
-    linear-gradient(135deg, #131827 0%, #1d2336 45%, #252c42 100%);
 }
 
 .admin-page-header {
@@ -306,55 +295,55 @@
 
 @media (max-width: 900px) {
   .admin-page {
-    padding: 22px;
+    padding: 0;
   }
+}
 
-  .admin-page-header h1 {
-    font-size: 2.4rem;
-  }
+.admin-page-header h1 {
+  font-size: 2.4rem;
+}
 
-  .admin-subtitle {
-    font-size: 0.98rem;
-  }
+.admin-subtitle {
+  font-size: 0.98rem;
+}
 
-  .admin-table-card {
-    overflow-x: auto;
-  }
+.admin-table-card {
+  overflow-x: auto;
+}
 
-  .admin-table {
-    min-width: 760px;
-  }
+.admin-table {
+  min-width: 760px;
 }
 
 @media (max-width: 640px) {
   .admin-page {
-    padding: 18px;
+    padding: 0;
   }
+}
 
-  .page-back-button {
-    width: 100%;
-    justify-content: center;
-  }
+.page-back-button {
+  width: 100%;
+  justify-content: center;
+}
 
-  .admin-page-header h1 {
-    font-size: 2rem;
-  }
+.admin-page-header h1 {
+  font-size: 2rem;
+}
 
-  .admin-subtitle {
-    font-size: 0.95rem;
-  }
+.admin-subtitle {
+  font-size: 0.95rem;
+}
 
-  .admin-filter-card,
-  .admin-info-card,
-  .admin-error-card,
-  .admin-empty-state {
-    border-radius: 16px;
-  }
+.admin-filter-card,
+.admin-info-card,
+.admin-error-card,
+.admin-empty-state {
+  border-radius: 16px;
+}
 
-  .admin-table th,
-  .admin-table td {
-    padding: 16px 16px;
-  }
+.admin-table th,
+.admin-table td {
+  padding: 16px 16px;
 }
 
 .admin-empty-state {
