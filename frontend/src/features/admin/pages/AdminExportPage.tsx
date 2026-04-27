@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { exportAdminInvoiceBasisExcel } from "../api/adminApi";
 import { useToasts } from "../../../shared/hooks/useToasts";
-import "../../../shared/styles/AdminExportPage.css";
+import "../../../shared/styles/admin.css";
 
 function formatLocalDate(date: Date) {
   const year = date.getFullYear();
@@ -119,9 +119,9 @@ export default function AdminExportPage() {
   }
 
   return (
-    <div className="page">
-      <div className="admin-export-shell">
-        <div className="page-intro">
+    <div className="admin-page">
+      <div className="admin-page-header">
+        <div className="admin-page-header-content">
           <button
             type="button"
             className="page-back-button"
@@ -130,48 +130,36 @@ export default function AdminExportPage() {
             ← Tilbake til oversikt
           </button>
 
-          <p className="page-kicker">TIMEOPPFØLGING</p>
-          <h1 className="page-title">Fakturagrunnlag</h1>
-          <p className="page-subtitle">
+          <p className="admin-eyebrow">TIMEOPPFØLGING</p>
+          <h1>Fakturagrunnlag</h1>
+          <p className="admin-subtitle">
             Eksporter godkjente timer og fravær for valgt uke.
           </p>
         </div>
+      </div>
 
-        <section className="admin-export-card">
-          <div className="admin-export-header">
-            <div>
-              <h2>Eksport</h2>
-              <p>Velg uke og hent ut fakturagrunnlag.</p>
-            </div>
-          </div>
+      <div className="admin-filter-card" style={{ maxWidth: 420 }}>
+        <label htmlFor="weekStart">Uke</label>
 
-          <div className="admin-export-form">
-            <label htmlFor="weekStart">Uke</label>
+        <input
+          id="weekStart"
+          type="week"
+          value={toWeekInputValue(weekStart)}
+          onChange={(e) => setWeekStart(getMondayFromWeekValue(e.target.value))}
+        />
 
-            <input
-              id="weekStart"
-              type="week"
-              value={toWeekInputValue(weekStart)}
-              onChange={(e) =>
-                setWeekStart(getMondayFromWeekValue(e.target.value))
-              }
-              className="admin-export-input"
-            />
+        <div style={{ marginTop: 10, marginBottom: 16 }}>
+          {formatWeekLabel(weekStart)}
+        </div>
 
-            <span className="admin-export-week-label">
-              {formatWeekLabel(weekStart)}
-            </span>
-
-            <button
-              type="button"
-              className="save-btn"
-              onClick={handleExportInvoiceBasis}
-              disabled={loading}
-            >
-              {loading ? "Eksporterer..." : "Eksporter fakturagrunnlag"}
-            </button>
-          </div>
-        </section>
+        <button
+          type="button"
+          className="admin-secondary-button"
+          onClick={handleExportInvoiceBasis}
+          disabled={loading}
+        >
+          {loading ? "Eksporterer..." : "Eksporter fakturagrunnlag"}
+        </button>
       </div>
     </div>
   );
