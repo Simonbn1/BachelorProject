@@ -543,3 +543,21 @@ textarea.dark-input {
     padding: 22px 18px;
   }
 }
+
+.page-intro .page-back-button {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: fit-content !important;
+  height: auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  justify-content: flex-start !important;
+  color: rgba(233, 238, 255, 0.68);
+}
+
+.page-intro .page-back-button:hover {
+  background: transparent !important;
+  color: #ffffff;
+}
