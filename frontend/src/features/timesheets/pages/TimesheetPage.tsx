@@ -1,5 +1,4 @@
 import "../styles/TimesheetPage.css";
-import "../styles/TimesheetHeader.css";
 import { DatePicker, type DatesRangeValue } from "@mantine/dates";
 import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -167,17 +166,17 @@ export function TimesheetPage({
         }
       >
         <div className="page-intro">
-          <div className="page-intro-text">
-            {showBackButton && (
-              <button
-                type="button"
-                className="page-back-button"
-                onClick={() => navigate("/dashboard")}
-              >
-                ← Oversikt
-              </button>
-            )}
+          {showBackButton && (
+            <button
+              type="button"
+              className="page-back-button"
+              onClick={() => navigate("/dashboard")}
+            >
+              ← Tilbake til oversikt
+            </button>
+          )}
 
+          <div className="page-intro-text">
             <p className="page-kicker">TIMEOPPFØLGING</p>
             <h1 className="page-title">{title}</h1>
             <p className="page-subtitle">{subtitle}</p>
@@ -264,75 +263,78 @@ export function TimesheetPage({
             </div>
           </div>
 
-          <div className="timesheet-columns">
-            <span>Prosjekt</span>
-            <span>Man</span>
-            <span>Tir</span>
-            <span>Ons</span>
-            <span>Tor</span>
-            <span>Fre</span>
-            <span>Totalt antall timer</span>
-            <span></span>
-          </div>
-
-          {visibleProjects.map((project) => (
-            <div key={project.workItemId} className="project-row">
-              <div className="project-name">
-                <strong>{project.name}</strong>
-                <span>
-                  Oppgave: {project.workItemTitle ?? `Prosjekt #${project.id}`}
-                </span>
-              </div>
-
-              {(["mon", "tue", "wed", "thu", "fri"] as const).map((day) => (
-                <div key={day} className="day-input-wrapper">
-                  {isOvertime(project.workItemId, day) && (
-                    <span className="overtime-indicator">
-                      +
-                      {(getNumericValue(project.workItemId, day) - 8)
-                        .toFixed(1)
-                        .replace(".", ",")}
-                      t
-                    </span>
-                  )}
-
-                  <input
-                    value={hours[`${project.workItemId}-${day}`] ?? ""}
-                    placeholder="0,0"
-                    disabled={isLocked}
-                    onChange={(e) =>
-                      handleChange(project.workItemId, day, e.target.value)
-                    }
-                    onContextMenu={(e) => {
-                      if (isLocked) return;
-                      e.preventDefault();
-                      toggleExcludedFromAbsence(project.workItemId, day);
-                    }}
-                    className={
-                      excludedFromAbsence[`${project.workItemId}-${day}`]
-                        ? "input-excluded"
-                        : ""
-                    }
-                  />
-                </div>
-              ))}
-
-              <div className="total">
-                {getRowTotal(project.workItemId).toFixed(1).replace(".", ",")}
-              </div>
-
-              {showDeleteButton && (
-                <button
-                  className="delete-btn"
-                  type="button"
-                  aria-label="Slett rad"
-                  onClick={() => removeProject(project.workItemId)}
-                >
-                  <Trash2 size={22} />
-                </button>
-              )}
+          <div className="timesheet-table">
+            <div className="timesheet-columns">
+              <span>Prosjekt</span>
+              <span>Man</span>
+              <span>Tir</span>
+              <span>Ons</span>
+              <span>Tor</span>
+              <span>Fre</span>
+              <span>Totalt antall timer</span>
+              <span></span>
             </div>
-          ))}
+
+            {visibleProjects.map((project) => (
+              <div key={project.workItemId} className="project-row">
+                <div className="project-name">
+                  <strong>{project.name}</strong>
+                  <span>
+                    Oppgave:{" "}
+                    {project.workItemTitle ?? `Prosjekt #${project.id}`}
+                  </span>
+                </div>
+
+                {(["mon", "tue", "wed", "thu", "fri"] as const).map((day) => (
+                  <div key={day} className="day-input-wrapper">
+                    {isOvertime(project.workItemId, day) && (
+                      <span className="overtime-indicator">
+                        +
+                        {(getNumericValue(project.workItemId, day) - 8)
+                          .toFixed(1)
+                          .replace(".", ",")}
+                        t
+                      </span>
+                    )}
+
+                    <input
+                      value={hours[`${project.workItemId}-${day}`] ?? ""}
+                      placeholder="0,0"
+                      disabled={isLocked}
+                      onChange={(e) =>
+                        handleChange(project.workItemId, day, e.target.value)
+                      }
+                      onContextMenu={(e) => {
+                        if (isLocked) return;
+                        e.preventDefault();
+                        toggleExcludedFromAbsence(project.workItemId, day);
+                      }}
+                      className={
+                        excludedFromAbsence[`${project.workItemId}-${day}`]
+                          ? "input-excluded"
+                          : ""
+                      }
+                    />
+                  </div>
+                ))}
+
+                <div className="total">
+                  {getRowTotal(project.workItemId).toFixed(1).replace(".", ",")}
+                </div>
+
+                {showDeleteButton && (
+                  <button
+                    className="delete-btn"
+                    type="button"
+                    aria-label="Slett rad"
+                    onClick={() => removeProject(project.workItemId)}
+                  >
+                    <Trash2 size={22} />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
 
           {hoursError && <p className="hours-error">{hoursError}</p>}
 
@@ -380,7 +382,7 @@ export function TimesheetPage({
 
               {showSubmitButton && (
                 <button
-                  className="save-btn"
+                  className="save-btn save-btn--primary"
                   type="button"
                   onClick={handleSubmitTimesheet}
                 >
@@ -500,7 +502,7 @@ export function TimesheetPage({
 
             <div className="action-buttons">
               <button
-                className="save-btn"
+                className="save-btn save-btn--primary"
                 type="button"
                 onClick={addSelectedProject}
               >
