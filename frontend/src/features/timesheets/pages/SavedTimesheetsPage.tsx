@@ -74,6 +74,7 @@ export default function SavedTimesheetsPage() {
     try {
       setLoading(true);
       setError("");
+
       const data = await fetchMyTimesheets();
       setItems(data);
     } catch (err) {
@@ -92,6 +93,7 @@ export default function SavedTimesheetsPage() {
     try {
       setError("");
       setActionMessage("");
+
       await submitTimesheet({ weekStart });
       setActionMessage("Timesheet sendt til godkjenning.");
       await loadTimesheets();
@@ -111,6 +113,7 @@ export default function SavedTimesheetsPage() {
     try {
       setError("");
       setActionMessage("");
+
       await withdrawTimesheet(timesheetId);
       setActionMessage("Timesheet ble trukket tilbake.");
       await loadTimesheets();
@@ -130,6 +133,7 @@ export default function SavedTimesheetsPage() {
     try {
       setError("");
       setActionMessage("");
+
       await deleteTimesheet(timesheetId);
       setActionMessage("Timesheet ble slettet.");
       await loadTimesheets();
@@ -156,103 +160,115 @@ export default function SavedTimesheetsPage() {
 
   return (
     <div className="saved-timesheets-page">
-      <div className="saved-timesheets-header">
-        <button
-          type="button"
-          className="page-back-button"
-          onClick={() => navigate("/dashboard")}
-        >
-          ← Tilbake til oversikt
-        </button>
+      <div className="saved-timesheets-shell">
+        <div className="saved-timesheets-header">
+          <button
+            type="button"
+            className="saved-back-button"
+            onClick={() => navigate("/dashboard")}
+          >
+            ← Oversikt
+          </button>
 
-        <p className="saved-timesheets-eyebrow">TIMEOPPFØLGING</p>
-        <h1>Mine timer</h1>
-        <p className="saved-timesheets-subtitle">
-          Se egne utkast og innsendinger, åpne dem igjen og følg statusen.
-        </p>
-      </div>
-
-      {loading && (
-        <div className="saved-timesheets-info">Laster dine timesheets...</div>
-      )}
-
-      {!loading && error && (
-        <div className="saved-timesheets-error">{error}</div>
-      )}
-
-      {!loading && !error && actionMessage && (
-        <div className="saved-timesheets-info">{actionMessage}</div>
-      )}
-
-      {!loading && !error && items.length === 0 && (
-        <div className="saved-timesheets-empty">
-          <div className="saved-timesheets-empty-icon">🕘</div>
-          <div>
-            <h2>Ingen timesheets funnet</h2>
-            <p>Du har ingen registrerte timesheets enda.</p>
-          </div>
+          <p className="saved-timesheets-eyebrow">TIMEOPPFØLGING</p>
+          <h1>Mine timer</h1>
+          <p className="saved-timesheets-subtitle">
+            Se egne utkast og innsendinger, åpne dem igjen og følg statusen.
+          </p>
         </div>
-      )}
 
-      {!loading && !error && items.length > 0 && (
-        <div className="saved-timesheets-table-card">
-          <table className="saved-timesheets-table">
-            <thead>
-              <tr>
-                <th>Uke</th>
-                <th>Periode</th>
-                <th>Timer</th>
-                <th>Fravær</th>
-                <th>Status</th>
-                <th>Handling</th>
-              </tr>
-            </thead>
+        {loading && (
+          <div className="saved-timesheets-info">Laster dine timesheets...</div>
+        )}
 
-            <tbody>
-              {items.map((item) => (
-                <tr key={item.timesheetId}>
-                  <td>{getWeekLabel(item.weekStart)}</td>
-                  <td>{formatWeekRange(item.weekStart)}</td>
-                  <td>{item.totalHours.toFixed(1)}</td>
-                  <td>{item.hasAbsence ? "Ja" : "Nei"}</td>
+        {!loading && error && (
+          <div className="saved-timesheets-error">{error}</div>
+        )}
 
-                  <td>
-                    <span
-                      className={`saved-timesheets-status saved-timesheets-status--${item.status.toLowerCase()}`}
-                    >
-                      {getStatusLabel(item.status)}
-                    </span>
+        {!loading && !error && actionMessage && (
+          <div className="saved-timesheets-info">{actionMessage}</div>
+        )}
 
-                    {item.managerComment && (
-                      <div className="saved-timesheets-comment">
-                        Kommentar: {item.managerComment}
-                      </div>
-                    )}
-                  </td>
+        {!loading && !error && items.length === 0 && (
+          <div className="saved-timesheets-empty">
+            <div className="saved-timesheets-empty-icon">🕘</div>
+            <div>
+              <h2>Ingen timesheets funnet</h2>
+              <p>Du har ingen registrerte timesheets enda.</p>
+            </div>
+          </div>
+        )}
 
-                  <td>
-                    <div className="saved-timesheets-actions">
-                      {(item.status === "NOT_SENT" ||
-                        item.status === "REJECTED") && (
+        {!loading && !error && items.length > 0 && (
+          <div className="saved-timesheets-table-card">
+            <table className="saved-timesheets-table">
+              <thead>
+                <tr>
+                  <th>Uke</th>
+                  <th>Periode</th>
+                  <th>Timer</th>
+                  <th>Fravær</th>
+                  <th>Status</th>
+                  <th>Handling</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {items.map((item) => (
+                  <tr key={item.timesheetId}>
+                    <td>{getWeekLabel(item.weekStart)}</td>
+                    <td>{formatWeekRange(item.weekStart)}</td>
+                    <td>{item.totalHours.toFixed(1)}</td>
+                    <td>{item.hasAbsence ? "Ja" : "Nei"}</td>
+
+                    <td>
+                      <span
+                        className={`saved-timesheets-status saved-timesheets-status--${item.status.toLowerCase()}`}
+                      >
+                        {getStatusLabel(item.status)}
+                      </span>
+
+                      {item.managerComment && (
+                        <div className="saved-timesheets-comment">
+                          Kommentar: {item.managerComment}
+                        </div>
+                      )}
+                    </td>
+
+                    <td>
+                      <div className="saved-timesheets-actions">
                         <button
                           type="button"
                           className="saved-timesheets-action"
                           onClick={() => handleOpen(item)}
                         >
-                          Åpne
+                          {item.status === "NOT_SENT" ||
+                          item.status === "REJECTED"
+                            ? "Åpne"
+                            : "Vis"}
                         </button>
-                      )}
 
-                      {item.status === "SENT" && (
-                        <>
-                          <button
-                            type="button"
-                            className="saved-timesheets-action"
-                            onClick={() => handleOpen(item)}
-                          >
-                            Vis
-                          </button>
+                        {item.status === "NOT_SENT" && (
+                          <>
+                            <button
+                              type="button"
+                              className="saved-timesheets-action saved-timesheets-action--primary"
+                              onClick={() => handleSubmit(item.weekStart)}
+                            >
+                              Send inn
+                            </button>
 
+                            <button
+                              type="button"
+                              className="saved-timesheets-action saved-timesheets-action--danger"
+                              onClick={() => handleDelete(item.timesheetId)}
+                            >
+                              Slett
+                            </button>
+                          </>
+                        )}
+
+                        {item.status === "SENT" && (
                           <button
                             type="button"
                             className="saved-timesheets-action saved-timesheets-action--secondary"
@@ -260,56 +276,26 @@ export default function SavedTimesheetsPage() {
                           >
                             Trekk tilbake
                           </button>
-                        </>
-                      )}
+                        )}
 
-                      {item.status === "APPROVED" && (
-                        <button
-                          type="button"
-                          className="saved-timesheets-action"
-                          onClick={() => handleOpen(item)}
-                        >
-                          Vis
-                        </button>
-                      )}
-
-                      {item.status === "NOT_SENT" && (
-                        <>
+                        {item.status === "REJECTED" && (
                           <button
                             type="button"
                             className="saved-timesheets-action saved-timesheets-action--primary"
-                            onClick={() => handleSubmit(item.weekStart)}
+                            onClick={() => handleOpen(item)}
                           >
-                            Send inn
+                            Rediger og send på nytt
                           </button>
-
-                          <button
-                            type="button"
-                            className="saved-timesheets-action saved-timesheets-action--danger"
-                            onClick={() => handleDelete(item.timesheetId)}
-                          >
-                            Slett
-                          </button>
-                        </>
-                      )}
-
-                      {item.status === "REJECTED" && (
-                        <button
-                          type="button"
-                          className="saved-timesheets-action saved-timesheets-action--primary"
-                          onClick={() => handleOpen(item)}
-                        >
-                          Rediger og send på nytt
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
 
       <TimesheetEditModal
         opened={editModalOpen}
