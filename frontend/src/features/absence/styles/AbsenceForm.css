@@ -1,46 +1,127 @@
-.absence-hours-list {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  max-height: 180px;
-  overflow-y: auto;
+.absence-card {
+  padding: 34px 32px 28px;
 }
 
-.absence-workitem-details {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
+.absence-form {
+  max-width: 720px;
 }
 
-.absence-workitem-label {
+.absence-form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.absence-field {
+  display: grid;
+  grid-template-columns: 150px minmax(280px, 1fr);
+  align-items: start;
+  gap: 22px;
+}
+
+.absence-field label {
+  padding-top: 12px;
+  color: #f5f7ff;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.absence-input {
+  width: 100%;
+  max-width: 420px;
+}
+
+.absence-textarea {
+  min-height: 112px;
+  max-width: 420px;
+  resize: vertical;
+}
+
+.absence-field--date {
+  display: block;
+}
+
+.absence-field--date .input-group-row {
+  display: grid;
+  grid-template-columns: 150px minmax(280px, 1fr);
+  align-items: start;
+  gap: 22px;
+  margin: 0;
+}
+
+.absence-field--date .input-group-row label {
+  width: auto;
+  padding-top: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.absence-field--date .dark-input {
+  width: 100%;
+  max-width: 420px;
+}
+
+.absence-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 30px;
+  margin-left: 172px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.absence-payload-summary {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.absence-payload-label {
+  margin: 0 0 8px;
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.5);
 }
 
-.absence-fill-week {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 10px;
+.absence-payload-entry {
+  font-size: 0.9rem;
+  margin-bottom: 4px;
 }
 
-.absence-description-row {
-  display: flex;
-  gap: 40px;
-  margin-top: 16px;
+.absence-payload-hours {
+  margin-left: 8px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8rem;
 }
 
-.absence-save-row {
-  display: flex;
-  gap: 40px;
-}
+@media (max-width: 760px) {
+  .absence-form {
+    max-width: none;
+  }
 
-.absence-workitem-row {
-  align-items: flex-start;
-  gap: 16px;
-}
+  .absence-field,
+  .absence-field--date .input-group-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
 
-.absence-workitem-row .delete-btn {
-  align-self: center;
-  margin-top: 26px;
+  .absence-field label,
+  .absence-field--date .input-group-row label {
+    padding-top: 0;
+  }
+
+  .absence-input,
+  .absence-textarea,
+  .absence-field--date .dark-input {
+    max-width: none;
+  }
+
+  .absence-actions {
+    margin-left: 0;
+    justify-content: stretch;
+  }
+
+  .absence-actions .save-btn {
+    width: 100%;
+  }
 }

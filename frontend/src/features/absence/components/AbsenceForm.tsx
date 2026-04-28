@@ -35,56 +35,54 @@ export default function AbsenceForm({
   onSave,
 }: AbsenceFormProps) {
   return (
-    <>
-      <div className="input-group-row">
-        <label>Årsak til fravær:</label>
+    <div className="absence-form">
+      <div className="absence-form-grid">
+        <div className="absence-field">
+          <label>Årsak til fravær</label>
 
-        <select
-          className="dark-input"
-          value={absenceType}
-          onChange={(e) => {
-            onTypeChange(e.target.value);
-            onHoursChange({});
-          }}
-        >
-          <option value="">Velg type...</option>
-          <option value="VACATION">Ferie</option>
-          <option value="LEAVE">Permisjon</option>
-          <option value="OTHER">Annet</option>
-        </select>
-      </div>
+          <select
+            className="dark-input absence-input"
+            value={absenceType}
+            onChange={(e) => {
+              onTypeChange(e.target.value);
+              onHoursChange({});
+            }}
+          >
+            <option value="">Velg type...</option>
+            <option value="VACATION">Ferie</option>
+            <option value="LEAVE">Permisjon</option>
+            <option value="OTHER">Annet</option>
+          </select>
+        </div>
 
-      <hr className="modal-divider" />
+        <div className="absence-field absence-field--date">
+          <DateRangeInput
+            onHoursChange={onHoursChange}
+            onRangeChange={onRangeChange}
+          />
+        </div>
 
-      <DateRangeInput
-        onHoursChange={onHoursChange}
-        onRangeChange={onRangeChange}
-      />
-
-      <hr className="modal-divider" />
-
-      <div className="absence-description-row">
-        <div className="input-group-row">
-          <label>Beskrivelse:</label>
+        <div className="absence-field">
+          <label>Beskrivelse</label>
 
           <textarea
-            className="dark-input"
-            placeholder="Beskrivelse..."
+            className="dark-input absence-input absence-textarea"
+            placeholder="Skriv kort hva fraværet gjelder..."
             value={description}
             onChange={(e) => onDescriptionChange(e.target.value)}
           />
         </div>
       </div>
 
-      <div className="timesheet-actions">
-        <div />
-
-        <div className="absence-save-row">
-          <button className="save-btn" type="button" onClick={onSave}>
-            Send søknad
-          </button>
-        </div>
+      <div className="absence-actions">
+        <button
+          className="save-btn save-btn--primary"
+          type="button"
+          onClick={onSave}
+        >
+          Send søknad
+        </button>
       </div>
-    </>
+    </div>
   );
 }
