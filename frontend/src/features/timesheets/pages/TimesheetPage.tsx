@@ -172,7 +172,7 @@ export function TimesheetPage({
               className="page-back-button"
               onClick={() => navigate("/dashboard")}
             >
-              ← Tilbake til oversikt
+              ← Oversikt
             </button>
           )}
 

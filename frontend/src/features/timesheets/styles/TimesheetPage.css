@@ -632,10 +632,10 @@ textarea.dark-input {
   }
 
   .page-back-button {
+    width: fit-content;
     min-width: 0;
-    width: 100%;
-    justify-content: center;
-    font-size: 0.92rem;
+    height: 38px;
+    padding: 0 14px;
   }
 
   .input-group-row {
