@@ -146,6 +146,7 @@ export function useTimesheetActions({
         "warning",
         "Ingen prosjekter",
         "Legg til et prosjekt før du lagrer.",
+        true,
       );
       return false;
     }

@@ -1,0 +1,297 @@
+.settings-page {
+    min-height: 100vh;
+}
+
+/* Card wrapper & section header*/
+.settings-section {
+    max-width: 600px;
+    margin: 0 auto 2.5rem;
+    margin-top: -4rem;
+}
+
+.settings-section-box {
+    background: rgba(16, 21, 36, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 20px;
+    padding: 2rem;
+    min-height: 80vh;
+
+}
+
+.settings-section-box .page-title {
+    font-size: 2rem;
+    margin-bottom: 0.25rem;
+}
+
+.settings-section-header {
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.settings-section-title {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #f5f7ff;
+}
+
+.settings-intro {
+    padding: 2rem 2.5rem 1.5rem;
+    position: relative;
+    text-align: center;
+}
+
+.settings-intro .page-back-button {
+    position: absolute;
+    left: 2.5rem;
+    top: 2.2rem;
+}
+
+.settings-intro-header {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 1rem;
+}
+
+/* Card */
+.settings-card {
+    margin: 0 auto 2.5rem;
+    background: #13152a;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 600px;
+}
+
+/* Avatar */
+.settings-avatar-section {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding-bottom: 1.5rem;
+}
+
+.settings-avatar-wrap {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.settings-avatar-img {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.settings-avatar-placeholder {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6c4fd4, #9b59f5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.05rem;
+}
+
+.settings-avatar-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(0,0,0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.settings-avatar-wrap:hover .settings-avatar-overlay {
+    opacity: 1;
+}
+
+.settings-avatar-name {
+    display: block;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #e8eaf6;
+}
+
+.settings-avatar-hint {
+    display: block;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.35);
+    margin-top: 0.2rem;
+}
+
+.settings-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.07);
+    margin: 0.25rem 0;
+}
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 0;
+}
+
+.settings-row-left {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+}
+
+.settings-row-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.5);
+    flex-shrink: 0;
+}
+
+.settings-row-label {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.06rem;
+    margin-bottom: 0.15rem;
+}
+
+.settings-row-value {
+    font-size: 0.95rem;
+    color: #e8eaf6;
+    font-weight: 500;
+}
+
+.settings-edit-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    padding: 0.4rem 1rem;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.settings-edit-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* Edit Section */
+.settings-edit-section {
+    padding: 0.5rem 0 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.settings-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 0.65rem 1rem;
+    color: #e8eaf6;
+    font-size: 0.92rem;
+    outline: none;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+}
+
+.settings-input:focus {
+    border-color: rgba(108, 79, 212, 0.6);
+}
+
+.settings-password-field {
+    position: relative;
+}
+
+.settings-password-field .settings-input {
+    padding-right: 2.8rem;
+}
+
+.settings-eye-btn {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.35);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    transition: color 0.15s;
+}
+
+.settings-eye-btn:hover {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.settings-edit-actions {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.25rem;
+}
+
+.settings-save-btn {
+    background: #6c4fd4;
+    border: none;
+    color: #fff;
+    border-radius: 8px;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: background 0.15s;
+}
+
+.settings-save-btn:hover {
+    background: #7d62e0;
+}
+
+.settings-cancel-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: background 0.15s;
+}
+
+.settings-cancel-btn:hover {
+    background: rgba(255, 255, 255, 0.09);
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.settings-error {
+    color: #f87171;
+    font-size: 0.82rem;
+    margin: 0;
+}
