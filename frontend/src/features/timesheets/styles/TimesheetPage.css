@@ -8,7 +8,6 @@
 .timesheet-shell {
   max-width: 1360px;
   margin: 0 auto;
-  position: relative;
 }
 
 .page-intro {
@@ -19,47 +18,32 @@
   margin: 8px 0 30px;
 }
 
-.page-intro-text {
-  max-width: 680px;
-}
-
 .page-back-button {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-width: 220px;
-  height: 42px;
-  padding: 0 18px;
-  background: rgba(255, 255, 255, 0.055);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
-  color: rgba(233, 238, 255, 0.82);
+  gap: 6px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: rgba(233, 238, 255, 0.68);
   font: inherit;
   font-size: 0.92rem;
   font-weight: 700;
-  line-height: 1;
   cursor: pointer;
   transition:
-    background 0.18s ease,
-    border-color 0.18s ease,
     color 0.18s ease,
     transform 0.18s ease;
 }
 
 .page-back-button:hover {
-  background: rgba(255, 255, 255, 0.085);
-  border-color: rgba(255, 255, 255, 0.2);
   color: #ffffff;
   transform: translateX(-2px);
-}
-
-.page-back-button:active {
-  transform: translateX(0);
 }
 
 .page-back-button:focus-visible {
   outline: 2px solid rgba(143, 160, 255, 0.7);
   outline-offset: 6px;
+  border-radius: 8px;
 }
 
 .page-kicker {
@@ -92,8 +76,6 @@
   background: rgba(16, 21, 36, 0.72);
   border-radius: 24px;
   padding: 28px 26px 22px;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.07);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
   color: white;
@@ -101,7 +83,6 @@
 
 .timesheet-status-banner {
   display: inline-flex;
-  align-items: center;
   width: fit-content;
   margin-bottom: 18px;
   padding: 8px 12px;
@@ -138,20 +119,31 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 20px;
+  gap: 24px;
   margin-bottom: 24px;
-}
-
-.week-nav-group {
-  display: flex;
-  align-items: center;
-  gap: 14px;
 }
 
 .timesheet-header-left {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+}
+
+.week-nav-group,
+.week-nav,
+.timesheet-progress-wrap,
+.timesheet-actions,
+.timesheet-actions-right {
+  display: flex;
+  align-items: center;
+}
+
+.week-nav-group {
+  gap: 14px;
+}
+
+.week-nav {
+  gap: 10px;
 }
 
 .week-icon {
@@ -161,48 +153,31 @@
   background: rgba(124, 144, 255, 0.12);
   border: 1px solid rgba(154, 170, 255, 0.16);
   color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  cursor: pointer;
   font-size: 1.2rem;
-  transition:
-    transform 0.18s ease,
-    background 0.18s ease,
-    border-color 0.18s ease;
 }
 
 .week-icon:hover {
   background: rgba(124, 144, 255, 0.2);
-  border-color: rgba(154, 170, 255, 0.24);
-  transform: scale(1.03);
-  cursor: pointer;
 }
 
-.week-nav {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.week-nav-btn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  justify-content: center;
 }
 
 .timesheet-header h5 {
   margin: 0;
-  color: #fff;
   font-size: 1.75rem;
   line-height: 1.1;
 }
 
 .week-subtitle {
-  margin-top: 4px;
   margin-left: 76px;
   color: rgba(255, 255, 255, 0.55);
   font-size: 0.85rem;
-}
-
-.timesheet-progress-wrap {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-top: 6px;
 }
 
 .timesheet-progress {
@@ -211,15 +186,14 @@
 }
 
 .progress-text {
-  color: #fff;
   font-size: 1rem;
   font-weight: 800;
 }
 
 .progress-bar {
   height: 5px;
-  background: #2b2f55;
   margin-top: 9px;
+  background: #2b2f55;
   border-radius: 999px;
   overflow: hidden;
 }
@@ -227,11 +201,6 @@
 .progress-fill {
   height: 100%;
   background: linear-gradient(90deg, #ff2bd6, #6a5cff);
-  border-radius: 999px;
-}
-
-.timesheet-table {
-  width: 100%;
 }
 
 .timesheet-columns,
@@ -243,11 +212,11 @@
 }
 
 .timesheet-columns {
+  padding: 0 2px 10px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.62);
   font-size: 0.9rem;
-  margin-bottom: 8px;
-  padding: 0 2px 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .project-row {
@@ -255,36 +224,39 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.project-name strong {
+.project-name strong,
+.project-name span {
   display: block;
-  color: white;
-  font-weight: 600;
-  font-size: 1rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.project-name strong {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
 .project-name span {
-  display: block;
   margin-top: 2px;
   color: rgba(255, 255, 255, 0.48);
   font-size: 0.78rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.project-row input,
+.total {
+  height: 42px;
+  border-radius: 10px;
+  box-sizing: border-box;
 }
 
 .project-row input {
   width: 100%;
-  height: 42px;
+  padding: 0 8px;
   background: #2e335a;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 10px;
-  text-align: center;
-  padding: 0 8px;
   color: white;
-  box-sizing: border-box;
+  text-align: center;
   outline: none;
   font-size: 0.95rem;
 }
@@ -302,14 +274,11 @@ textarea.dark-input:focus {
 }
 
 .total {
-  height: 42px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   font-weight: 700;
 }
 
@@ -318,21 +287,14 @@ textarea.dark-input:focus {
   border: none;
   color: rgba(255, 80, 80, 0.7);
   cursor: pointer;
-  font-size: 1.1rem;
-  transition:
-    color 0.18s ease,
-    transform 0.18s ease;
 }
 
 .delete-btn:hover {
   color: #ff4444;
-  transform: scale(1.05);
 }
 
 .timesheet-actions {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
   margin-top: 22px;
   padding-top: 18px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -340,18 +302,13 @@ textarea.dark-input:focus {
 }
 
 .timesheet-actions-right {
-  display: flex;
   gap: 12px;
-  align-items: center;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
 
-.add-project {
-  margin-top: 0;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  padding: 10px 14px;
+.add-project,
+.save-btn {
   border-radius: 10px;
   color: white;
   cursor: pointer;
@@ -359,40 +316,24 @@ textarea.dark-input:focus {
   transition:
     background 0.18s ease,
     border-color 0.18s ease,
-    transform 0.18s ease;
+    transform 0.18s ease,
+    opacity 0.18s ease,
+    filter 0.18s ease;
 }
 
-.add-project:hover {
-  background: linear-gradient(90deg, #c600ff, #6a5cff);
-  border-color: transparent;
-  transform: translateY(-1px);
-}
-
-.week-nav-btn {
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.add-project {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 10px 14px;
 }
 
 .save-btn {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.26);
   padding: 10px 16px;
-  border-radius: 10px;
-  color: white;
-  cursor: pointer;
-  font-weight: 600;
-  transition:
-    background 0.3s ease,
-    border-color 0.3s ease,
-    transform 0.18s ease,
-    filter 0.18s ease,
-    opacity 0.18s ease;
 }
 
+.add-project:hover,
 .save-btn:hover {
   background: linear-gradient(90deg, #c600ff, #6a5cff);
   border-color: transparent;
@@ -417,29 +358,66 @@ textarea.dark-input:focus {
   border-color: rgba(198, 0, 255, 0.6);
 }
 
+.day-input-wrapper {
+  position: relative;
+}
+
+.overtime-indicator,
+.overtime-badge {
+  background: linear-gradient(90deg, #c600ff, #6a5cff);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 7px;
+}
+
+.overtime-indicator {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 6px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.overtime-badge {
+  margin-left: 8px;
+  padding: 2px 7px;
+}
+
+.input-excluded {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.hours-error {
+  margin: 12px 2px 0;
+  color: #f59e0b;
+  font-size: 0.85rem;
+}
+
 .wireframe-modal {
   position: fixed;
   inset: 0;
-  background: rgba(8, 12, 24, 0.52);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
   z-index: 1000;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   padding: 20px;
-  box-sizing: border-box;
+  background: rgba(8, 12, 24, 0.52);
+  backdrop-filter: blur(5px);
 }
 
 .modal-content {
   position: relative;
-  background: rgba(30, 35, 70, 0.97);
+  width: min(1100px, 100%);
   padding: 28px;
   border-radius: 18px;
-  width: min(1100px, 100%);
+  background: rgba(30, 35, 70, 0.97);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   color: white;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
 .modal-content--calendar {
@@ -450,16 +428,13 @@ textarea.dark-input:focus {
   position: absolute;
   top: 16px;
   right: 16px;
-  background: none;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: white;
   width: 34px;
   height: 34px;
   border-radius: 8px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: white;
   cursor: pointer;
-  transition:
-    background 0.18s ease,
-    border-color 0.18s ease;
 }
 
 .close-btn:hover {
@@ -477,25 +452,22 @@ textarea.dark-input:focus {
 .input-group-row label {
   width: 150px;
   flex-shrink: 0;
-  color: white;
-  font-size: 0.98rem;
   font-weight: 600;
 }
 
 .dark-input {
+  width: 300px;
+  padding: 11px 14px;
+  box-sizing: border-box;
   background: #2e335a;
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 10px;
-  padding: 11px 14px;
   color: white;
-  width: 300px;
-  box-sizing: border-box;
   outline: none;
 }
 
 .dark-input option {
   background: #2e335a;
-  border-radius: 10px;
 }
 
 textarea.dark-input {
@@ -505,60 +477,7 @@ textarea.dark-input {
 
 .action-buttons {
   display: flex;
-  justify-content: flex-start;
   margin-top: 24px;
-}
-
-.modal-divider {
-  border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  margin: 16px 0;
-}
-
-.day-input-wrapper {
-  position: relative;
-}
-
-.overtime-indicator {
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: linear-gradient(90deg, #c600ff, #6a5cff);
-  color: white;
-  font-size: 0.7rem;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 6px;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.input-overtime {
-  border-color: rgba(158, 131, 255, 0.7) !important;
-  box-shadow: 0 0 0 2px rgba(123, 97, 255, 0.2);
-}
-
-.overtime-badge {
-  margin-left: 8px;
-  background: linear-gradient(90deg, #c600ff, #6a5cff);
-  color: white;
-  font-size: 0.7rem;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 8px;
-  vertical-align: middle;
-}
-
-.input-excluded {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.hours-error {
-  color: #f59e0b;
-  font-size: 0.85rem;
-  margin: 12px 2px 0;
 }
 
 .modal-week-title {
@@ -569,26 +488,12 @@ textarea.dark-input {
   .timesheet-columns,
   .project-row {
     grid-template-columns: 200px repeat(5, minmax(68px, 1fr)) 120px 40px;
-    gap: 12px;
   }
 }
 
 @media (max-width: 980px) {
-  .page {
-    padding: 0;
-  }
-
-  .page-intro {
-    margin-bottom: 24px;
-  }
-
   .timesheet-header {
     flex-direction: column;
-    align-items: stretch;
-  }
-
-  .timesheet-progress-wrap {
-    justify-content: flex-start;
   }
 
   .timesheet-progress {
@@ -623,31 +528,13 @@ textarea.dark-input {
     font-size: 2rem;
   }
 
-  .page-subtitle {
-    font-size: 0.95rem;
-  }
-
-  .page-intro {
-    gap: 12px;
-  }
-
-  .page-back-button {
-    width: fit-content;
-    min-width: 0;
-    height: 38px;
-    padding: 0 14px;
-  }
-
   .input-group-row {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
   }
 
-  .input-group-row label {
-    width: auto;
-  }
-
+  .input-group-row label,
   .dark-input {
     width: 100%;
   }
