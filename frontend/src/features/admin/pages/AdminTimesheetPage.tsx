@@ -47,6 +47,35 @@ function weekValueToMonday(weekValue: string) {
   return monday.toISOString().split("T")[0];
 }
 
+function getWeekNumberFromDate(dateString: string) {
+  const date = new Date(`${dateString}T00:00:00`);
+  const temp = new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
+  );
+  const dayNum = temp.getUTCDay() || 7;
+
+  temp.setUTCDate(temp.getUTCDate() + 4 - dayNum);
+
+  const yearStart = new Date(Date.UTC(temp.getUTCFullYear(), 0, 1));
+  return Math.ceil(((temp.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+}
+
+function formatWeekRange(weekStart: string) {
+  const start = new Date(`${weekStart}T00:00:00`);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 4);
+
+  const options: Intl.DateTimeFormatOptions = {
+    day: "numeric",
+    month: "short",
+  };
+
+  const startText = start.toLocaleDateString("nb-NO", options);
+  const endText = end.toLocaleDateString("nb-NO", options);
+
+  return `Uke ${getWeekNumberFromDate(weekStart)} (${startText} – ${endText})`;
+}
+
 export default function AdminTimesheetPage() {
   const navigate = useNavigate();
 
@@ -95,6 +124,7 @@ export default function AdminTimesheetPage() {
 
       try {
         setDetailLoading(true);
+        setError("");
         const data = await fetchAdminTimesheetDetail(selectedTimesheetId);
         setDetail(data);
         setRejectComment(data.managerComment ?? "");
@@ -114,14 +144,18 @@ export default function AdminTimesheetPage() {
 
     try {
       setDecisionLoading(true);
+      setError("");
+
       await approveTimesheet({
         userId: detail.userId,
         weekStart: detail.weekStart,
       });
 
       await loadOverview();
+
       const updated = await fetchAdminTimesheetDetail(detail.timesheetId);
       setDetail(updated);
+      setRejectComment(updated.managerComment ?? "");
     } catch (err) {
       console.error(err);
       setError("Kunne ikke godkjenne timesheet.");
@@ -135,6 +169,8 @@ export default function AdminTimesheetPage() {
 
     try {
       setDecisionLoading(true);
+      setError("");
+
       await rejectTimesheet({
         userId: detail.userId,
         weekStart: detail.weekStart,
@@ -142,8 +178,10 @@ export default function AdminTimesheetPage() {
       });
 
       await loadOverview();
+
       const updated = await fetchAdminTimesheetDetail(detail.timesheetId);
       setDetail(updated);
+      setRejectComment(updated.managerComment ?? "");
     } catch (err) {
       console.error(err);
       setError("Kunne ikke avslå timesheet.");
@@ -218,11 +256,13 @@ export default function AdminTimesheetPage() {
             <div>
               <p className="admin-eyebrow">DETALJER</p>
               <h2>{detail.userName}</h2>
-              <p>{detail.userEmail}</p>
+              {detail.userEmail && <p>{detail.userEmail}</p>}
             </div>
 
             <span
-              className={`admin-status-pill status-${detail.status.toLowerCase()}`}
+              className={`admin-status-pill status-${String(
+                detail.status,
+              ).toLowerCase()}`}
             >
               {detail.status}
             </span>
@@ -231,7 +271,7 @@ export default function AdminTimesheetPage() {
           <div className="admin-detail-stats">
             <div>
               <span>Uke</span>
-              <strong>{detail.weekStart}</strong>
+              <strong>{formatWeekRange(detail.weekStart)}</strong>
             </div>
             <div>
               <span>Totalt</span>
@@ -252,8 +292,7 @@ export default function AdminTimesheetPage() {
               <div className="admin-detail-table">
                 <div className="admin-detail-table-head">
                   <span>Dato</span>
-                  <span>Prosjekt</span>
-                  <span>Oppgave</span>
+                  <span>Prosjekt / oppgave</span>
                   <span>Timer</span>
                   <span>Beskrivelse</span>
                 </div>
@@ -261,8 +300,14 @@ export default function AdminTimesheetPage() {
                 {detail.timeEntries.map((entry) => (
                   <div className="admin-detail-table-row" key={entry.id}>
                     <span>{entry.entryDate}</span>
-                    <strong>{entry.projectName}</strong>
-                    <span>{entry.workItemTitle}</span>
+
+                    <div>
+                      <strong>{entry.projectName}</strong>
+                      <div className="admin-subtext">
+                        {entry.workItemTitle || "Ingen oppgave valgt"}
+                      </div>
+                    </div>
+
                     <span>{entry.hours}t</span>
                     <span>{entry.description || "—"}</span>
                   </div>
@@ -310,7 +355,7 @@ export default function AdminTimesheetPage() {
               id="rejectComment"
               value={rejectComment}
               onChange={(e) => setRejectComment(e.target.value)}
-              placeholder="F.eks. feil prosjekt eller manglende beskrivelse..."
+              placeholder="F.eks. feil prosjekt, manglende timer eller behov for mer info..."
             />
           </div>
 

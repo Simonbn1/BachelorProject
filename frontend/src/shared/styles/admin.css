@@ -625,3 +625,18 @@
     flex-direction: column;
   }
 }
+
+.admin-detail-table-head,
+.admin-detail-table-row {
+  display: grid;
+  grid-template-columns: 140px 2fr 100px 2fr;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 16px;
+}
+
+.admin-subtext {
+  margin-top: 3px;
+  font-size: 13px;
+  color: #9ca3af;
+}
