@@ -1,7 +1,43 @@
 import { useNavigate } from "react-router-dom";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { Camera, Check, Eye, EyeOff, Lock, User, X } from "lucide-react";
 import "../styles/SettingsPage.css";
+
+type UserProfile = {
+  id: number;
+  displayName: string;
+  email: string;
+  role: string;
+};
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
+
+async function apiRequest<T>(
+  path: string,
+  options: RequestInit = {},
+): Promise<T> {
+  const token = localStorage.getItem("accessToken");
+
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers,
+    },
+  });
+
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(message || "Noe gikk galt.");
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  return response.json();
+}
 
 export default function SettingsPage() {
   const navigate = useNavigate();
@@ -15,54 +51,103 @@ export default function SettingsPage() {
     "name" | "password" | null
   >(null);
 
-  const [name, setName] = useState(initialName);
-  const [nameInput, setNameInput] = useState(initialName);
+  const [name, setName] = useState<string>(initialName);
+  const [nameInput, setNameInput] = useState<string>(initialName);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
+
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showRepeat, setShowRepeat] = useState(false);
 
   const [nameSuccess, setNameSuccess] = useState(false);
+  const [nameError, setNameError] = useState<string | null>(null);
+
   const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const profile = await apiRequest<UserProfile>("/api/users/me");
+
+        setName(profile.displayName);
+        setNameInput(profile.displayName);
+
+        localStorage.setItem(
+          "authUser",
+          JSON.stringify({
+            ...storedUser,
+            id: profile.id,
+            displayName: profile.displayName,
+            name: profile.displayName,
+            email: profile.email,
+            role: profile.role,
+          }),
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    loadProfile();
+  }, []);
+
+  function handleAvatarChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const url = URL.createObjectURL(file);
-    setAvatarUrl(url);
+    setAvatarUrl(URL.createObjectURL(file));
   }
 
-  function handleNameSave() {
+  async function handleNameSave() {
     const trimmedName = nameInput.trim();
-    if (!trimmedName) return;
 
-    setName(trimmedName);
+    if (!trimmedName) {
+      setNameError("Navn kan ikke være tomt.");
+      return;
+    }
 
-    const storedUser = JSON.parse(localStorage.getItem("authUser") ?? "{}");
+    try {
+      setNameError(null);
 
-    localStorage.setItem(
-      "authUser",
-      JSON.stringify({
-        ...storedUser,
-        displayName: trimmedName,
-        name: trimmedName,
-      }),
-    );
+      const profile = await apiRequest<UserProfile>("/api/users/me", {
+        method: "PATCH",
+        body: JSON.stringify({ displayName: trimmedName }),
+      });
 
-    setNameSuccess(true);
+      setName(profile.displayName);
+      setNameInput(profile.displayName);
 
-    setTimeout(() => {
-      setNameSuccess(false);
-      setActiveSection(null);
-    }, 1500);
+      const currentUser = JSON.parse(localStorage.getItem("authUser") ?? "{}");
+
+      localStorage.setItem(
+        "authUser",
+        JSON.stringify({
+          ...currentUser,
+          id: profile.id,
+          displayName: profile.displayName,
+          name: profile.displayName,
+          email: profile.email,
+          role: profile.role,
+        }),
+      );
+
+      setNameSuccess(true);
+
+      setTimeout(() => {
+        setNameSuccess(false);
+        setActiveSection(null);
+      }, 1500);
+    } catch (err) {
+      console.error(err);
+      setNameError("Kunne ikke oppdatere navn.");
+    }
   }
 
-  function handlePasswordSave() {
+  async function handlePasswordSave() {
     setPasswordError(null);
 
     if (!currentPassword) {
@@ -80,17 +165,28 @@ export default function SettingsPage() {
       return;
     }
 
-    // TODO: koble til backend senere
-    setPasswordSuccess(true);
+    try {
+      await apiRequest<void>("/api/users/me/password", {
+        method: "PATCH",
+        body: JSON.stringify({
+          currentPassword,
+          newPassword,
+        }),
+      });
 
-    setCurrentPassword("");
-    setNewPassword("");
-    setRepeatPassword("");
+      setPasswordSuccess(true);
+      setCurrentPassword("");
+      setNewPassword("");
+      setRepeatPassword("");
 
-    setTimeout(() => {
-      setPasswordSuccess(false);
-      setActiveSection(null);
-    }, 1500);
+      setTimeout(() => {
+        setPasswordSuccess(false);
+        setActiveSection(null);
+      }, 1500);
+    } catch (err) {
+      console.error(err);
+      setPasswordError("Kunne ikke oppdatere passord.");
+    }
   }
 
   function cancelSection() {
@@ -99,6 +195,7 @@ export default function SettingsPage() {
     setCurrentPassword("");
     setNewPassword("");
     setRepeatPassword("");
+    setNameError(null);
     setPasswordError(null);
   }
 
@@ -113,6 +210,7 @@ export default function SettingsPage() {
     <div className="page settings-page">
       <div className="page-intro">
         <button
+          type="button"
           className="page-back-button"
           onClick={() => navigate("/dashboard")}
         >
@@ -170,7 +268,6 @@ export default function SettingsPage() {
 
             <div className="settings-divider" />
 
-            {/* NAVN */}
             <div className="settings-row">
               <div className="settings-row-left">
                 <div className="settings-row-icon">
@@ -184,6 +281,7 @@ export default function SettingsPage() {
 
               {activeSection !== "name" && (
                 <button
+                  type="button"
                   className="settings-edit-btn"
                   onClick={() => {
                     setActiveSection("name");
@@ -205,8 +303,11 @@ export default function SettingsPage() {
                   autoFocus
                 />
 
+                {nameError && <p className="settings-error">{nameError}</p>}
+
                 <div className="settings-edit-actions">
                   <button
+                    type="button"
                     className="settings-save-btn"
                     onClick={handleNameSave}
                   >
@@ -220,6 +321,7 @@ export default function SettingsPage() {
                   </button>
 
                   <button
+                    type="button"
                     className="settings-cancel-btn"
                     onClick={cancelSection}
                   >
@@ -231,7 +333,6 @@ export default function SettingsPage() {
 
             <div className="settings-divider" />
 
-            {/* PASSORD */}
             <div className="settings-row">
               <div className="settings-row-left">
                 <div className="settings-row-icon">
@@ -245,6 +346,7 @@ export default function SettingsPage() {
 
               {activeSection !== "password" && (
                 <button
+                  type="button"
                   className="settings-edit-btn"
                   onClick={() => setActiveSection("password")}
                 >
@@ -316,6 +418,7 @@ export default function SettingsPage() {
 
                 <div className="settings-edit-actions">
                   <button
+                    type="button"
                     className="settings-save-btn"
                     onClick={handlePasswordSave}
                   >
@@ -329,6 +432,7 @@ export default function SettingsPage() {
                   </button>
 
                   <button
+                    type="button"
                     className="settings-cancel-btn"
                     onClick={cancelSection}
                   >
