@@ -18,14 +18,18 @@ export type AdminTimesheetDetail = {
   totalHours: number;
   managerComment?: string | null;
   employeeComment?: string;
+
   timeEntries: {
-    id: number;
+    timeEntryId: number;
+    projectId: number | null;
+    projectName: string | null;
+    workItemId: number | null;
+    workItemName: string | null;
     entryDate: string;
-    projectName: string;
-    workItemTitle?: string;
     hours: number;
-    description?: string;
+    description?: string | null;
   }[];
+
   absences: {
     id: number;
     absenceDate: string;

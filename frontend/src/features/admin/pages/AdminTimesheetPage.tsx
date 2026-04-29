@@ -298,13 +298,16 @@ export default function AdminTimesheetPage() {
                 </div>
 
                 {detail.timeEntries.map((entry) => (
-                  <div className="admin-detail-table-row" key={entry.id}>
+                  <div
+                    className="admin-detail-table-row"
+                    key={entry.timeEntryId}
+                  >
                     <span>{entry.entryDate}</span>
 
                     <div>
-                      <strong>{entry.projectName}</strong>
+                      <strong>{entry.projectName || "Ukjent prosjekt"}</strong>
                       <div className="admin-subtext">
-                        {entry.workItemTitle || "Ingen oppgave valgt"}
+                        {entry.workItemName || "Ingen oppgave valgt"}
                       </div>
                     </div>
 
