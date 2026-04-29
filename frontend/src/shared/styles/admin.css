@@ -387,3 +387,241 @@
   outline: 2px solid rgba(143, 160, 255, 0.7);
   outline-offset: 3px;
 }
+
+.admin-detail-panel {
+  margin-top: 24px;
+  padding: 28px;
+  border-radius: 24px;
+  background: linear-gradient(
+    180deg,
+    rgba(24, 29, 48, 0.98),
+    rgba(15, 19, 34, 0.98)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+.admin-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-detail-header h2 {
+  margin: 4px 0 6px;
+  font-size: 28px;
+  color: #f8fafc;
+}
+
+.admin-detail-header p {
+  margin: 0;
+  color: #9ca3af;
+}
+
+.admin-status-pill {
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.status-approved {
+  color: #bbf7d0;
+  background: rgba(34, 197, 94, 0.16);
+  border: 1px solid rgba(34, 197, 94, 0.28);
+}
+
+.status-sent {
+  color: #bfdbfe;
+  background: rgba(59, 130, 246, 0.16);
+  border: 1px solid rgba(59, 130, 246, 0.28);
+}
+
+.status-rejected {
+  color: #fecaca;
+  background: rgba(239, 68, 68, 0.16);
+  border: 1px solid rgba(239, 68, 68, 0.28);
+}
+
+.status-not_sent {
+  color: #fde68a;
+  background: rgba(245, 158, 11, 0.16);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+}
+
+.admin-detail-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 22px 0;
+}
+
+.admin-detail-stats div {
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-detail-stats span {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.admin-detail-stats strong {
+  color: #f8fafc;
+  font-size: 18px;
+}
+
+.admin-detail-section {
+  margin-top: 26px;
+}
+
+.admin-detail-section h3 {
+  margin: 0 0 14px;
+  color: #f8fafc;
+  font-size: 18px;
+}
+
+.admin-muted {
+  margin: 0;
+  color: #9ca3af;
+}
+
+.admin-detail-table {
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-detail-table-head,
+.admin-detail-table-row {
+  display: grid;
+  grid-template-columns: 140px 1.3fr 1.3fr 90px 1.8fr;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 16px;
+}
+
+.admin-detail-table-head.absence,
+.admin-detail-table-row.absence {
+  grid-template-columns: 140px 1fr 90px 2fr;
+}
+
+.admin-detail-table-head {
+  background: rgba(255, 255, 255, 0.045);
+  color: #9ca3af;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.admin-detail-table-row {
+  color: #dbeafe;
+  background: rgba(255, 255, 255, 0.018);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.admin-detail-table-row strong {
+  color: #f8fafc;
+}
+
+.admin-decision-box {
+  margin-top: 28px;
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(124, 58, 237, 0.08);
+  border: 1px solid rgba(168, 85, 247, 0.18);
+}
+
+.admin-decision-box label {
+  display: block;
+  margin-bottom: 6px;
+  color: #f8fafc;
+  font-weight: 800;
+}
+
+.admin-decision-box p {
+  margin: 0 0 12px;
+  color: #a1a1aa;
+  font-size: 14px;
+}
+
+.admin-decision-box textarea {
+  width: 100%;
+  min-height: 130px;
+  resize: vertical;
+  border-radius: 16px;
+  padding: 14px 16px;
+  color: #f8fafc;
+  background: rgba(7, 10, 20, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  outline: none;
+  font: inherit;
+}
+
+.admin-decision-box textarea:focus {
+  border-color: rgba(168, 85, 247, 0.65);
+  box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.12);
+}
+
+.admin-detail-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.admin-approve-button,
+.admin-reject-button {
+  border: none;
+  border-radius: 14px;
+  padding: 12px 18px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-approve-button {
+  color: #052e16;
+  background: linear-gradient(135deg, #86efac, #22c55e);
+}
+
+.admin-reject-button {
+  color: #fff;
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+}
+
+.admin-approve-button:disabled,
+.admin-reject-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .admin-detail-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-detail-table {
+    overflow-x: auto;
+  }
+
+  .admin-detail-table-head,
+  .admin-detail-table-row {
+    min-width: 900px;
+  }
+
+  .admin-detail-header {
+    flex-direction: column;
+  }
+}

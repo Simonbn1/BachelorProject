@@ -54,9 +54,11 @@ export default function AdminTimesheetPage() {
 
   const [selectedWeek, setSelectedWeek] = useState(initialWeek);
   const [weekStart, setWeekStart] = useState(weekValueToMonday(initialWeek));
+
   const [items, setItems] = useState<AdminTimesheetSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   const [selectedTimesheetId, setSelectedTimesheetId] = useState<number | null>(
     null,
   );
@@ -116,6 +118,7 @@ export default function AdminTimesheetPage() {
         userId: detail.userId,
         weekStart: detail.weekStart,
       });
+
       await loadOverview();
       const updated = await fetchAdminTimesheetDetail(detail.timesheetId);
       setDetail(updated);
@@ -137,6 +140,7 @@ export default function AdminTimesheetPage() {
         weekStart: detail.weekStart,
         comment: rejectComment,
       });
+
       await loadOverview();
       const updated = await fetchAdminTimesheetDetail(detail.timesheetId);
       setDetail(updated);
@@ -190,7 +194,7 @@ export default function AdminTimesheetPage() {
       {!loading && !error && items.length > 0 && (
         <AdminOverviewTable
           items={items}
-          onOpenDetails={(timesheetId) => setSelectedTimesheetId(timesheetId)}
+          onOpenDetails={(id) => setSelectedTimesheetId(id)}
         />
       )}
 
@@ -209,85 +213,127 @@ export default function AdminTimesheetPage() {
       )}
 
       {detail && !detailLoading && (
-        <div className="admin-info-card">
-          <h2 style={{ marginTop: 0 }}>{detail.userName}</h2>
-          <p>Status: {detail.status}</p>
-          <p>Uke: {detail.weekStart}</p>
-          <p>Totalt: {detail.totalHours.toFixed(1)} timer</p>
-
-          <h3>Timer</h3>
-          {detail.timeEntries.length === 0 ? (
-            <p>Ingen førte timer.</p>
-          ) : (
+        <section className="admin-detail-panel">
+          <div className="admin-detail-header">
             <div>
-              {detail.timeEntries.map((entry) => (
-                <div key={entry.id} style={{ marginBottom: "10px" }}>
-                  <strong>{entry.projectName}</strong> – {entry.workItemTitle} –{" "}
-                  {entry.entryDate} – {entry.hours}t
-                  {entry.description && <div>{entry.description}</div>}
-                </div>
-              ))}
+              <p className="admin-eyebrow">DETALJER</p>
+              <h2>{detail.userName}</h2>
+              <p>{detail.userEmail}</p>
             </div>
-          )}
 
-          <h3>Fravær</h3>
-          {detail.absences.length === 0 ? (
-            <p>Ingen registrert fravær.</p>
-          ) : (
+            <span
+              className={`admin-status-pill status-${detail.status.toLowerCase()}`}
+            >
+              {detail.status}
+            </span>
+          </div>
+
+          <div className="admin-detail-stats">
             <div>
-              {detail.absences.map((absence) => (
-                <div key={absence.id} style={{ marginBottom: "10px" }}>
-                  <strong>{absence.type}</strong> – {absence.absenceDate} –{" "}
-                  {absence.hours}t
-                  {absence.description && <div>{absence.description}</div>}
-                </div>
-              ))}
+              <span>Uke</span>
+              <strong>{detail.weekStart}</strong>
             </div>
-          )}
+            <div>
+              <span>Totalt</span>
+              <strong>{detail.totalHours.toFixed(1)} timer</strong>
+            </div>
+            <div>
+              <span>Fravær</span>
+              <strong>{detail.absences.length > 0 ? "Ja" : "Nei"}</strong>
+            </div>
+          </div>
 
-          <div style={{ marginTop: "20px" }}>
-            <label htmlFor="rejectComment">Kommentar ved avslag</label>
+          <div className="admin-detail-section">
+            <h3>Timer</h3>
+
+            {detail.timeEntries.length === 0 ? (
+              <p className="admin-muted">Ingen førte timer.</p>
+            ) : (
+              <div className="admin-detail-table">
+                <div className="admin-detail-table-head">
+                  <span>Dato</span>
+                  <span>Prosjekt</span>
+                  <span>Oppgave</span>
+                  <span>Timer</span>
+                  <span>Beskrivelse</span>
+                </div>
+
+                {detail.timeEntries.map((entry) => (
+                  <div className="admin-detail-table-row" key={entry.id}>
+                    <span>{entry.entryDate}</span>
+                    <strong>{entry.projectName}</strong>
+                    <span>{entry.workItemTitle}</span>
+                    <span>{entry.hours}t</span>
+                    <span>{entry.description || "—"}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="admin-detail-section">
+            <h3>Fravær</h3>
+
+            {detail.absences.length === 0 ? (
+              <p className="admin-muted">Ingen registrert fravær.</p>
+            ) : (
+              <div className="admin-detail-table">
+                <div className="admin-detail-table-head absence">
+                  <span>Dato</span>
+                  <span>Type</span>
+                  <span>Timer</span>
+                  <span>Beskrivelse</span>
+                </div>
+
+                {detail.absences.map((absence) => (
+                  <div
+                    className="admin-detail-table-row absence"
+                    key={absence.id}
+                  >
+                    <span>{absence.absenceDate}</span>
+                    <strong>{absence.type}</strong>
+                    <span>{absence.hours}t</span>
+                    <span>{absence.description || "—"}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="admin-decision-box">
+            <label htmlFor="rejectComment">Tilbakemelding ved avslag</label>
+            <p>
+              Skriv en kort forklaring dersom timelisten skal sendes tilbake.
+            </p>
+
             <textarea
               id="rejectComment"
               value={rejectComment}
               onChange={(e) => setRejectComment(e.target.value)}
-              rows={4}
-              style={{
-                width: "100%",
-                marginTop: "8px",
-                borderRadius: "12px",
-                padding: "12px",
-              }}
+              placeholder="F.eks. feil prosjekt eller manglende beskrivelse..."
             />
           </div>
 
-          <div
-            style={{
-              display: "flex",
-              gap: "12px",
-              marginTop: "20px",
-              flexWrap: "wrap",
-            }}
-          >
+          <div className="admin-detail-actions">
             <button
               type="button"
-              className="admin-action-button"
+              className="admin-approve-button"
               onClick={handleApprove}
-              disabled={decisionLoading}
+              disabled={decisionLoading || detail.status === "APPROVED"}
             >
               Godkjenn
             </button>
 
             <button
               type="button"
-              className="admin-action-button"
+              className="admin-reject-button"
               onClick={handleReject}
               disabled={decisionLoading}
             >
-              Avslå
+              Avslå og send tilbake
             </button>
           </div>
-        </div>
+        </section>
       )}
     </div>
   );

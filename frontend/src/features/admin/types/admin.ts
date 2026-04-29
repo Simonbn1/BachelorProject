@@ -12,6 +12,7 @@ export type AdminTimesheetDetail = {
   timesheetId: number;
   userId: number;
   userName: string;
+  userEmail?: string;
   weekStart: string;
   status: "NOT_SENT" | "SENT" | "APPROVED" | "REJECTED";
   totalHours: number;
