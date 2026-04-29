@@ -2,7 +2,13 @@ package no.timeforing.BachelorProject.user.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "users")
 public class User {
@@ -26,7 +32,6 @@ public class User {
 
     private String entraObjectId;
 
-    public User() {}
 
     public User(String displayName, String email, String passwordHash, String role) {
         this.displayName = displayName;
@@ -35,15 +40,4 @@ public class User {
         this.role = role;
     }
 
-    public Long getId() { return id; }
-    public String getDisplayName() { return displayName; }
-    public void setDisplayName(String displayName) { this.displayName = displayName; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public String getPasswordHash() { return passwordHash; }
-    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
-    public String getEntraObjectId() { return entraObjectId; }
-    public void setEntraObjectId(String entraObjectId) { this.entraObjectId = entraObjectId; }
 }

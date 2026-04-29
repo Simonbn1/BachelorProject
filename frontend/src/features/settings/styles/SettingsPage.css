@@ -55,12 +55,23 @@
 
 /* Card */
 .settings-card {
+  display: flex;
+  flex-direction: column;
   margin: 0 auto 2.5rem;
   background: #13152a;
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 16px;
   padding: 2rem;
   max-width: 600px;
+}
+
+.settings-footer-actions {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: auto;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    justify-content: flex-end;
 }
 
 /* Avatar */

@@ -1,91 +1,37 @@
 import { useNavigate } from "react-router-dom";
-import { useRef, useState } from "react";
-import { Camera, Check, Eye, EyeOff, Lock, User, X } from "lucide-react";
+import { Camera, Eye, EyeOff, Lock, User, X } from "lucide-react";
 import "../styles/SettingsPage.css";
+import { useSettings } from "../hooks/useSettings.ts";
 
 export default function SettingsPage() {
   const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [activeSection, setActiveSection] = useState<
-    "name" | "password" | null
-  >(null);
-
-  const [name, setName] = useState("Test User");
-  const [nameInput, setNameInput] = useState("Test User");
-
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [repeatPassword, setRepeatPassword] = useState("");
-  const [showCurrent, setShowCurrent] = useState(false);
-  const [showNew, setShowNew] = useState(false);
-  const [showRepeat, setShowRepeat] = useState(false);
-
-  const [nameSuccess, setNameSuccess] = useState(false);
-  const [passwordSuccess, setPasswordSuccess] = useState(false);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
-
-  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) {
-      return;
-    }
-    const url = URL.createObjectURL(file);
-    setAvatarUrl(url);
-  }
-
-  function handleNameSave() {
-    if (!nameInput.trim()) return;
-    setName(nameInput.trim());
-    setNameSuccess(true);
-    setTimeout(() => {
-      setNameSuccess(false);
-      setActiveSection(null);
-    }, 1500);
-  }
-
-  function handlePasswordSave() {
-    setPasswordError(null);
-    if (!currentPassword) {
-      setPasswordError("Skriv inn nåværende passord.");
-      return;
-    }
-
-    if (newPassword.length < 8) {
-      setPasswordError("Nytt passord må være minst 8 tegn.");
-      return;
-    }
-
-    if (newPassword !== repeatPassword) {
-      setPasswordError("Passordene stemmer ikke overens.");
-      return;
-    }
-    setPasswordSuccess(true);
-    setCurrentPassword("");
-    setNewPassword("");
-    setRepeatPassword("");
-    setTimeout(() => {
-      setPasswordSuccess(false);
-      setActiveSection(null);
-    }, 1500);
-  }
-
-  function cancelSection() {
-    setActiveSection(null);
-    setNameInput(name);
-    setCurrentPassword("");
-    setNewPassword("");
-    setRepeatPassword("");
-    setPasswordError(null);
-  }
-
-  const initials = name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+  const {
+    fileInputRef,
+    avatarUrl,
+    pendingAvatarUrl,
+    activeSection,
+    setActiveSection,
+    name,
+    nameInput,
+    setNameInput,
+    currentPassword,
+    setCurrentPassword,
+    newPassword,
+    setNewPassword,
+    repeatPassword,
+    setRepeatPassword,
+    showCurrent,
+    setShowCurrent,
+    showNew,
+    setShowNew,
+    showRepeat,
+    setShowRepeat,
+    passwordError,
+    initials,
+    handleAvatarChange,
+    cancelSection,
+    handleSave,
+  } = useSettings();
 
   return (
     <div className="page settings-page">
@@ -115,9 +61,9 @@ export default function SettingsPage() {
                 className="settings-avatar-wrap"
                 onClick={() => fileInputRef.current?.click()}
               >
-                {avatarUrl ? (
+                {(pendingAvatarUrl ?? avatarUrl) ? (
                   <img
-                    src={avatarUrl}
+                    src={pendingAvatarUrl ?? avatarUrl!}
                     alt="Profilbilde"
                     className="settings-avatar-img"
                   />
@@ -159,6 +105,7 @@ export default function SettingsPage() {
                 <button
                   className="settings-edit-btn"
                   onClick={() => {
+                    console.log("Setting activeSection to name");
                     setActiveSection("name");
                     setNameInput(name);
                   }}
@@ -177,27 +124,6 @@ export default function SettingsPage() {
                   placeholder="Fullt navn"
                   autoFocus
                 />
-
-                <div className="settings-edit-actions">
-                  <button
-                    className="settings-save-btn"
-                    onClick={handleNameSave}
-                  >
-                    {nameSuccess ? (
-                      <>
-                        <Check size={15} /> Lagret!{" "}
-                      </>
-                    ) : (
-                      "Lagre"
-                    )}
-                  </button>
-                  <button
-                    className="settings-cancel-btn"
-                    onClick={cancelSection}
-                  >
-                    <X size={15} /> Avbryt
-                  </button>
-                </div>
               </div>
             )}
 
@@ -275,31 +201,18 @@ export default function SettingsPage() {
                     {showRepeat ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
-                {passwordError && (
-                  <p className="settings-error">{passwordError}</p>
-                )}
-                <div className="settings-edit-actions">
-                  <button
-                    className="settings-save-btn"
-                    onClick={handlePasswordSave}
-                  >
-                    {passwordSuccess ? (
-                      <>
-                        <Check size={15} /> Lagret!
-                      </>
-                    ) : (
-                      "Lagre"
-                    )}
-                  </button>
-                  <button
-                    className="settings-cancel-btn"
-                    onClick={cancelSection}
-                  >
-                    <X size={15} /> Avbryt
-                  </button>
-                </div>
               </div>
             )}
+            {passwordError && <p className="settings-error">{passwordError}</p>}
+
+            <div className="settings-footer-actions">
+              <button className="settings-save-btn" onClick={handleSave}>
+                Lagre
+              </button>
+              <button className="settings-cancel-btn" onClick={cancelSection}>
+                <X size={15} /> Avbryt
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -1,5 +1,12 @@
 package no.timeforing.BachelorProject.user.dto;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
 public class AdminUserResponse {
 
     private Long id;
@@ -14,19 +21,4 @@ public class AdminUserResponse {
         this.role = role;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getRole() {
-        return role;
-    }
 }
