@@ -2,13 +2,23 @@ import "../styles/TopBar.css";
 import { useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import { clearAuth, getAuthUser } from "../../features/auth/types/auth";
+import { useEffect, useState } from "react";
 
 export default function TopBar() {
   const navigate = useNavigate();
 
-  const user = getAuthUser();
+  const [user, setUser] = useState(getAuthUser);
   const userName = user?.displayName || "User";
   const initial = userName.charAt(0).toUpperCase();
+
+  useEffect(() => {
+    function handleStorageChange() {
+      setUser(getAuthUser());
+    }
+    window.addEventListener("storageChange", handleStorageChange);
+    return () =>
+      window.removeEventListener("storageChange", handleStorageChange);
+  }, []);
 
   const handleLogout = () => {
     clearAuth();

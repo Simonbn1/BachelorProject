@@ -50,8 +50,20 @@ export function useSettings() {
         },
         body: JSON.stringify({ displayName: nameInput.trim() }),
       });
+      setName(nameInput.trim());
       setNameInput(nameInput.trim());
       setActiveSection(null);
+
+      const storedUser = JSON.parse(localStorage.getItem("authUser") ?? "{}");
+      localStorage.setItem(
+        "authUser",
+        JSON.stringify({
+          ...storedUser,
+          displayName: nameInput.trim(),
+        }),
+      );
+      window.dispatchEvent(new Event("storageChange", {}));
+
       showToast("success", "Navn oppdatert!");
     } catch {
       showToast("error", "Kunne ikke oppdatere navn.");
@@ -128,6 +140,9 @@ export function useSettings() {
   useEffect(() => {
     async function loadProfile() {
       try {
+        const token = getAccessToken();
+        if (!token) return;
+
         const res = await fetch("/api/users/me", {
           headers: { Authorization: `Bearer ${getAccessToken()}` },
         });
