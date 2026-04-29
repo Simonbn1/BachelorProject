@@ -6,6 +6,7 @@ import no.timeforing.BachelorProject.user.dto.UserProfileResponse;
 import no.timeforing.BachelorProject.user.service.UserProfileService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,7 +21,7 @@ public class UserProfileController {
 
     @GetMapping
     public UserProfileResponse getMe(Authentication authentication) {
-        return userProfileService.getMe(authentication.getName());
+        return userProfileService.getMe(getEmail(authentication));
     }
 
     @PatchMapping
@@ -28,7 +29,7 @@ public class UserProfileController {
             Authentication authentication,
             @RequestBody UpdateProfileRequest request
     ) {
-        return userProfileService.updateProfile(authentication.getName(), request);
+        return userProfileService.updateProfile(getEmail(authentication), request);
     }
 
     @PatchMapping("/password")
@@ -36,7 +37,27 @@ public class UserProfileController {
             Authentication authentication,
             @RequestBody UpdatePasswordRequest request
     ) {
-        userProfileService.updatePassword(authentication.getName(), request);
+        userProfileService.updatePassword(getEmail(authentication), request);
         return ResponseEntity.noContent().build();
+    }
+
+    private String getEmail(Authentication authentication) {
+        if (authentication.getPrincipal() instanceof Jwt jwt) {
+            String email = jwt.getClaimAsString("email");
+
+            if (email == null || email.isBlank()) {
+                email = jwt.getClaimAsString("preferred_username");
+            }
+
+            if (email == null || email.isBlank()) {
+                email = jwt.getSubject();
+            }
+
+            System.out.println("PROFILE EMAIL FROM JWT: " + email);
+            return email;
+        }
+
+        System.out.println("PROFILE AUTH NAME: " + authentication.getName());
+        return authentication.getName();
     }
 }
