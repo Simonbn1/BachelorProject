@@ -37,10 +37,17 @@ export function useSettings() {
   }
 
   async function handleNameSave() {
-    if (!nameInput.trim()) {
-      showToast("warning", "Type your full name to change it");
+    const nameError = validateName(nameInput);
+    if (nameError) {
+      showToast("warning", nameError);
       return;
     }
+
+    if (nameInput.trim() === name) {
+      showToast("warning", "Navnet er det samme som det nåværende");
+      return;
+    }
+
     try {
       await fetch(`/api/users/me`, {
         method: "PATCH",
@@ -73,18 +80,20 @@ export function useSettings() {
 
   async function handlePasswordSave() {
     setPasswordError(null);
+
     if (!currentPassword) {
       setPasswordError("Skriv inn nåværende passord.");
       return;
     }
 
-    if (newPassword.length < 8) {
-      setPasswordError("Nytt passord må være minst 8 tegn.");
+    if (newPassword !== repeatPassword) {
+      setPasswordError("Passordene stemmer ikke overens");
       return;
     }
 
-    if (newPassword !== repeatPassword) {
-      setPasswordError("Passordene stemmer ikke overens.");
+    const pwError = validateNewPassword(newPassword);
+    if (pwError) {
+      setPasswordError(pwError);
       return;
     }
 
@@ -135,6 +144,25 @@ export function useSettings() {
     }
     if (activeSection === "name") await handleNameSave();
     else if (activeSection === "password") await handlePasswordSave();
+  }
+
+  function validateName(name: string): string | null {
+    const parts = name.trim().split(/\s+/);
+    if (parts.length < 2)
+      return "Vennligst oppgi fullt navn (fornavn og etternavn).";
+    if (name.trim().length > 100)
+      return "Navn kan ikke være lengre enn 100 tegn.";
+    if (!/^[a-zA-ZæøåÆØÅ -]+$/.test(name.trim()))
+      return "Navn kan kun inneholde bokstaver, mellomrom og bindestrek.";
+    return null;
+  }
+
+  function validateNewPassword(password: string): string | null {
+    if (password.length < 8) return "Passordet må minst være 8 tegn";
+    if (!/[a-zA-ZæøåÆØÅ]/.test(password))
+      return "Passordet må inneholde minst en bokstav";
+    if (!/\d/.test(password)) return "Passordet må inneholde minst ett tall.";
+    return null;
   }
 
   useEffect(() => {

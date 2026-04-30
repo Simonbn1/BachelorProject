@@ -51,6 +51,13 @@ export function validateRegister(
     };
   }
 
+  if (!/\d/.test(password)) {
+    return {
+      message: "Passordet må inneholde minst ett tall.",
+      field: "password",
+    };
+  }
+
   if (!confirmPassword) {
     return { message: "Vennligst genta passordet.", field: "confirmPassword" };
   }

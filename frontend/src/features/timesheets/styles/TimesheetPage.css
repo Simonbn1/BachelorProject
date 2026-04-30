@@ -162,10 +162,17 @@
 }
 
 .week-nav-btn {
-  width: 36px;
-  height: 36px;
-  padding: 0;
+  width: 36px !important;
+  height: 36px !important;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
   justify-content: center;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
 }
 
 .timesheet-header h5 {

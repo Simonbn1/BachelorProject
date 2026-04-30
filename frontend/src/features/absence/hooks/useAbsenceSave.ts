@@ -24,7 +24,8 @@ export function useAbsenceSave({
   const { showToast } = useToasts();
 
   async function handleSave() {
-    const userId = Number(localStorage.getItem("userId") ?? "1");
+    const authUser = JSON.parse(localStorage.getItem("authUser") ?? "{}");
+    const userId = authUser?.id;
 
     if (!absenceType) {
       showToast(
