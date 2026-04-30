@@ -63,8 +63,14 @@ export function useTimesheetActions({
     const normalized = value.replace(",", ".");
     const key = `${workItemId}-${day}`;
 
+    if (normalized.startsWith("-")) {
+      setHoursError("Du kan ikke registrere negative timer.");
+      return;
+    }
+
     if (normalized === "" || /^(\d+)?([.]\d{0,1})?$/.test(normalized)) {
       const parsed = parseFloat(normalized);
+
       if (!isNaN(parsed) && parsed > 16) {
         setHoursError("Du kan ikke registrere mer enn 16 timer per dag.");
         return;
@@ -140,12 +146,39 @@ export function useTimesheetActions({
 
   async function handleSave(): Promise<boolean> {
     const userId = 1;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const weekStartDate = new Date(weekStart);
+
+    if (weekStartDate > today) {
+      showToast(
+        "warning",
+        "Fremtidig uke",
+        "Du kan ikke registrere timer for en uke som ikke har startet enda.",
+        true,
+      );
+      return false;
+    }
 
     if (visibleProjects.length === 0) {
       showToast(
         "warning",
         "Ingen prosjekter",
         "Legg til et prosjekt før du lagrer.",
+        true,
+      );
+      return false;
+    }
+
+    const hasAnyHours = Object.values(hours ?? {}).some(
+      (v) => parseFloat(v.replace(",", ".")) > 0,
+    );
+
+    if (!hasAnyHours) {
+      showToast(
+        "warning",
+        "Ingen timer",
+        "Registrer timer før du lagrer.",
         true,
       );
       return false;

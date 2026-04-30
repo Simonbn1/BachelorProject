@@ -155,6 +155,7 @@ export function TimesheetPage({
   const showAddProjectButton = !isLocked;
   const showDeleteButton = !isLocked;
   const statusLabel = getStatusLabel(timesheetStatus);
+  const isFutureWeek = new Date(weekStart) > new Date();
 
   return (
     <div className={embedded ? "page page--embedded" : "page"}>
@@ -343,6 +344,7 @@ export function TimesheetPage({
               <button
                 className="add-project"
                 type="button"
+                disabled={isFutureWeek}
                 onClick={() => setIsAddModalOpen(true)}
               >
                 + Legg til nytt prosjekt
@@ -368,12 +370,19 @@ export function TimesheetPage({
                 </button>
               )}
 
+              {isFutureWeek && (
+                <p className="hours-error">
+                  Du kan ikke registrere timer for en fremtidig uke.
+                </p>
+              )}
+
               {showDraftButton && (
                 <button
                   className={
                     hasUnsavedChanges ? "save-btn" : "save-btn save-btn--saved"
                   }
                   type="button"
+                  disabled={isFutureWeek}
                   onClick={handleSave}
                 >
                   Lagre kladd
@@ -384,6 +393,7 @@ export function TimesheetPage({
                 <button
                   className="save-btn save-btn--primary"
                   type="button"
+                  disabled={isFutureWeek}
                   onClick={handleSubmitTimesheet}
                 >
                   Send inn

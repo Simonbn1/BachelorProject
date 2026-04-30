@@ -568,3 +568,20 @@ textarea.dark-input {
   background: transparent !important;
   color: #ffffff;
 }
+
+.save-btn:disabled,
+.add-project:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+  background: transparent;
+}
+
+.save-btn--primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+  background: linear-gradient(90deg, #c600ff, #6a5cff);
+}
