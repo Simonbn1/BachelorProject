@@ -156,6 +156,11 @@ export function TimesheetPage({
   const showDeleteButton = !isLocked;
   const statusLabel = getStatusLabel(timesheetStatus);
   const isFutureWeek = new Date(weekStart) > new Date();
+  const earliestAllowed = new Date();
+  earliestAllowed.setMonth(earliestAllowed.getMonth() - 1);
+  earliestAllowed.setDate(1);
+  earliestAllowed.setHours(0, 0, 0, 0);
+  const isPastLimit = new Date(weekStart) < earliestAllowed;
 
   return (
     <div className={embedded ? "page page--embedded" : "page"}>
@@ -382,7 +387,7 @@ export function TimesheetPage({
                     hasUnsavedChanges ? "save-btn" : "save-btn save-btn--saved"
                   }
                   type="button"
-                  disabled={isFutureWeek}
+                  disabled={isFutureWeek || isPastLimit}
                   onClick={handleSave}
                 >
                   Lagre kladd
@@ -393,7 +398,7 @@ export function TimesheetPage({
                 <button
                   className="save-btn save-btn--primary"
                   type="button"
-                  disabled={isFutureWeek}
+                  disabled={isFutureWeek || isPastLimit}
                   onClick={handleSubmitTimesheet}
                 >
                   Send inn
