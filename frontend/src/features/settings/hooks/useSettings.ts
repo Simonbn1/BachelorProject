@@ -10,8 +10,10 @@ export function useSettings() {
     "name" | "password" | null
   >(null);
 
-  const [name, setName] = useState("Test User");
-  const [nameInput, setNameInput] = useState("Test User");
+  const storedUser = JSON.parse(localStorage.getItem("authUser") ?? "{}");
+  const initialName = storedUser?.displayName ?? "";
+  const [name, setName] = useState(initialName);
+  const [nameInput, setNameInput] = useState(initialName);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -131,7 +133,7 @@ export function useSettings() {
 
   const initials = name
     .split(" ")
-    .map((w) => w[0])
+    .map((w: string) => w[0])
     .join("")
     .toUpperCase()
     .slice(0, 2);
