@@ -45,7 +45,6 @@ export default function EmployeeDashboardPage() {
   return (
     <section className="employee-dashboard-card-wrap">
       <div className="employee-dashboard-header">
-        <p className="employee-dashboard-kicker">TIMEOPPFØLGING</p>
         <h1>Hei, {firstName}</h1>
         <p className="employee-dashboard-subtitle">
           Her kan du føre timer, registrere fravær og administrere kontoen din.

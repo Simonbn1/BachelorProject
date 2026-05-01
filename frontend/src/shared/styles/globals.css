@@ -57,3 +57,161 @@ body {
 .app-content {
   margin-top: 28px;
 }
+
+/* Page layout */
+
+.page {
+  min-height: auto;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.page-shell {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.page-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  margin: 8px 0 30px;
+}
+
+.page-back-button:hover {
+  color: #ffffff;
+  transform: translateX(-2px);
+}
+
+.page-back-button:focus-visible {
+  outline: 2px solid rgba(143, 160, 255, 0.7);
+  outline-offset: 6px;
+  border-radius: 8px;
+}
+
+.page-kicker {
+  margin: 2px 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(226, 232, 255, 0.68);
+}
+
+.page-intro-header {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.page-intro-text {
+  margin-top: -1rem;
+  margin-left: 0.5rem;
+}
+
+.page-title {
+  margin: 0;
+  font-size: clamp(2.2rem, 4vw, 3.6rem);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #f5f7ff;
+}
+
+.page-subtitle {
+  margin-top: 10px;
+  max-width: 560px;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(233, 238, 255, 0.76);
+}
+
+/* Card */
+
+.timesheet-card {
+  background: rgba(16, 21, 36, 0.72);
+  border-radius: 24px;
+  padding: 28px 26px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+  color: white;
+}
+
+/* Buttons */
+
+.add-project,
+.save-btn {
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease,
+    opacity 0.18s ease,
+    filter 0.18s ease;
+}
+
+.add-project {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 10px 14px;
+}
+
+.save-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  padding: 10px 16px;
+}
+
+.add-project:hover,
+.save-btn:hover {
+  background: linear-gradient(90deg, #c600ff, #6a5cff);
+  border-color: transparent;
+  transform: translateY(-1px);
+}
+
+.save-btn--primary {
+  background: linear-gradient(90deg, #c600ff, #6a5cff);
+  border-color: transparent;
+  font-weight: 800;
+}
+
+.save-btn--primary:hover {
+  filter: brightness(1.08);
+}
+
+.save-btn--saved {
+  opacity: 0.45;
+}
+
+/* Form inputs*/
+
+.dark-input {
+  width: 300px;
+  padding: 11px 14px;
+  box-sizing: border-box;
+  background: #2e335a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  color: white;
+  outline: none;
+}
+
+.dark-input option {
+  background: #2e335a;
+}
+
+textarea.dark-input {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.action-buttons {
+  display: flex;
+  margin-top: 24px;
+}

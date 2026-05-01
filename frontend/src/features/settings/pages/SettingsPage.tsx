@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Camera, Eye, EyeOff, Lock, User, X } from "lucide-react";
 import "../styles/SettingsPage.css";
 import { useSettings } from "../hooks/useSettings.ts";
+import "../../../shared/styles/globals.css";
 
 export default function SettingsPage() {
   const navigate = useNavigate();

@@ -15,24 +15,6 @@
   margin-bottom: 34px;
 }
 
-.saved-back-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 28px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  color: rgba(233, 238, 255, 0.68);
-  font: inherit;
-  font-size: 0.92rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition:
-    color 0.18s ease,
-    transform 0.18s ease;
-}
-
 .saved-back-button:hover {
   color: #ffffff;
   transform: translateX(-2px);

@@ -8,6 +8,7 @@ import { useTimesheetActions } from "../hooks/useTimesheetActions.ts";
 import { useAbsenceNavigation } from "../hooks/useAbsenceNavigation.ts";
 import { useTimesheetExport } from "../hooks/useTimesheetExport.ts";
 import { submitTimesheet } from "../api/timesheetsApi.ts";
+import "../../../shared/styles/globals.css";
 
 type TimesheetPageProps = {
   embedded?: boolean;
@@ -165,27 +166,24 @@ export function TimesheetPage({
   return (
     <div className={embedded ? "page page--embedded" : "page"}>
       <div
-        className={
-          embedded
-            ? "timesheet-shell timesheet-shell--embedded"
-            : "timesheet-shell"
-        }
+        className={embedded ? "page-shell page-shell--embedded" : "page-shell"}
       >
         <div className="page-intro">
-          {showBackButton && (
-            <button
-              type="button"
-              className="page-back-button"
-              onClick={() => navigate("/dashboard")}
-            >
-              ← Oversikt
-            </button>
-          )}
+          <div className="page-intro-header">
+            {showBackButton && (
+              <button
+                type="button"
+                className="page-back-button"
+                onClick={() => navigate("/dashboard")}
+              >
+                ← Oversikt
+              </button>
+            )}
 
-          <div className="page-intro-text">
-            <p className="page-kicker">TIMEOPPFØLGING</p>
-            <h1 className="page-title">{title}</h1>
-            <p className="page-subtitle">{subtitle}</p>
+            <div className="page-intro-text">
+              <h1 className="page-title">{title}</h1>
+              <p className="page-subtitle">{subtitle}</p>
+            </div>
           </div>
         </div>
 

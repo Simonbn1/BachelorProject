@@ -4,6 +4,7 @@ import { useAbsence } from "../hooks/useAbsence.ts";
 import { useAbsenceSave } from "../hooks/useAbsenceSave.ts";
 import "../styles/AbsencePage.css";
 import { useNavigate } from "react-router-dom";
+import "../../../shared/styles/globals.css";
 
 export default function AbsencePage() {
   const navigate = useNavigate();
@@ -43,22 +44,23 @@ export default function AbsencePage() {
 
   return (
     <div className="page">
-      <div className="timesheet-shell">
+      <div className="page-shell">
         <div className="page-intro">
-          <button
-            type="button"
-            className="page-back-button"
-            onClick={() => navigate("/dashboard")}
-          >
-            ← Oversikt
-          </button>
+          <div className="page-intro-header">
+            <button
+              type="button"
+              className="page-back-button"
+              onClick={() => navigate("/dashboard")}
+            >
+              ← Oversikt
+            </button>
 
-          <div className="page-intro-text">
-            <p className="page-kicker">TIMEOPPFØLGING</p>
-            <h1 className="page-title">Fravær</h1>
-            <p className="page-subtitle">
-              Søk om ferie, permisjon eller annet planlagt fravær.
-            </p>
+            <div className="page-intro-text">
+              <h1 className="page-title">Fravær</h1>
+              <p className="page-subtitle">
+                Søk om ferie, permisjon eller annet planlagt fravær.
+              </p>
+            </div>
           </div>
         </div>
 

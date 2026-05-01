@@ -9,6 +9,7 @@ import {
 import type { MyTimesheet } from "../types/timesheet";
 import TimesheetEditModal from "../components/TimesheetEditModal";
 import "../styles/SavedTimesheetsPage.css";
+import "../../../shared/styles/globals.css";
 
 function formatWeekRange(weekStart: string) {
   const start = new Date(`${weekStart}T00:00:00`);
@@ -161,20 +162,22 @@ export default function SavedTimesheetsPage() {
   return (
     <div className="saved-timesheets-page">
       <div className="saved-timesheets-shell">
-        <div className="saved-timesheets-header">
-          <button
-            type="button"
-            className="saved-back-button"
-            onClick={() => navigate("/dashboard")}
-          >
-            ← Oversikt
-          </button>
-
-          <p className="saved-timesheets-eyebrow">TIMEOPPFØLGING</p>
-          <h1>Mine timer</h1>
-          <p className="saved-timesheets-subtitle">
-            Se egne utkast og innsendinger, åpne dem igjen og følg statusen.
-          </p>
+        <div className="page-intro">
+          <div className="page-intro-header">
+            <button
+              type="button"
+              className="page-back-button"
+              onClick={() => navigate("/dashboard")}
+            >
+              ← Oversikt
+            </button>
+            <div className="page-intro-text">
+              <h1 className="page-title">Mine timer</h1>
+              <p className="page-subtitle">
+                Se egne utkast og innsendinger, åpne dem igjen og følg statusen.
+              </p>
+            </div>
+          </div>
         </div>
 
         {loading && (
