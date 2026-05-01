@@ -347,7 +347,7 @@ export function TimesheetPage({
               <button
                 className="add-project"
                 type="button"
-                disabled={isFutureWeek}
+                disabled={isFutureWeek || isPastLimit}
                 onClick={() => setIsAddModalOpen(true)}
               >
                 + Legg til nytt prosjekt
@@ -376,6 +376,12 @@ export function TimesheetPage({
               {isFutureWeek && (
                 <p className="hours-error">
                   Du kan ikke registrere timer for en fremtidig uke.
+                </p>
+              )}
+
+              {isPastLimit && (
+                <p className="hours-error">
+                  Du kan ikke registrere timer for mer enn en måned tilbake.
                 </p>
               )}
 
