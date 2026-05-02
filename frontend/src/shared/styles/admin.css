@@ -640,3 +640,38 @@
   font-size: 13px;
   color: #9ca3af;
 }
+
+.admin-back-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: auto;
+  margin: 0 0 18px;
+  padding: 0;
+  color: rgba(226, 232, 255, 0.72);
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  font: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition:
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.admin-back-link:hover {
+  color: #f8fafc;
+  transform: translateX(-2px);
+}
+
+.admin-back-link:active {
+  transform: translateX(0);
+}
+
+.admin-back-link:focus-visible {
+  outline: 2px solid rgba(143, 160, 255, 0.7);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
