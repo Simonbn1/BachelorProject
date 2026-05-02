@@ -40,7 +40,6 @@ export default function AdminEmployeesPage() {
             ← Tilbake til oversikt
           </button>
 
-          <p className="admin-eyebrow">TIMEOPPFØLGING</p>
           <h1>Ansatte</h1>
           <p className="admin-subtitle">
             Se brukere, roller og administrativ informasjon.

@@ -45,7 +45,6 @@ export default function AdminProjectsPage() {
             ← Tilbake til oversikt
           </button>
 
-          <p className="admin-eyebrow">TIMEOPPFØLGING</p>
           <h1>Prosjekter</h1>
           <p className="admin-subtitle">
             Se alle tilgjengelige prosjekter i løsningen.

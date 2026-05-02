@@ -49,7 +49,6 @@ export default function AdminDashboardPage() {
   return (
     <div className="admin-dashboard-page">
       <div className="admin-dashboard-header">
-        <p className="admin-dashboard-kicker">TIMEOPPFØLGING</p>
         <h1 className="admin-dashboard-title">Oversikt</h1>
         <p className="admin-dashboard-subtitle">
           Velg en funksjon for å følge opp timer, fakturagrunnlag og ansatte.

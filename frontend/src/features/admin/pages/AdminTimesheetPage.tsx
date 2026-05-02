@@ -202,7 +202,6 @@ export default function AdminTimesheetPage() {
             ← Tilbake til oversikt
           </button>
 
-          <p className="admin-eyebrow">TIMEOPPFØLGING</p>
           <h1>Godkjenn timer</h1>
           <p className="admin-subtitle">
             Se innsendinger per uke, åpne detaljer og godkjenn eller avvis.

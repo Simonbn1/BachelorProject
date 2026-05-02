@@ -131,7 +131,6 @@ export default function AdminExportPage() {
             ← Tilbake til oversikt
           </button>
 
-          <p className="admin-eyebrow">TIMEOPPFØLGING</p>
           <h1>Fakturagrunnlag</h1>
           <p className="admin-subtitle">
             Eksporter godkjente timer og fravær for valgt uke.
