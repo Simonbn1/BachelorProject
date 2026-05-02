@@ -34,10 +34,10 @@ export default function AdminEmployeesPage() {
         <div className="admin-page-header-content">
           <button
             type="button"
-            className="page-back-button"
+            className="admin-back-link"
             onClick={() => navigate("/admin")}
           >
-            ← Tilbake til oversikt
+            ← Oversikt
           </button>
 
           <h1>Ansatte</h1>
