@@ -141,7 +141,7 @@ public class TimesheetExportService {
                             workItemId,
                             workItemTitle
                     )
-            ).addHours(entry.getHours(), entry.getOvertimeHours());
+            ).addHours(entry.getHours(), 0.0);
         }
 
         try (Workbook workbook = new XSSFWorkbook();
