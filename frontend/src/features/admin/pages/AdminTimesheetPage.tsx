@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { DatePicker, type DatesRangeValue } from "@mantine/dates";
+import { DatePicker } from "@mantine/dates";
 import { useNavigate } from "react-router-dom";
 import AdminOverviewTable from "../components/AdminOverviewTable";
 import {
@@ -76,14 +76,6 @@ function formatWeekRange(weekStart: string) {
   const endText = end.toLocaleDateString("nb-NO", options);
 
   return `Uke ${getWeekNumberFromDate(weekStart)} (${startText} – ${endText})`;
-}
-
-function getFridayFromMonday(weekStart: string) {
-  const monday = new Date(`${weekStart}T00:00:00`);
-  const friday = new Date(monday);
-  friday.setDate(monday.getDate() + 4);
-
-  return friday;
 }
 
 function getMondayFromDate(date: Date) {
@@ -213,19 +205,6 @@ export default function AdminTimesheetPage() {
     } finally {
       setDecisionLoading(false);
     }
-  }
-
-  function handleCalendarChange(value: DatesRangeValue) {
-    const selectedDate = value?.[0];
-
-    if (!(selectedDate instanceof Date)) return;
-
-    const monday = getMondayFromDate(selectedDate);
-    const mondayString = formatDateOnly(monday);
-
-    setWeekStart(mondayString);
-    setSelectedTimesheetId(null);
-    setIsCalendarOpen(false);
   }
 
   return (
@@ -439,14 +418,18 @@ export default function AdminTimesheetPage() {
             <h5 className="modal-week-title">{formatWeekRange(weekStart)}</h5>
 
             <DatePicker
-              type="range"
-              value={
-                [
-                  new Date(`${weekStart}T00:00:00`),
-                  getFridayFromMonday(weekStart),
-                ] as DatesRangeValue
-              }
-              onChange={handleCalendarChange}
+              value={weekStart}
+              onChange={(value) => {
+                if (!value) return;
+
+                const selectedDate = new Date(`${value}T00:00:00`);
+                const monday = getMondayFromDate(selectedDate);
+                const mondayString = formatDateOnly(monday);
+
+                setWeekStart(mondayString);
+                setSelectedTimesheetId(null);
+                setIsCalendarOpen(false);
+              }}
               locale="nb"
               firstDayOfWeek={1}
             />
