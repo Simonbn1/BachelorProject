@@ -1,5 +1,5 @@
 import type { AbsencePayloadEntry } from "./useAbsence.ts";
-import { saveAbsencesFromPayload } from "../api/absenceApi.ts";
+import { saveAbsences, saveAbsencesFromPayload } from "../api/absenceApi.ts";
 import { useToasts } from "../../../shared/hooks/useToasts.ts";
 
 type UseAbsenceSaveProps = {
@@ -15,10 +15,13 @@ type UseAbsenceSaveProps = {
 };
 
 export function useAbsenceSave({
+  hours,
   absenceType,
   description,
+  projectId,
   selectedStartDate,
   selectedEndDate,
+  selectedWorkItemIds,
   absencePayload,
 }: UseAbsenceSaveProps) {
   const { showToast } = useToasts();
@@ -26,6 +29,11 @@ export function useAbsenceSave({
   async function handleSave() {
     const authUser = JSON.parse(localStorage.getItem("authUser") ?? "{}");
     const userId = authUser?.id;
+
+    if (!userId) {
+      showToast("error", "Feil", "Fant ikke innlogget bruker.", true);
+      return;
+    }
 
     if (!absenceType) {
       showToast(
@@ -56,29 +64,30 @@ export function useAbsenceSave({
           absencePayload,
         );
       } else {
-        /**
-         * Midlertidig løsning uten prosjekt/arbeidsoppgave:
-         * Bruker samme payload-funksjon, men bygger én søknads-entry.
-         * Backend må enten støtte null/0 workItemId senere,
-         * eller så må dere lage en egen absence application-endpoint.
-         */
-        await saveAbsencesFromPayload(userId, absenceType, description, [
-          {
-            projectId: 0,
-            projectName: "Fravær",
-            workItemId: 0,
-            workItemTitle: absenceType,
-            missingHours: {},
-          },
-        ]);
+        await saveAbsences(
+          userId,
+          absenceType,
+          description,
+          projectId ?? 0,
+          selectedWorkItemIds[0] ?? 0,
+          selectedStartDate,
+          selectedEndDate,
+          hours,
+          true,
+        );
       }
 
-      showToast("success", "Søknad sendt!");
+      showToast(
+        "success",
+        "Søknad sendt!",
+        "Fraværssøknaden ble sendt inn.",
+        true,
+      );
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
-          : "Noe gikk galt. Sjekk konsollen";
+          : "Noe gikk galt. Sjekk konsollen.";
 
       showToast("error", "Feil ved innsending", message, true);
     }
