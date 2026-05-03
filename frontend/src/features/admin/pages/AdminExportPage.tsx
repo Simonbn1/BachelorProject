@@ -1,5 +1,6 @@
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { DatePicker } from "@mantine/dates";
+import { useNavigate } from "react-router-dom";
 import { exportAdminInvoiceBasisExcel } from "../api/adminApi";
 import { useToasts } from "../../../shared/hooks/useToasts";
 import "../../../shared/styles/admin.css";
@@ -24,6 +25,16 @@ function getMondayOfCurrentWeek() {
   return formatLocalDate(monday);
 }
 
+function getMondayFromDate(date: Date) {
+  const day = date.getDay() || 7;
+  const monday = new Date(date);
+
+  monday.setDate(date.getDate() - day + 1);
+  monday.setHours(0, 0, 0, 0);
+
+  return monday;
+}
+
 function getIsoWeek(date: Date) {
   const temp = new Date(date.getTime());
   temp.setHours(0, 0, 0, 0);
@@ -42,36 +53,23 @@ function getIsoWeek(date: Date) {
   };
 }
 
-function toWeekInputValue(weekStart: string) {
-  const date = new Date(`${weekStart}T00:00:00`);
-  const { year, week } = getIsoWeek(date);
-
-  return `${year}-W${String(week).padStart(2, "0")}`;
-}
-
-function getMondayFromWeekValue(weekValue: string) {
-  const [yearText, weekText] = weekValue.split("-W");
-  const year = Number(yearText);
-  const week = Number(weekText);
-
-  const jan4 = new Date(year, 0, 4);
-  const jan4Day = jan4.getDay() || 7;
-
-  const monday = new Date(jan4);
-  monday.setDate(jan4.getDate() - jan4Day + 1 + (week - 1) * 7);
-  monday.setHours(0, 0, 0, 0);
-
-  return formatLocalDate(monday);
-}
-
 function formatWeekLabel(weekStart: string) {
-  const start = new Date(`${weekStart}T00:00:00`);
+  const start = new Date(`${weekStart}T12:00:00`);
   const end = new Date(start);
-  end.setDate(start.getDate() + 6);
+
+  end.setDate(start.getDate() + 4);
 
   const { week } = getIsoWeek(start);
 
-  return `Uke ${week} (${start.toLocaleDateString("nb-NO")} - ${end.toLocaleDateString("nb-NO")})`;
+  const options: Intl.DateTimeFormatOptions = {
+    day: "numeric",
+    month: "short",
+  };
+
+  return `Uke ${week} (${start.toLocaleDateString(
+    "nb-NO",
+    options,
+  )} – ${end.toLocaleDateString("nb-NO", options)})`;
 }
 
 export default function AdminExportPage() {
@@ -79,6 +77,7 @@ export default function AdminExportPage() {
   const { showToast } = useToasts();
 
   const [weekStart, setWeekStart] = useState(getMondayOfCurrentWeek());
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function handleExportInvoiceBasis() {
@@ -146,22 +145,17 @@ export default function AdminExportPage() {
 
         <div className="admin-export-form">
           <div>
-            <label htmlFor="weekStart">Uke</label>
+            <label>Uke</label>
 
-            <input
-              id="weekStart"
-              type="week"
-              value={toWeekInputValue(weekStart)}
-              onChange={(e) =>
-                setWeekStart(getMondayFromWeekValue(e.target.value))
-              }
-              className="admin-export-input"
-            />
+            <button
+              type="button"
+              className="admin-week-picker-button"
+              onClick={() => setIsCalendarOpen(true)}
+            >
+              {formatWeekLabel(weekStart)}
+              <span>🗓</span>
+            </button>
           </div>
-
-          <span className="admin-export-week-label">
-            {formatWeekLabel(weekStart)}
-          </span>
 
           <button
             type="button"
@@ -173,6 +167,44 @@ export default function AdminExportPage() {
           </button>
         </div>
       </section>
+
+      {isCalendarOpen && (
+        <div
+          className="wireframe-modal"
+          onClick={() => setIsCalendarOpen(false)}
+        >
+          <div
+            className="modal-content modal-content--calendar"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="close-btn"
+              type="button"
+              onClick={() => setIsCalendarOpen(false)}
+            >
+              x
+            </button>
+
+            <h5 className="modal-week-title">{formatWeekLabel(weekStart)}</h5>
+
+            <DatePicker
+              value={weekStart}
+              onChange={(value) => {
+                if (!value) return;
+
+                const selectedDate = new Date(`${value}T12:00:00`);
+                const monday = getMondayFromDate(selectedDate);
+                const mondayString = formatLocalDate(monday);
+
+                setWeekStart(mondayString);
+                setIsCalendarOpen(false);
+              }}
+              locale="nb"
+              firstDayOfWeek={1}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
