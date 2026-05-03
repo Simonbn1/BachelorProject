@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { DatePicker, type DatesRangeValue } from "@mantine/dates";
 import { useNavigate } from "react-router-dom";
 import AdminOverviewTable from "../components/AdminOverviewTable";
 import {
@@ -57,6 +58,7 @@ function getWeekNumberFromDate(dateString: string) {
   temp.setUTCDate(temp.getUTCDate() + 4 - dayNum);
 
   const yearStart = new Date(Date.UTC(temp.getUTCFullYear(), 0, 1));
+
   return Math.ceil(((temp.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
 }
 
@@ -76,13 +78,34 @@ function formatWeekRange(weekStart: string) {
   return `Uke ${getWeekNumberFromDate(weekStart)} (${startText} – ${endText})`;
 }
 
+function getFridayFromMonday(weekStart: string) {
+  const monday = new Date(`${weekStart}T00:00:00`);
+  const friday = new Date(monday);
+  friday.setDate(monday.getDate() + 4);
+
+  return friday;
+}
+
+function getMondayFromDate(date: Date) {
+  const day = date.getDay() || 7;
+  const monday = new Date(date);
+
+  monday.setDate(date.getDate() - day + 1);
+  monday.setHours(0, 0, 0, 0);
+
+  return monday;
+}
+
+function formatDateOnly(date: Date) {
+  return date.toISOString().split("T")[0];
+}
+
 export default function AdminTimesheetPage() {
   const navigate = useNavigate();
-
   const initialWeek = getCurrentWeekValue();
 
-  const [selectedWeek, setSelectedWeek] = useState(initialWeek);
   const [weekStart, setWeekStart] = useState(weekValueToMonday(initialWeek));
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const [items, setItems] = useState<AdminTimesheetSummary[]>([]);
   const [loading, setLoading] = useState(false);
@@ -100,6 +123,7 @@ export default function AdminTimesheetPage() {
     try {
       setLoading(true);
       setError("");
+
       const data = await fetchAdminTimesheets(weekStart);
       setItems(data);
     } catch (err) {
@@ -125,6 +149,7 @@ export default function AdminTimesheetPage() {
       try {
         setDetailLoading(true);
         setError("");
+
         const data = await fetchAdminTimesheetDetail(selectedTimesheetId);
         setDetail(data);
         setRejectComment(data.managerComment ?? "");
@@ -190,6 +215,19 @@ export default function AdminTimesheetPage() {
     }
   }
 
+  function handleCalendarChange(value: DatesRangeValue) {
+    const selectedDate = value?.[0];
+
+    if (!(selectedDate instanceof Date)) return;
+
+    const monday = getMondayFromDate(selectedDate);
+    const mondayString = formatDateOnly(monday);
+
+    setWeekStart(mondayString);
+    setSelectedTimesheetId(null);
+    setIsCalendarOpen(false);
+  }
+
   return (
     <div className="admin-page">
       <div className="admin-page-header">
@@ -209,18 +247,16 @@ export default function AdminTimesheetPage() {
         </div>
 
         <div className="admin-filter-card">
-          <label htmlFor="weekStart">Uke</label>
-          <input
-            id="weekStart"
-            type="week"
-            value={selectedWeek}
-            onChange={(e) => {
-              const value = e.target.value;
-              setSelectedWeek(value);
-              setWeekStart(weekValueToMonday(value));
-              setSelectedTimesheetId(null);
-            }}
-          />
+          <label>Uke</label>
+
+          <button
+            type="button"
+            className="admin-week-picker-button"
+            onClick={() => setIsCalendarOpen(true)}
+          >
+            {formatWeekRange(weekStart)}
+            <span>🗓</span>
+          </button>
         </div>
       </div>
 
@@ -381,6 +417,41 @@ export default function AdminTimesheetPage() {
             </button>
           </div>
         </section>
+      )}
+
+      {isCalendarOpen && (
+        <div
+          className="wireframe-modal"
+          onClick={() => setIsCalendarOpen(false)}
+        >
+          <div
+            className="modal-content modal-content--calendar"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="close-btn"
+              type="button"
+              onClick={() => setIsCalendarOpen(false)}
+            >
+              x
+            </button>
+
+            <h5 className="modal-week-title">{formatWeekRange(weekStart)}</h5>
+
+            <DatePicker
+              type="range"
+              value={
+                [
+                  new Date(`${weekStart}T00:00:00`),
+                  getFridayFromMonday(weekStart),
+                ] as DatesRangeValue
+              }
+              onChange={handleCalendarChange}
+              locale="nb"
+              firstDayOfWeek={1}
+            />
+          </div>
+        </div>
       )}
     </div>
   );
