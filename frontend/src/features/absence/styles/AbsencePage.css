@@ -65,3 +65,29 @@
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
+
+.absence-list-table {
+  display: grid;
+  gap: 10px;
+}
+
+.absence-list-row {
+  display: grid;
+  grid-template-columns: 1.5fr 100px 160px 2fr;
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.absence-list-row div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.absence-list-row span {
+  color: rgba(226, 232, 255, 0.72);
+}

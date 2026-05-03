@@ -56,6 +56,21 @@ const DAY_OFFSETS: Record<string, number> = {
   fri: 4,
 };
 
+export type MyAbsence = {
+  id: number;
+  absenceDate: string;
+  type: string;
+  hours: number;
+  description?: string | null;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  managerComment?: string | null;
+};
+
+export async function fetchMyAbsences() {
+  const response = await api.get<MyAbsence[]>("/absences/me");
+  return response.data;
+}
+
 export async function saveAbsences(
   userId: number,
   absenceType: string,

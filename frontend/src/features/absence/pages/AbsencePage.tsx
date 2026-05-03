@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { fetchMyAbsences, type MyAbsence } from "../api/absenceApi.ts";
 import "../../../features/timesheets/styles/TimesheetPage.css";
 import AbsenceForm from "../components/AbsenceForm.tsx";
 import { useAbsence } from "../hooks/useAbsence.ts";
@@ -9,9 +10,24 @@ import "../../../shared/styles/globals.css";
 
 type AbsenceTab = "form" | "mine";
 
+function getStatusLabel(status: MyAbsence["status"]) {
+  switch (status) {
+    case "PENDING":
+      return "Til behandling";
+    case "APPROVED":
+      return "Godkjent";
+    case "REJECTED":
+      return "Avvist";
+    default:
+      return status;
+  }
+}
+
 export default function AbsencePage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<AbsenceTab>("form");
+  const [myAbsences, setMyAbsences] = useState<MyAbsence[]>([]);
+  const [myAbsencesLoading, setMyAbsencesLoading] = useState(false);
 
   const {
     hours,
@@ -45,6 +61,32 @@ export default function AbsencePage() {
     absencePayload,
     days,
   });
+
+  async function loadMyAbsences() {
+    try {
+      setMyAbsencesLoading(true);
+      const data = await fetchMyAbsences();
+      setMyAbsences(data);
+    } catch (error) {
+      console.error("Kunne ikke hente mine fravær:", error);
+    } finally {
+      setMyAbsencesLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (activeTab === "mine") {
+      loadMyAbsences();
+    }
+  }, [activeTab]);
+
+  async function handleSaveAndRefresh() {
+    await handleSave();
+
+    if (activeTab === "mine") {
+      await loadMyAbsences();
+    }
+  }
 
   return (
     <div className="page">
@@ -106,7 +148,7 @@ export default function AbsencePage() {
               onTypeChange={(type) => setAbsenceType(type)}
               onDescriptionChange={(desc) => setDescription(desc)}
               onProjectChange={handleProjectChange}
-              onSave={handleSave}
+              onSave={handleSaveAndRefresh}
               lockedDays={absencePayload ? lockedDaysFromPayload : {}}
               hasAbsenceParams={!!absencePayload}
               hideProjectFields={true}
@@ -124,11 +166,42 @@ export default function AbsencePage() {
           {activeTab === "mine" && (
             <div className="absence-my-list">
               <h2>Mine fravær</h2>
-              <p>Her skal ansatte kunne se status på egne fraværssøknader.</p>
+              <p>Her kan du se status på egne fraværssøknader.</p>
 
-              <div className="absence-empty-state">
-                Ingen fraværssøknader å vise enda.
-              </div>
+              {myAbsencesLoading && (
+                <div className="absence-empty-state">Laster fravær...</div>
+              )}
+
+              {!myAbsencesLoading && myAbsences.length === 0 && (
+                <div className="absence-empty-state">
+                  Ingen fraværssøknader å vise enda.
+                </div>
+              )}
+
+              {!myAbsencesLoading && myAbsences.length > 0 && (
+                <div className="absence-list-table">
+                  {myAbsences.map((absence) => (
+                    <div className="absence-list-row" key={absence.id}>
+                      <div>
+                        <strong>{absence.absenceDate}</strong>
+                        <span>{absence.type}</span>
+                      </div>
+
+                      <div>{absence.hours}t</div>
+
+                      <span
+                        className={`status-pill ${absence.status.toLowerCase()}`}
+                      >
+                        {getStatusLabel(absence.status)}
+                      </span>
+
+                      <div>
+                        {absence.managerComment || absence.description || "—"}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </section>
