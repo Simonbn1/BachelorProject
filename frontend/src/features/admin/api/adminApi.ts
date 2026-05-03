@@ -55,14 +55,14 @@ export type AdminAbsence = {
 };
 
 export async function fetchAdminAbsences() {
-  const response = await api.get<AdminAbsence[]>("/admin/absences");
+  const response = await api.get<AdminAbsence[]>("/api/admin/absences");
   return response.data;
 }
 
 export async function approveAbsence(id: number) {
-  await api.post(`/admin/absences/${id}/approve`);
+  await api.post(`/api/admin/absences/${id}/approve`);
 }
 
 export async function rejectAbsence(id: number, comment: string) {
-  await api.post(`/admin/absences/${id}/reject`, { comment });
+  await api.post(`/api/admin/absences/${id}/reject`, { comment });
 }
