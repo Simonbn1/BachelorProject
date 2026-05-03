@@ -14,6 +14,7 @@ import AdminProjectsPage from "../features/admin/pages/AdminProjectsPage";
 import SavedTimesheetsPage from "../features/timesheets/pages/SavedTimesheetsPage.tsx";
 import AdminExportPage from "../features/admin/pages/AdminExportPage.tsx";
 import SettingsPage from "../features/settings/pages/SettingsPage.tsx";
+import AdminAbsencesPage from "../features/admin/pages/AdminAbsencesPage.tsx";
 
 export const router = createBrowserRouter([
   { path: "/", element: <Navigate to="/login" replace /> },
@@ -46,6 +47,7 @@ export const router = createBrowserRouter([
           { path: "/admin/export", element: <AdminExportPage /> },
           { path: "/admin/employees", element: <AdminEmployeesPage /> },
           { path: "/admin/projects", element: <AdminProjectsPage /> },
+          { path: "/admin/absences", element: <AdminAbsencesPage /> },
         ],
       },
     ],

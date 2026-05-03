@@ -1,8 +1,8 @@
-package no.timeforing.BachelorProject.admin.api.dto;
+package no.timeforing.BachelorProject.absence.dto;
 
 import java.time.LocalDate;
 
-public record AdminAbsenceResponse(
+public record MyAbsenceResponse(
         Long id,
         LocalDate absenceDate,
         String type,

@@ -101,7 +101,9 @@ public class AdminTimesheetService {
                         absence.getAbsenceDate(),
                         absence.getType().name(),
                         absence.getHours(),
-                        absence.getDescription()
+                        absence.getDescription(),
+                        absence.getStatus().name(),
+                        absence.getManagerComment()
                 ))
                 .toList();
 

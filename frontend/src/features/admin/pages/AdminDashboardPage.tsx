@@ -4,6 +4,7 @@ import {
   FileSpreadsheet,
   Users,
   FolderKanban,
+  CalendarX2,
 } from "lucide-react";
 import "../../../shared/styles/AdminDashboardPage.css";
 
@@ -31,6 +32,12 @@ export default function AdminDashboardPage() {
         "Eksporter timer og fravær for videre fakturering og oppfølging.",
       path: "/admin/export",
       icon: FileSpreadsheet,
+    },
+    {
+      title: "Godkjenn søknad om fravær",
+      description: "Behandle ferie, sykdom og annet fravær.",
+      path: "/admin/absences",
+      icon: CalendarX2,
     },
     {
       title: "Ansatte",

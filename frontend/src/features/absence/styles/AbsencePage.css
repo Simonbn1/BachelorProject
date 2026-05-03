@@ -21,3 +21,47 @@
   color: rgba(255, 255, 255, 0.4);
   font-size: 0.8rem;
 }
+
+.absence-tabs {
+  display: inline-flex;
+  gap: 8px;
+  padding: 6px;
+  margin-bottom: 28px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.absence-tab {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  color: rgba(226, 232, 255, 0.72);
+  background: transparent;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.absence-tab--active {
+  color: #f8fafc;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.absence-my-list h2 {
+  margin: 0 0 8px;
+  color: #f8fafc;
+}
+
+.absence-my-list p {
+  margin: 0 0 20px;
+  color: rgba(226, 232, 255, 0.72);
+}
+
+.absence-empty-state {
+  padding: 20px;
+  border-radius: 16px;
+  color: rgba(226, 232, 255, 0.72);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}

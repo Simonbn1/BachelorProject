@@ -43,3 +43,26 @@ export async function exportAdminInvoiceBasisExcel(weekStart: string) {
 
   return response.data;
 }
+
+export type AdminAbsence = {
+  id: number;
+  absenceDate: string;
+  type: "VACATION" | "SICKNESS" | "LEAVE" | "OTHER";
+  hours: number;
+  description?: string | null;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  managerComment?: string | null;
+};
+
+export async function fetchAdminAbsences() {
+  const response = await api.get<AdminAbsence[]>("/admin/absences");
+  return response.data;
+}
+
+export async function approveAbsence(id: number) {
+  await api.post(`/admin/absences/${id}/approve`);
+}
+
+export async function rejectAbsence(id: number, comment: string) {
+  await api.post(`/admin/absences/${id}/reject`, { comment });
+}

@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import no.timeforing.BachelorProject.timesheet.domain.Timesheet;
 import no.timeforing.BachelorProject.absence.domain.enums.AbsenceType;
+import no.timeforing.BachelorProject.absence.domain.enums.AbsenceStatus;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -43,13 +45,29 @@ public class Absence {
   @Column(nullable = false)
   private Long workItemId;
 
-  public Absence(Timesheet timesheet, LocalDate absenceDate, AbsenceType type, String description, double hours, Long projectId,  Long workItemId) {
-    this.timesheet = timesheet;
-    this.absenceDate = absenceDate;
-    this.type = type;
-    this.description = description;
-    this.hours = hours;
-    this.projectId = projectId;
-    this.workItemId = workItemId;
-  }
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AbsenceStatus status = AbsenceStatus.PENDING;
+
+    @Column(length = 1000)
+    private String managerComment;
+
+    public Absence(
+            Timesheet timesheet,
+            LocalDate absenceDate,
+            AbsenceType type,
+            String description,
+            double hours,
+            Long projectId,
+            Long workItemId
+    ) {
+        this.timesheet = timesheet;
+        this.absenceDate = absenceDate;
+        this.type = type;
+        this.description = description;
+        this.hours = hours;
+        this.projectId = projectId;
+        this.workItemId = workItemId;
+        this.status = AbsenceStatus.PENDING;
+    }
 }

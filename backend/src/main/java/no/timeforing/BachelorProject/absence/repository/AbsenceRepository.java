@@ -13,4 +13,6 @@ public interface AbsenceRepository extends JpaRepository<Absence, Long> {
 
   Optional<Absence> findByTimesheetIdAndAbsenceDateAndType(
           Long timesheetId, LocalDate absenceDate, AbsenceType absenceType);
+
+    List<Absence> findByTimesheetUserIdOrderByAbsenceDateDesc(Long userId);
 }
