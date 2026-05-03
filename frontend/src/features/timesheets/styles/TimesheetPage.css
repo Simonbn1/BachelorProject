@@ -435,3 +435,33 @@ textarea.dark-input:focus {
   filter: none;
   background: linear-gradient(90deg, #c600ff, #6a5cff);
 }
+
+.page-intro {
+  display: block;
+}
+
+.page-intro-header {
+  display: block;
+}
+
+.page-intro-text {
+  margin-left: 0;
+}
+
+.page-back-link {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 22px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: rgba(226, 232, 255, 0.65);
+  font: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.page-back-link:hover {
+  color: #fff;
+  transform: translateX(-2px);
+}
