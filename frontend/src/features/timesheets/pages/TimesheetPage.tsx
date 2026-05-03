@@ -173,7 +173,7 @@ export function TimesheetPage({
             {showBackButton && (
               <button
                 type="button"
-                className="page-back-button"
+                className="page-back-link"
                 onClick={() => navigate("/dashboard")}
               >
                 ← Oversikt
