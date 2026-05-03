@@ -67,7 +67,7 @@ export type MyAbsence = {
 };
 
 export async function fetchMyAbsences() {
-  const response = await api.get<MyAbsence[]>("/absences/me");
+  const response = await api.get<MyAbsence[]>("/api/absences/me");
   return response.data;
 }
 
