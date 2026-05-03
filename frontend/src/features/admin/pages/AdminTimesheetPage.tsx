@@ -89,7 +89,11 @@ function getMondayFromDate(date: Date) {
 }
 
 function formatDateOnly(date: Date) {
-  return date.toISOString().split("T")[0];
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
 }
 
 export default function AdminTimesheetPage() {
@@ -422,7 +426,7 @@ export default function AdminTimesheetPage() {
               onChange={(value) => {
                 if (!value) return;
 
-                const selectedDate = new Date(`${value}T00:00:00`);
+                const selectedDate = new Date(`${value}T12:00:00`);
                 const monday = getMondayFromDate(selectedDate);
                 const mondayString = formatDateOnly(monday);
 
