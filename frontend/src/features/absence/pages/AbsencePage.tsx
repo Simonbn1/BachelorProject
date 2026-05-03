@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchMyAbsences, type MyAbsence } from "../api/absenceApi.ts";
 import "../../../features/timesheets/styles/TimesheetPage.css";
@@ -9,6 +9,13 @@ import "../styles/AbsencePage.css";
 import "../../../shared/styles/globals.css";
 
 type AbsenceTab = "form" | "mine";
+
+type AbsenceGroup = {
+  key: string;
+  first: MyAbsence;
+  last: MyAbsence;
+  days: number;
+};
 
 function getStatusLabel(status: MyAbsence["status"]) {
   switch (status) {
@@ -23,11 +30,80 @@ function getStatusLabel(status: MyAbsence["status"]) {
   }
 }
 
+function getTypeLabel(type: string) {
+  switch (type) {
+    case "VACATION":
+      return "Ferie";
+    case "SICKNESS":
+      return "Sykdom";
+    case "LEAVE":
+      return "Permisjon";
+    case "OTHER":
+      return "Annet";
+    default:
+      return type;
+  }
+}
+
+function formatDate(dateString: string) {
+  return new Date(`${dateString}T12:00:00`).toLocaleDateString("nb-NO", {
+    day: "numeric",
+    month: "short",
+  });
+}
+
+function getNextDate(dateString: string) {
+  const date = new Date(`${dateString}T12:00:00`);
+  date.setDate(date.getDate() + 1);
+  return date.toISOString().split("T")[0];
+}
+
+function groupAbsences(absences: MyAbsence[]): AbsenceGroup[] {
+  const sorted = [...absences].sort((a, b) =>
+    a.absenceDate.localeCompare(b.absenceDate),
+  );
+
+  const groups: MyAbsence[][] = [];
+
+  for (const absence of sorted) {
+    const currentGroup = groups[groups.length - 1];
+    const previous = currentGroup?.[currentGroup.length - 1];
+
+    const sameRequest =
+      previous &&
+      previous.type === absence.type &&
+      previous.status === absence.status &&
+      (previous.description ?? "") === (absence.description ?? "") &&
+      (previous.managerComment ?? "") === (absence.managerComment ?? "") &&
+      getNextDate(previous.absenceDate) === absence.absenceDate;
+
+    if (sameRequest) {
+      currentGroup.push(absence);
+    } else {
+      groups.push([absence]);
+    }
+  }
+
+  return groups
+    .map((group) => ({
+      key: `${group[0].id}-${group[group.length - 1].id}`,
+      first: group[0],
+      last: group[group.length - 1],
+      days: group.length,
+    }))
+    .reverse();
+}
+
 export default function AbsencePage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<AbsenceTab>("form");
   const [myAbsences, setMyAbsences] = useState<MyAbsence[]>([]);
   const [myAbsencesLoading, setMyAbsencesLoading] = useState(false);
+
+  const groupedAbsences = useMemo(
+    () => groupAbsences(myAbsences),
+    [myAbsences],
+  );
 
   const {
     hours,
@@ -82,10 +158,7 @@ export default function AbsencePage() {
 
   async function handleSaveAndRefresh() {
     await handleSave();
-
-    if (activeTab === "mine") {
-      await loadMyAbsences();
-    }
+    await loadMyAbsences();
   }
 
   return (
@@ -172,34 +245,46 @@ export default function AbsencePage() {
                 <div className="absence-empty-state">Laster fravær...</div>
               )}
 
-              {!myAbsencesLoading && myAbsences.length === 0 && (
+              {!myAbsencesLoading && groupedAbsences.length === 0 && (
                 <div className="absence-empty-state">
                   Ingen fraværssøknader å vise enda.
                 </div>
               )}
 
-              {!myAbsencesLoading && myAbsences.length > 0 && (
+              {!myAbsencesLoading && groupedAbsences.length > 0 && (
                 <div className="absence-list-table">
-                  {myAbsences.map((absence) => (
-                    <div className="absence-list-row" key={absence.id}>
-                      <div>
-                        <strong>{absence.absenceDate}</strong>
-                        <span>{absence.type}</span>
+                  {groupedAbsences.map((group) => {
+                    const { first, last, days } = group;
+                    const dateLabel =
+                      first.absenceDate === last.absenceDate
+                        ? formatDate(first.absenceDate)
+                        : `${formatDate(first.absenceDate)} – ${formatDate(
+                            last.absenceDate,
+                          )}`;
+
+                    return (
+                      <div className="absence-list-row" key={group.key}>
+                        <div className="absence-list-main">
+                          <strong>{getTypeLabel(first.type)}</strong>
+                          <span>{dateLabel}</span>
+                        </div>
+
+                        <div className="absence-days">
+                          {days} {days === 1 ? "dag" : "dager"}
+                        </div>
+
+                        <span
+                          className={`status-pill ${first.status.toLowerCase()}`}
+                        >
+                          {getStatusLabel(first.status)}
+                        </span>
+
+                        <div className="absence-comment">
+                          {first.managerComment || first.description || "—"}
+                        </div>
                       </div>
-
-                      <div>{absence.hours}t</div>
-
-                      <span
-                        className={`status-pill ${absence.status.toLowerCase()}`}
-                      >
-                        {getStatusLabel(absence.status)}
-                      </span>
-
-                      <div>
-                        {absence.managerComment || absence.description || "—"}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
