@@ -356,24 +356,6 @@ textarea.dark-input:focus {
   }
 }
 
-.page-intro .page-back-button {
-  width: auto !important;
-  min-width: 0 !important;
-  max-width: fit-content !important;
-  height: auto !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  border-radius: 0 !important;
-  justify-content: flex-start !important;
-  color: rgba(233, 238, 255, 0.68);
-}
-
-.page-intro .page-back-button:hover {
-  background: transparent !important;
-  color: #ffffff;
-}
-
 .wireframe-modal {
   position: fixed;
   inset: 0;
@@ -434,34 +416,4 @@ textarea.dark-input:focus {
   transform: none;
   filter: none;
   background: linear-gradient(90deg, #c600ff, #6a5cff);
-}
-
-.page-intro {
-  display: block;
-}
-
-.page-intro-header {
-  display: block;
-}
-
-.page-intro-text {
-  margin-left: 0;
-}
-
-.page-back-link {
-  display: inline-flex;
-  align-items: center;
-  margin-bottom: 22px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  color: rgba(226, 232, 255, 0.65);
-  font: inherit;
-  font-size: 0.95rem;
-  cursor: pointer;
-}
-
-.page-back-link:hover {
-  color: #fff;
-  transform: translateX(-2px);
 }

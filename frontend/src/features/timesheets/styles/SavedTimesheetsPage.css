@@ -10,42 +10,6 @@
   margin: 0 auto;
 }
 
-.saved-timesheets-header {
-  max-width: 760px;
-  margin-bottom: 34px;
-}
-
-.saved-back-button:hover {
-  color: #ffffff;
-  transform: translateX(-2px);
-}
-
-.saved-timesheets-eyebrow {
-  margin: 0 0 10px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(226, 232, 255, 0.68);
-}
-
-.saved-timesheets-header h1 {
-  margin: 0;
-  font-size: clamp(2.6rem, 5vw, 4.4rem);
-  line-height: 1.02;
-  font-weight: 850;
-  letter-spacing: -0.055em;
-  color: #f5f7ff;
-}
-
-.saved-timesheets-subtitle {
-  margin: 14px 0 0;
-  max-width: 720px;
-  font-size: 1.05rem;
-  line-height: 1.65;
-  color: rgba(233, 238, 255, 0.78);
-}
-
 .saved-timesheets-info,
 .saved-timesheets-error,
 .saved-timesheets-empty {

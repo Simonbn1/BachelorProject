@@ -80,15 +80,11 @@ body {
   margin: 8px 0 30px;
 }
 
-.page-back-button:hover {
-  color: #ffffff;
-  transform: translateX(-2px);
-}
+/* Back home button */
 
-.page-back-button:focus-visible {
-  outline: 2px solid rgba(143, 160, 255, 0.7);
-  outline-offset: 6px;
-  border-radius: 8px;
+.page-back-button:hover {
+  color: #fff;
+  transform: translateX(-2px);
 }
 
 .page-kicker {
@@ -214,24 +210,4 @@ textarea.dark-input {
 .action-buttons {
   display: flex;
   margin-top: 24px;
-}
-
-.page-back-link {
-  display: inline-flex;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  color: rgba(226, 232, 255, 0.65);
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition:
-    color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.page-back-link:hover {
-  color: #fff;
-  transform: translateX(-2px);
 }

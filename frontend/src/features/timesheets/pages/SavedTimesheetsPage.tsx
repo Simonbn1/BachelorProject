@@ -8,8 +8,8 @@ import {
 } from "../api/timesheetsApi";
 import type { MyTimesheet } from "../types/timesheet";
 import TimesheetEditModal from "../components/TimesheetEditModal";
-import "../styles/SavedTimesheetsPage.css";
 import "../../../shared/styles/globals.css";
+import "../styles/SavedTimesheetsPage.css";
 
 function formatWeekRange(weekStart: string) {
   const start = new Date(`${weekStart}T00:00:00`);
@@ -160,8 +160,8 @@ export default function SavedTimesheetsPage() {
   }
 
   return (
-    <div className="saved-timesheets-page">
-      <div className="saved-timesheets-shell">
+    <div className="page">
+      <div className="page-shell">
         <div className="page-intro">
           <div className="page-intro-header">
             <button
