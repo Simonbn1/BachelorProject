@@ -156,9 +156,8 @@ export function TimesheetPage({
   const showAddProjectButton = !isLocked;
   const showDeleteButton = !isLocked;
   const statusLabel = getStatusLabel(timesheetStatus);
-  const isFutureWeek = new Date(weekStart) > new Date();
   const earliestAllowed = new Date();
-  earliestAllowed.setMonth(earliestAllowed.getMonth() - 1);
+  earliestAllowed.setMonth(earliestAllowed.getMonth() - 7);
   earliestAllowed.setDate(1);
   earliestAllowed.setHours(0, 0, 0, 0);
   const isPastLimit = new Date(weekStart) < earliestAllowed;
@@ -347,7 +346,7 @@ export function TimesheetPage({
               <button
                 className="add-project"
                 type="button"
-                disabled={isFutureWeek || isPastLimit}
+                disabled={isPastLimit}
                 onClick={() => setIsAddModalOpen(true)}
               >
                 + Legg til nytt prosjekt
@@ -373,15 +372,9 @@ export function TimesheetPage({
                 </button>
               )}
 
-              {isFutureWeek && (
-                <p className="hours-error">
-                  Du kan ikke registrere timer for en fremtidig uke.
-                </p>
-              )}
-
               {isPastLimit && (
                 <p className="hours-error">
-                  Du kan ikke registrere timer for mer enn en måned tilbake.
+                  Du kan ikke registrere timer for mer enn en uke tilbake.
                 </p>
               )}
 
@@ -391,7 +384,7 @@ export function TimesheetPage({
                     hasUnsavedChanges ? "save-btn" : "save-btn save-btn--saved"
                   }
                   type="button"
-                  disabled={isFutureWeek || isPastLimit}
+                  disabled={isPastLimit}
                   onClick={handleSave}
                 >
                   Lagre kladd
@@ -402,7 +395,7 @@ export function TimesheetPage({
                 <button
                   className="save-btn save-btn--primary"
                   type="button"
-                  disabled={isFutureWeek || isPastLimit}
+                  disabled={isPastLimit}
                   onClick={handleSubmitTimesheet}
                 >
                   Send inn

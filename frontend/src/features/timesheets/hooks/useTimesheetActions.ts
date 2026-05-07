@@ -147,28 +147,16 @@ export function useTimesheetActions({
   async function handleSave(): Promise<boolean> {
     const userId = 1;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const weekStartDate = new Date(weekStart);
-    if (weekStartDate > today) {
-      showToast(
-        "warning",
-        "Fremtidig uke",
-        "Du kan ikke registrere timer for en uke som ikke har startet enda.",
-        true,
-      );
-      return false;
-    }
-
     const earliestAllowed = new Date();
-    earliestAllowed.setMonth(earliestAllowed.getMonth() - 1);
+    earliestAllowed.setMonth(earliestAllowed.getMonth() - 7);
     earliestAllowed.setDate(1);
     earliestAllowed.setHours(0, 0, 0, 0);
+    const weekStartDate = new Date();
     if (weekStartDate < earliestAllowed) {
       showToast(
         "warning",
         "For langt tilbake",
-        "Du kan ikke registerer timer for mer enn  en måned tilbake.",
+        "Du kan ikke registerer timer for mer enn  en uke tilbake.",
         true,
       );
       return false;
