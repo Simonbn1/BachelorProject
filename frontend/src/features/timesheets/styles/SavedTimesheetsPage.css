@@ -114,12 +114,11 @@
 
 .saved-timesheets-action:hover {
   transform: translateY(-1px);
-  background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.2);
 }
 
 .saved-timesheets-action--primary {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: linear-gradient(90deg, #c600ff, #6a5cff);
   border-color: transparent;
   color: white;
 }

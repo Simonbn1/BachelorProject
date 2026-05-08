@@ -157,8 +157,7 @@ export function TimesheetPage({
   const showDeleteButton = !isLocked;
   const statusLabel = getStatusLabel(timesheetStatus);
   const earliestAllowed = new Date();
-  earliestAllowed.setMonth(earliestAllowed.getMonth() - 7);
-  earliestAllowed.setDate(1);
+  earliestAllowed.setDate(earliestAllowed.getDate() - 7);
   earliestAllowed.setHours(0, 0, 0, 0);
   const isPastLimit = new Date(weekStart) < earliestAllowed;
 

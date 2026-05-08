@@ -24,3 +24,9 @@ VALUES ('Test User', 'test@test.com', '$2b$10$U2InSC6kOyeWfiEoFXVUdOguELZVoUtCZ4
 ON CONFLICT (email) DO NOTHING;
 
 
+INSERT INTO users (display_name, email, password_hash, role)
+VALUES ('Admin', 'admin@admin.com', '$2b$10$U2InSC6kOyeWfiEoFXVUdOguELZVoUtCZ4Ammch.6Kwz3dInqs6GG', 'ADMIN')
+ON CONFLICT (email) DO NOTHING;
+
+
+

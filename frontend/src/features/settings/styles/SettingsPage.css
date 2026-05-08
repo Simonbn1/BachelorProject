@@ -18,7 +18,7 @@
 }
 
 .settings-section-box .page-title {
-  font-size: 2rem;
+  font-size: 3rem;
   margin-bottom: 0.25rem;
 }
 
@@ -102,7 +102,7 @@
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6c4fd4, #9b59f5);
+  background: linear-gradient(90deg, #c600ff, #6a5cff);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -265,7 +265,7 @@
 }
 
 .settings-save-btn {
-  background: #6c4fd4;
+  background: linear-gradient(90deg, #c600ff, #6a5cff);
   border: none;
   color: #fff;
   border-radius: 8px;
@@ -280,7 +280,8 @@
 }
 
 .settings-save-btn:hover {
-  background: #7d62e0;
+  filter: brightness(1.15);
+  transform: translateY(-1px);
 }
 
 .settings-cancel-btn {
@@ -300,6 +301,7 @@
 .settings-cancel-btn:hover {
   background: rgba(255, 255, 255, 0.09);
   color: rgba(255, 255, 255, 0.75);
+  transform: translateY(-1px);
 }
 
 .settings-error {
