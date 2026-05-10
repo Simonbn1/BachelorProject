@@ -49,15 +49,6 @@ export default function TimesheetEditModal({
         aria-modal="true"
         aria-labelledby="timesheet-edit-modal-title"
       >
-        <button
-          className="timesheet-modal__close"
-          type="button"
-          onClick={onClose}
-          aria-label="Lukk"
-        >
-          ✕
-        </button>
-
         {error && <div className="timesheet-modal__error-banner">{error}</div>}
 
         <div className="timesheet-modal__page-body">
