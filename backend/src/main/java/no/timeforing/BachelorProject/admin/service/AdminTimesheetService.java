@@ -56,7 +56,10 @@ public class AdminTimesheetService {
                                     .sum() * 10.0
                     ) / 10.0;
 
-                    boolean hasAbsence = !absences.isEmpty();
+                    boolean hasSicknessEntries = entries.stream()
+                            .anyMatch(this::isSicknessProject);
+
+                    boolean hasAbsence = !absences.isEmpty() || hasSicknessEntries;
 
                     return new AdminTimesheetSummaryResponse(
                             timesheet.getId(),
@@ -125,5 +128,15 @@ public class AdminTimesheetService {
                 timeEntryResponses,
                 absenceResponses
         );
+    }
+
+    private boolean isSicknessProject(TimeEntry entry) {
+        if (entry.getWorkItem() == null || entry.getWorkItem().getProject() == null) {
+            return false;
+        }
+
+        String projectName = entry.getWorkItem().getProject().getName();
+
+        return projectName != null && projectName.equalsIgnoreCase("Sykdom");
     }
 }
