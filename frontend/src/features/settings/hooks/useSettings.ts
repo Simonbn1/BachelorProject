@@ -24,7 +24,9 @@ export function useSettings() {
 
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(() =>
+    localStorage.getItem("avatarUrl"),
+  );
   const [pendingAvatarUrl, setPendingAvatarUrl] = useState<string | null>(null);
 
   const { showToast } = useToasts();
@@ -142,6 +144,10 @@ export function useSettings() {
     if (pendingAvatarUrl) {
       setAvatarUrl(pendingAvatarUrl);
       setPendingAvatarUrl(null);
+
+      localStorage.setItem("avatarUrl", pendingAvatarUrl);
+      window.dispatchEvent(new Event("storageChange"));
+
       showToast("success", "Profilbilde oppdatert!");
     }
     if (activeSection === "name") await handleNameSave();

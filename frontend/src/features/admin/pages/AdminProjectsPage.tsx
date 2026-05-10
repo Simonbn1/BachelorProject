@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchAdminProjects, type AdminProject } from "../api/adminProjectsApi";
 import "../../../shared/styles/admin.css";
+import "../../../shared/styles/globals.css";
 
 export default function AdminProjectsPage() {
   const navigate = useNavigate();
@@ -37,18 +38,22 @@ export default function AdminProjectsPage() {
     <div className="admin-page">
       <div className="admin-page-header">
         <div className="admin-page-header-content">
-          <button
-            type="button"
-            className="admin-back-link"
-            onClick={() => navigate("/admin")}
-          >
-            ← Oversikt
-          </button>
+          <div className="admin-intro-header">
+            <button
+              type="button"
+              className="page-back-button"
+              onClick={() => navigate("/admin")}
+            >
+              ← Oversikt
+            </button>
 
-          <h1>Prosjekter</h1>
-          <p className="admin-subtitle">
-            Se alle tilgjengelige prosjekter i løsningen.
-          </p>
+            <div className="admin-intro-text">
+              <h1>Prosjekter</h1>
+              <p className="admin-subtitle">
+                Se alle tilgjengelige prosjekter i løsningen.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 

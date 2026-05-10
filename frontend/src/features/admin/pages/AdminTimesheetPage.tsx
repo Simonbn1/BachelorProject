@@ -13,6 +13,7 @@ import type {
   AdminTimesheetSummary,
 } from "../types/admin";
 import "../../../shared/styles/admin.css";
+import "../../../shared/styles/globals.css";
 
 function getCurrentWeekValue() {
   const today = new Date();
@@ -225,20 +226,22 @@ export default function AdminTimesheetPage() {
     <div className="admin-page">
       <div className="admin-page-header">
         <div className="admin-page-header-content">
-          <button
-            type="button"
-            className="admin-back-link"
-            onClick={() => navigate("/admin")}
-          >
-            ← Oversikt
-          </button>
-
-          <h1>Godkjenn timer</h1>
-          <p className="admin-subtitle">
-            Se innsendinger per uke, åpne detaljer og godkjenn eller avvis.
-          </p>
+          <div className="admin-intro-header">
+            <button
+              type="button"
+              className="page-back-button"
+              onClick={() => navigate("/admin")}
+            >
+              ← Oversikt
+            </button>
+            <div className="admin-intro-text">
+              <h1>Godkjenn timer</h1>
+              <p className="admin-subtitle">
+                Se innsendinger per uke, åpne detaljer og godkjenn eller avvis.
+              </p>
+            </div>
+          </div>
         </div>
-
         <div className="admin-filter-card">
           <label>Uke</label>
 

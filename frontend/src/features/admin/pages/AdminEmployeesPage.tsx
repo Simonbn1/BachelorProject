@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchAdminUsers, type AdminUser } from "../api/adminUsersApi";
 import "../../../shared/styles/admin.css";
+import "../../../shared/styles/globals.css";
 
 export default function AdminEmployeesPage() {
   const navigate = useNavigate();
@@ -32,18 +33,21 @@ export default function AdminEmployeesPage() {
     <div className="admin-page">
       <div className="admin-page-header">
         <div className="admin-page-header-content">
-          <button
-            type="button"
-            className="admin-back-link"
-            onClick={() => navigate("/admin")}
-          >
-            ← Oversikt
-          </button>
-
-          <h1>Ansatte</h1>
-          <p className="admin-subtitle">
-            Se brukere, roller og administrativ informasjon.
-          </p>
+          <div className="admin-intro-header">
+            <button
+              type="button"
+              className="page-back-button"
+              onClick={() => navigate("/admin")}
+            >
+              ← Oversikt
+            </button>
+            <div className="admin-intro-text">
+              <h1>Ansatte</h1>
+              <p className="admin-subtitle">
+                Se brukere, roller og administrativ informasjon.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 

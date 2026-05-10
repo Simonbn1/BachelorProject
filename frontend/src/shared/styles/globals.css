@@ -87,6 +87,37 @@ body {
   transform: translateX(-2px);
 }
 
+.page-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding: 10px 14px;
+  color: #eef2ff;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.page-back-button:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(150, 168, 255, 0.24);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.24);
+}
+
+.page-back-button:active {
+  transform: translateY(0);
+}
+
 .page-kicker {
   margin: 2px 0 10px;
   font-size: 12px;

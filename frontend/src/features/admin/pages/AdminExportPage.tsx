@@ -5,6 +5,7 @@ import { exportAdminInvoiceBasisExcel } from "../api/adminApi";
 import { useToasts } from "../../../shared/hooks/useToasts";
 import "../../../shared/styles/admin.css";
 import "../../../shared/styles/AdminExportPage.css";
+import "../../../shared/styles/globals.css";
 
 function formatLocalDate(date: Date) {
   const year = date.getFullYear();
@@ -122,18 +123,21 @@ export default function AdminExportPage() {
     <div className="admin-page">
       <div className="admin-page-header">
         <div className="admin-page-header-content">
-          <button
-            type="button"
-            className="admin-back-link"
-            onClick={() => navigate("/admin")}
-          >
-            ← Oversikt
-          </button>
-
-          <h1>Fakturagrunnlag</h1>
-          <p className="admin-subtitle">
-            Eksporter godkjente timer og fravær for valgt uke.
-          </p>
+          <div className="admin-intro-header">
+            <button
+              type="button"
+              className="page-back-button"
+              onClick={() => navigate("/admin")}
+            >
+              ← Oversikt
+            </button>
+            <div className="admin-intro-text">
+              <h1>Fakturagrunnlag</h1>
+              <p className="admin-subtitle">
+                Eksporter godkjente timer og fravær for valgt uke.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 

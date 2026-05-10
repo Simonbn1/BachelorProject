@@ -8,12 +8,17 @@ export default function TopBar() {
   const navigate = useNavigate();
 
   const [user, setUser] = useState(getAuthUser);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(() =>
+    localStorage.getItem("avatarUrl"),
+  );
+
   const userName = user?.displayName || "User";
   const initial = userName.charAt(0).toUpperCase();
 
   useEffect(() => {
     function handleStorageChange() {
       setUser(getAuthUser());
+      setAvatarUrl(localStorage.getItem("avatarUrl"));
     }
     window.addEventListener("storageChange", handleStorageChange);
     return () =>
@@ -36,7 +41,11 @@ export default function TopBar() {
       <div className="topbar-right">
         <div className="topbar-user-chip">
           <span className="topbar-user-name">{userName}</span>
-          <span className="avatar">{initial}</span>
+          {avatarUrl ? (
+            <img src={avatarUrl} alt={userName} className="avatar" />
+          ) : (
+            <span className="avatar">{initial}</span>
+          )}
         </div>
 
         <button

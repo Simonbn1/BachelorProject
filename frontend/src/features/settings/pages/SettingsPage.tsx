@@ -37,14 +37,12 @@ export default function SettingsPage() {
   return (
     <div className="page settings-page">
       <div className="page-intro">
-        <div className="page-intro-text">
-          <button
-            className="page-back-button"
-            onClick={() => navigate("/dashboard")}
-          >
-            ← Oversikt
-          </button>
-        </div>
+        <button
+          className="page-back-button"
+          onClick={() => navigate("/dashboard")}
+        >
+          ← Oversikt
+        </button>
       </div>
 
       <div className="settings-section">

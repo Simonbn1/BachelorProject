@@ -7,6 +7,7 @@ import {
   type AdminAbsence,
 } from "../api/adminApi";
 import "../../../shared/styles/admin.css";
+import "../../../shared/styles/globals.css";
 
 type AbsenceGroup = {
   key: string;
@@ -145,18 +146,21 @@ export default function AdminAbsencesPage() {
     <div className="admin-page">
       <div className="admin-page-header">
         <div className="admin-page-header-content">
-          <button
-            type="button"
-            className="admin-back-link"
-            onClick={() => navigate("/admin")}
-          >
-            ← Oversikt
-          </button>
-
-          <h1>Godkjenn fravær</h1>
-          <p className="admin-subtitle">
-            Se fraværsøknader og godkjenn eller avslå.
-          </p>
+          <div className="admin-intro-header">
+            <button
+              type="button"
+              className="page-back-button"
+              onClick={() => navigate("/admin")}
+            >
+              ← Oversikt
+            </button>
+            <div className="admin-intro-text">
+              <h1>Godkjenn fravær</h1>
+              <p className="admin-subtitle">
+                Se fraværsøknader og godkjenn eller avslå.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 

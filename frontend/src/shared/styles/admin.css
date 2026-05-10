@@ -20,37 +20,6 @@
   max-width: 760px;
 }
 
-.page-back-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 18px;
-  padding: 10px 14px;
-  color: #eef2ff;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(10px);
-  cursor: pointer;
-  transition:
-    transform 0.18s ease,
-    background 0.18s ease,
-    border-color 0.18s ease,
-    box-shadow 0.18s ease;
-}
-
-.page-back-button:hover {
-  transform: translateY(-1px);
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(150, 168, 255, 0.24);
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.24);
-}
-
-.page-back-button:active {
-  transform: translateY(0);
-}
-
 .admin-eyebrow {
   margin: 0 0 10px;
   font-size: 12px;
@@ -66,14 +35,15 @@
   line-height: 1.05;
   font-weight: 800;
   letter-spacing: -0.03em;
+  color: #f5f7ff;
 }
 
-.admin-subtitle {
-  margin-top: 12px;
-  max-width: 700px;
-  font-size: 1.02rem;
-  line-height: 1.65;
-  color: rgba(233, 238, 255, 0.78);
+.page-subtitle {
+  margin-top: 10px;
+  max-width: 560px;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(233, 238, 255, 0.76);
 }
 
 .admin-filter-card,
@@ -299,10 +269,6 @@
   }
 }
 
-.admin-page-header h1 {
-  font-size: 2.4rem;
-}
-
 .admin-subtitle {
   font-size: 0.98rem;
 }
@@ -319,10 +285,6 @@
   .admin-page {
     padding: 0;
   }
-}
-
-.admin-page-header h1 {
-  font-size: 2rem;
 }
 
 .admin-subtitle {
@@ -591,6 +553,11 @@
   background: linear-gradient(135deg, #86efac, #22c55e);
 }
 
+.admin-reject-button:hover,
+.admin-approve-button:hover {
+  transform: translateY(-1px);
+}
+
 .admin-reject-button {
   color: #fff;
   background: linear-gradient(135deg, #ef4444, #b91c1c);
@@ -636,35 +603,6 @@
   color: #9ca3af;
 }
 
-.admin-back-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-start;
-  width: auto;
-  margin: 0 0 18px;
-  padding: 0;
-  color: rgba(226, 232, 255, 0.72);
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  backdrop-filter: none;
-  font: inherit;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition:
-    color 0.18s ease,
-    transform 0.18s ease;
-}
-
-.admin-back-link:hover {
-  color: #f8fafc;
-  transform: translateX(-2px);
-}
-
-.admin-back-link:active {
-  transform: translateX(0);
-}
-
 .admin-back-link:focus-visible {
   outline: 2px solid rgba(143, 160, 255, 0.7);
   outline-offset: 4px;
@@ -689,4 +627,22 @@
 
 .admin-week-picker-button:hover {
   background: rgba(255, 255, 255, 0.07);
+}
+
+.admin-page-header-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 760px;
+}
+
+.admin-intro-header {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.admin-intro-text {
+  margin-top: -0.5rem;
 }

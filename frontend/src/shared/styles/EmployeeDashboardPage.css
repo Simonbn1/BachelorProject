@@ -83,7 +83,7 @@
 
 .employee-dashboard-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(154, 170, 255, 0.24);
+  border-color: rgba(161, 0, 255, 0.3);
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.34);
   background: rgba(19, 26, 44, 0.82);
 }
