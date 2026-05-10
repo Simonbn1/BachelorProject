@@ -96,6 +96,10 @@ function formatDateOnly(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
+function isSicknessEntry(entry: AdminTimesheetDetail["timeEntries"][number]) {
+  return entry.projectName?.toLowerCase() === "sykdom";
+}
+
 export default function AdminTimesheetPage() {
   const navigate = useNavigate();
   const initialWeek = getCurrentWeekValue();
@@ -114,6 +118,12 @@ export default function AdminTimesheetPage() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [decisionLoading, setDecisionLoading] = useState(false);
   const [rejectComment, setRejectComment] = useState("");
+
+  const regularEntries =
+    detail?.timeEntries.filter((entry) => !isSicknessEntry(entry)) ?? [];
+  const sicknessEntries = detail?.timeEntries.filter(isSicknessEntry) ?? [];
+  const hasAbsence =
+    (detail?.absences.length ?? 0) > 0 || sicknessEntries.length > 0;
 
   async function loadOverview() {
     try {
@@ -297,14 +307,14 @@ export default function AdminTimesheetPage() {
             </div>
             <div>
               <span>Fravær</span>
-              <strong>{detail.absences.length > 0 ? "Ja" : "Nei"}</strong>
+              <strong>{hasAbsence ? "Ja" : "Nei"}</strong>
             </div>
           </div>
 
           <div className="admin-detail-section">
             <h3>Timer</h3>
 
-            {detail.timeEntries.length === 0 ? (
+            {regularEntries.length === 0 ? (
               <p className="admin-muted">Ingen førte timer.</p>
             ) : (
               <div className="admin-detail-table">
@@ -315,7 +325,7 @@ export default function AdminTimesheetPage() {
                   <span>Beskrivelse</span>
                 </div>
 
-                {detail.timeEntries.map((entry) => (
+                {regularEntries.map((entry) => (
                   <div
                     className="admin-detail-table-row"
                     key={entry.timeEntryId}
@@ -337,11 +347,45 @@ export default function AdminTimesheetPage() {
             )}
           </div>
 
+          {sicknessEntries.length > 0 && (
+            <div className="admin-detail-section">
+              <h3>Sykdom / fravær</h3>
+
+              <div className="admin-detail-table">
+                <div className="admin-detail-table-head">
+                  <span>Dato</span>
+                  <span>Prosjekt / oppgave</span>
+                  <span>Timer</span>
+                  <span>Beskrivelse</span>
+                </div>
+
+                {sicknessEntries.map((entry) => (
+                  <div
+                    className="admin-detail-table-row"
+                    key={entry.timeEntryId}
+                  >
+                    <span>{entry.entryDate}</span>
+
+                    <div>
+                      <strong>{entry.projectName || "Sykdom"}</strong>
+                      <div className="admin-subtext">
+                        {entry.workItemName || "Sykefravær"}
+                      </div>
+                    </div>
+
+                    <span>{entry.hours}t</span>
+                    <span>{entry.description || "—"}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="admin-detail-section">
-            <h3>Fravær</h3>
+            <h3>Fraværssøknader</h3>
 
             {detail.absences.length === 0 ? (
-              <p className="admin-muted">Ingen registrert fravær.</p>
+              <p className="admin-muted">Ingen registrerte fraværssøknader.</p>
             ) : (
               <div className="admin-detail-table">
                 <div className="admin-detail-table-head absence">
