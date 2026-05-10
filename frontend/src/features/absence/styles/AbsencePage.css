@@ -134,3 +134,26 @@
     grid-template-columns: 1fr;
   }
 }
+
+.absence-content-wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  margin-top: -4rem;
+}
+
+.absence-content-wrap .page-title {
+  font-size: 3rem;
+  margin-bottom: 0.25rem;
+}
+
+.absence-content-wrap .page-subtitle {
+  margin-bottom: 1.5rem;
+}
+
+.absence-tabs {
+  margin-bottom: 2rem;
+}
+
+.absence-form-grid {
+  gap: 28px;
+}

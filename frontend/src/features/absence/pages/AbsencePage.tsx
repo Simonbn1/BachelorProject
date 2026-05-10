@@ -173,133 +173,130 @@ export default function AbsencePage() {
     <div className="page">
       <div className="page-shell">
         <div className="page-intro">
-          <div className="page-intro-header">
-            <button
-              type="button"
-              className="page-back-button"
-              onClick={() => navigate("/dashboard")}
-            >
-              ← Oversikt
-            </button>
-
-            <div className="page-intro-text">
-              <h1 className="page-title">Fravær</h1>
-              <p className="page-subtitle">
-                Søk om ferie, permisjon eller annet planlagt fravær.
-              </p>
-            </div>
-          </div>
+          <button
+            type="button"
+            className="page-back-button"
+            onClick={() => navigate("/dashboard")}
+          >
+            ← Oversikt
+          </button>
         </div>
 
-        <section className="timesheet-card absence-card">
-          <div className="absence-tabs">
-            <button
-              type="button"
-              className={
-                activeTab === "form"
-                  ? "absence-tab absence-tab--active"
-                  : "absence-tab"
-              }
-              onClick={() => setActiveTab("form")}
-            >
-              Søk fravær
-            </button>
+        <div className="absence-content-wrap">
+          <section className="timesheet-card absence-card">
+            <h1 className="page-title">Fravær</h1>
+            <p className="page-subtitle">
+              Søk om ferie, permisjon eller annet planlagt fravær.
+            </p>
+            <div className="absence-tabs">
+              <button
+                type="button"
+                className={
+                  activeTab === "form"
+                    ? "absence-tab absence-tab--active"
+                    : "absence-tab"
+                }
+                onClick={() => setActiveTab("form")}
+              >
+                Søk fravær
+              </button>
 
-            <button
-              type="button"
-              className={
-                activeTab === "mine"
-                  ? "absence-tab absence-tab--active"
-                  : "absence-tab"
-              }
-              onClick={() => setActiveTab("mine")}
-            >
-              Mine fravær
-            </button>
-          </div>
-
-          {activeTab === "form" && (
-            <AbsenceForm
-              hours={hours}
-              absenceType={absenceType}
-              description={description}
-              projectId={projectId}
-              projects={projects}
-              workItems={workItems}
-              onHoursChange={handleHoursChange}
-              onRangeChange={handleRangeChange}
-              onTypeChange={(type) => setAbsenceType(type)}
-              onDescriptionChange={(desc) => setDescription(desc)}
-              onProjectChange={handleProjectChange}
-              onSave={handleSaveAndRefresh}
-              lockedDays={absencePayload ? lockedDaysFromPayload : {}}
-              hasAbsenceParams={!!absencePayload}
-              hideProjectFields={true}
-              selectedWorkItemIds={selectedWorkItemIds}
-              onWorkItemIdsChange={setSelectedWorkItemIds}
-              onFillWeek={() => {}}
-              onRemoveWorkItem={(id) =>
-                setSelectedWorkItemIds((prev) =>
-                  prev.filter((wId) => wId !== id),
-                )
-              }
-            />
-          )}
-
-          {activeTab === "mine" && (
-            <div className="absence-my-list">
-              <h2>Mine fravær</h2>
-              <p>Her kan du se status på egne fraværssøknader.</p>
-
-              {myAbsencesLoading && (
-                <div className="absence-empty-state">Laster fravær...</div>
-              )}
-
-              {!myAbsencesLoading && groupedAbsences.length === 0 && (
-                <div className="absence-empty-state">
-                  Ingen fraværssøknader å vise enda.
-                </div>
-              )}
-
-              {!myAbsencesLoading && groupedAbsences.length > 0 && (
-                <div className="absence-list-table">
-                  {groupedAbsences.map((group) => {
-                    const { first, last, days } = group;
-                    const dateLabel =
-                      first.absenceDate === last.absenceDate
-                        ? formatDate(first.absenceDate)
-                        : `${formatDate(first.absenceDate)} – ${formatDate(
-                            last.absenceDate,
-                          )}`;
-
-                    return (
-                      <div className="absence-list-row" key={group.key}>
-                        <div className="absence-list-main">
-                          <strong>{getTypeLabel(first.type)}</strong>
-                          <span>{dateLabel}</span>
-                        </div>
-
-                        <div className="absence-days">
-                          {days} {days === 1 ? "dag" : "dager"}
-                        </div>
-
-                        <span
-                          className={`status-pill ${first.status.toLowerCase()}`}
-                        >
-                          {getStatusLabel(first.status)}
-                        </span>
-
-                        <div className="absence-comment">
-                          {first.managerComment || first.description || "—"}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+              <button
+                type="button"
+                className={
+                  activeTab === "mine"
+                    ? "absence-tab absence-tab--active"
+                    : "absence-tab"
+                }
+                onClick={() => setActiveTab("mine")}
+              >
+                Mine fravær
+              </button>
             </div>
-          )}
-        </section>
+
+            {activeTab === "form" && (
+              <AbsenceForm
+                hours={hours}
+                absenceType={absenceType}
+                description={description}
+                projectId={projectId}
+                projects={projects}
+                workItems={workItems}
+                onHoursChange={handleHoursChange}
+                onRangeChange={handleRangeChange}
+                onTypeChange={(type) => setAbsenceType(type)}
+                onDescriptionChange={(desc) => setDescription(desc)}
+                onProjectChange={handleProjectChange}
+                onSave={handleSaveAndRefresh}
+                lockedDays={absencePayload ? lockedDaysFromPayload : {}}
+                hasAbsenceParams={!!absencePayload}
+                hideProjectFields={true}
+                selectedWorkItemIds={selectedWorkItemIds}
+                onWorkItemIdsChange={setSelectedWorkItemIds}
+                onFillWeek={() => {}}
+                onRemoveWorkItem={(id) =>
+                  setSelectedWorkItemIds((prev) =>
+                    prev.filter((wId) => wId !== id),
+                  )
+                }
+              />
+            )}
+
+            {activeTab === "mine" && (
+              <div className="absence-my-list">
+                <h2>Mine fravær</h2>
+                <p>Her kan du se status på egne fraværssøknader.</p>
+
+                {myAbsencesLoading && (
+                  <div className="absence-empty-state">Laster fravær...</div>
+                )}
+
+                {!myAbsencesLoading && groupedAbsences.length === 0 && (
+                  <div className="absence-empty-state">
+                    Ingen fraværssøknader å vise enda.
+                  </div>
+                )}
+
+                {!myAbsencesLoading && groupedAbsences.length > 0 && (
+                  <div className="absence-list-table">
+                    {groupedAbsences.map((group) => {
+                      const { first, last, days } = group;
+                      const dateLabel =
+                        first.absenceDate === last.absenceDate
+                          ? formatDate(first.absenceDate)
+                          : `${formatDate(first.absenceDate)} – ${formatDate(
+                              last.absenceDate,
+                            )}`;
+
+                      return (
+                        <div className="absence-list-row" key={group.key}>
+                          <div className="absence-list-main">
+                            <strong>{getTypeLabel(first.type)}</strong>
+                            <span>{dateLabel}</span>
+                          </div>
+
+                          <div className="absence-days">
+                            {days} {days === 1 ? "dag" : "dager"}
+                          </div>
+
+                          <span
+                            className={`status-pill ${first.status.toLowerCase()}`}
+                          >
+                            {getStatusLabel(first.status)}
+                          </span>
+
+                          <div className="absence-comment">
+                            {first.managerComment || first.description || "—"}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+          </section>
+        </div>
       </div>
     </div>
   );
