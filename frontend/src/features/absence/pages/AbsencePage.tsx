@@ -259,6 +259,12 @@ export default function AbsencePage() {
 
                 {!myAbsencesLoading && groupedAbsences.length > 0 && (
                   <div className="absence-list-table">
+                    <div className="absence-list-header">
+                      <span>Type</span>
+                      <span>Dager</span>
+                      <span>Status</span>
+                      <span>Kommentar</span>
+                    </div>
                     {groupedAbsences.map((group) => {
                       const { first, last, days } = group;
                       const dateLabel =
