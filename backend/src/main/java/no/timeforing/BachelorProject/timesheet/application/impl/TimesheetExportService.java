@@ -129,6 +129,10 @@ public class TimesheetExportService {
         Map<String, InvoiceLine> grouped = new LinkedHashMap<>();
 
         for (TimeEntry entry : entries) {
+            if (isNonBillableAbsenceProject(entry)) {
+                continue;
+            }
+
             String projectName = getProjectName(entry);
             Long workItemId = getWorkItemId(entry);
             String workItemTitle = getWorkItemTitle(entry);
@@ -240,6 +244,13 @@ public class TimesheetExportService {
         }
 
         return entry.getWorkItem().getId();
+    }
+
+    private boolean isNonBillableAbsenceProject(TimeEntry entry) {
+        String projectName = getProjectName(entry);
+
+        return projectName.equalsIgnoreCase("Sykdom")
+                || projectName.equalsIgnoreCase("Fravær");
     }
 
     private String safe(String value) {
