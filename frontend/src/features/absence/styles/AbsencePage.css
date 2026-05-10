@@ -108,7 +108,6 @@
   color: rgba(226, 232, 255, 0.72);
 }
 
-
 .absence-days {
   color: #f8fafc;
   font-weight: 800;
@@ -144,22 +143,22 @@
 }
 
 .absence-list-header {
-    display: grid;
-    grid-template-columns: 2fr 120px 170px 2fr;
-    gap: 18px;
-    padding: 0 20px 8px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    margin-bottom: 4px;
+  display: grid;
+  grid-template-columns: 2fr 120px 170px 2fr;
+  gap: 18px;
+  padding: 0 20px 8px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 4px;
 }
 
 .absence-list-header span {
-    font-size: 0.78rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    color: rgba(226, 232, 255, 0.5);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: rgba(226, 232, 255, 0.5);
 }
 
 .status-pill {
-    position: relative;
-    left: -40px;
+  position: relative;
+  left: -40px;
 }
