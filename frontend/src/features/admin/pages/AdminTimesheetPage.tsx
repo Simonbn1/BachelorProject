@@ -190,7 +190,7 @@ export default function AdminTimesheetPage() {
   }, [selectedTimesheetId]);
 
   async function handleApprove() {
-    if (!detail) return;
+    if (!detail || detail.status === "APPROVED") return;
 
     try {
       setDecisionLoading(true);
@@ -215,7 +215,7 @@ export default function AdminTimesheetPage() {
   }
 
   async function handleReject() {
-    if (!detail) return;
+    if (!detail || detail.status === "APPROVED") return;
 
     try {
       setDecisionLoading(true);
@@ -412,39 +412,47 @@ export default function AdminTimesheetPage() {
             </div>
           )}
 
-          <div className="admin-decision-box">
-            <label htmlFor="rejectComment">Tilbakemelding ved avslag</label>
-            <p>
-              Skriv en kort forklaring dersom timelisten skal sendes tilbake.
-            </p>
+          {detail.status !== "APPROVED" && (
+            <div className="admin-decision-box">
+              <label htmlFor="rejectComment">Tilbakemelding ved avslag</label>
+              <p>
+                Skriv en kort forklaring dersom timelisten skal sendes tilbake.
+              </p>
 
-            <textarea
-              id="rejectComment"
-              value={rejectComment}
-              onChange={(e) => setRejectComment(e.target.value)}
-              placeholder="F.eks. feil prosjekt, manglende timer eller behov for mer info..."
-            />
-          </div>
+              <textarea
+                id="rejectComment"
+                value={rejectComment}
+                onChange={(e) => setRejectComment(e.target.value)}
+                placeholder="F.eks. feil prosjekt, manglende timer eller behov for mer info..."
+              />
+            </div>
+          )}
 
-          <div className="admin-detail-actions">
-            <button
-              type="button"
-              className="admin-approve-button"
-              onClick={handleApprove}
-              disabled={decisionLoading || detail.status === "APPROVED"}
-            >
-              Godkjenn
-            </button>
+          {detail.status === "APPROVED" ? (
+            <div className="admin-approved-note">
+              Denne timelisten er allerede godkjent.
+            </div>
+          ) : (
+            <div className="admin-detail-actions">
+              <button
+                type="button"
+                className="admin-approve-button"
+                onClick={handleApprove}
+                disabled={decisionLoading}
+              >
+                Godkjenn
+              </button>
 
-            <button
-              type="button"
-              className="admin-reject-button"
-              onClick={handleReject}
-              disabled={decisionLoading}
-            >
-              Avslå og send tilbake
-            </button>
-          </div>
+              <button
+                type="button"
+                className="admin-reject-button"
+                onClick={handleReject}
+                disabled={decisionLoading}
+              >
+                Avslå og send tilbake
+              </button>
+            </div>
+          )}
         </section>
       )}
 
