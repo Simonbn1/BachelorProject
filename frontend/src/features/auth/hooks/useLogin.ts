@@ -15,8 +15,9 @@ export function useLogin() {
     e.preventDefault();
 
     const error = validateLogin(email, password);
+
     if (error) {
-      showToast("error", "Feil ved innlogging", error, true);
+      showToast("error", "Feil ved innlogging", error);
       return;
     }
 
@@ -31,12 +32,7 @@ export function useLogin() {
       }
     } catch (err) {
       console.error(err);
-      showToast(
-        "error",
-        "Feil ved innlogging",
-        "Mail eller passord er feil",
-        true,
-      );
+      showToast("error", "Feil ved innlogging", "Mail eller passord er feil");
     }
   };
 

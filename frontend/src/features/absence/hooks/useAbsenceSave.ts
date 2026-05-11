@@ -31,17 +31,12 @@ export function useAbsenceSave({
     const userId = authUser?.id;
 
     if (!userId) {
-      showToast("error", "Feil", "Fant ikke innlogget bruker.", true);
+      showToast("error", "Feil", "Fant ikke innlogget bruker.");
       return;
     }
 
     if (!absenceType) {
-      showToast(
-        "warning",
-        "Mangler årsak",
-        "Velg årsak til fravær først.",
-        true,
-      );
+      showToast("warning", "Mangler årsak", "Velg årsak til fravær først.");
       return;
     }
 
@@ -50,7 +45,6 @@ export function useAbsenceSave({
         "warning",
         "Mangler periode",
         "Velg en periode for søknaden først.",
-        true,
       );
       return;
     }
@@ -77,19 +71,14 @@ export function useAbsenceSave({
         );
       }
 
-      showToast(
-        "success",
-        "Søknad sendt!",
-        "Fraværssøknaden ble sendt inn.",
-        true,
-      );
+      showToast("success", "Søknad sendt!", "Fraværssøknaden ble sendt inn.");
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
           : "Noe gikk galt. Sjekk konsollen.";
 
-      showToast("error", "Feil ved innsending", message, true);
+      showToast("error", "Feil ved innsending", message);
     }
   }
 

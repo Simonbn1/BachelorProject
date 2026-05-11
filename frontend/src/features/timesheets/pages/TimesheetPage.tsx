@@ -160,10 +160,13 @@ export function TimesheetPage({
   const showWeekNavigation = !embedded && !hideWeekNavigation;
   const showCalendarButton = !embedded && !hideCalendarButton;
   const showExports = !embedded && !hideExports;
-  const showSubmitButton = !embedded && !isLocked;
-  const showDraftButton = !isLocked;
-  const showAddProjectButton = !isLocked;
-  const showDeleteButton = !isLocked;
+
+  const canEditTimesheet = !isLocked;
+
+  const showSubmitButton = !embedded && canEditTimesheet;
+  const showDraftButton = canEditTimesheet;
+  const showAddProjectButton = canEditTimesheet;
+  const showDeleteButton = canEditTimesheet;
 
   const statusLabel = getStatusLabel(timesheetStatus);
 
@@ -279,7 +282,7 @@ export function TimesheetPage({
             <div
               className={`timesheet-status-banner timesheet-status-banner--${timesheetStatus?.toLowerCase()}`}
             >
-              Status: {statusLabel}
+              {statusLabel}
             </div>
           )}
 
@@ -378,7 +381,7 @@ export function TimesheetPage({
           {hoursError && <p className="hours-error">{hoursError}</p>}
 
           <div className="timesheet-actions">
-            {showAddProjectButton ? (
+            {showAddProjectButton && (
               <button
                 className="add-project"
                 type="button"
@@ -386,14 +389,6 @@ export function TimesheetPage({
                 onClick={() => setIsAddModalOpen(true)}
               >
                 + Legg til nytt prosjekt
-              </button>
-            ) : (
-              <button
-                className="add-project"
-                type="button"
-                onClick={() => navigate("/timesheets/saved")}
-              >
-                Gå til Mine timer
               </button>
             )}
 

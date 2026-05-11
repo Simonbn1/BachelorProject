@@ -7,12 +7,14 @@ import { useToasts } from "../../../shared/hooks/useToasts.ts";
 
 export function useRegister() {
   const navigate = useNavigate();
+
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [errorField, setErrorField] = useState<string | null>(null);
+
   const { showToast } = useToasts();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -24,11 +26,14 @@ export function useRegister() {
       password,
       confirmPassword,
     );
+
     if (result) {
       setError(result.message);
       setErrorField(result.field);
+      showToast("error", "Registrering feilet", result.message);
       return;
     }
+
     setError(null);
     setErrorField(null);
 
@@ -47,7 +52,6 @@ export function useRegister() {
         "error",
         "Registrering feilet",
         "E-postadressen er ikke godkjent. Kun Accenture-kontoer har tilgang til systemet.",
-        true,
       );
     }
   };

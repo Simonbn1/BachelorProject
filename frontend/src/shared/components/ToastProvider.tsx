@@ -13,31 +13,38 @@ type ToastData = {
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
+  const removeToast = useCallback((id: number) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  }, []);
+
   const showToast = useCallback(
-    (
-      type: ToastType,
-      title: string,
-      message?: string,
-      persistent?: boolean,
-    ) => {
-      const id = Date.now();
-      setToasts((prev) => [...prev, { id, type, title, message }]);
+    (type: ToastType, title: string, message?: string, persistent = false) => {
+      const id = Date.now() + Math.random();
+
+      setToasts((prev) => [
+        ...prev,
+        {
+          id,
+          type,
+          title,
+          message,
+          persistent,
+        },
+      ]);
+
       if (!persistent) {
-        setTimeout(() => {
-          setToasts((prev) => prev.filter((t) => t.id !== id));
+        window.setTimeout(() => {
+          removeToast(id);
         }, 7000);
       }
     },
-    [],
+    [removeToast],
   );
-
-  const removeToast = useCallback((id: number) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  }, []);
 
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
+
       <div className="toast-container">
         {toasts.map((toast) => (
           <Toast

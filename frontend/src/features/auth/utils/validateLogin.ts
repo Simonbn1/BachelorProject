@@ -1,7 +1,7 @@
 import "../../../shared/context/ToastContext.tsx";
 
 export function validateLogin(email: string, password: string): string | null {
-  if (!email) {
+  if (!email.trim()) {
     return "Vennligst oppgi en e-postadresse.";
   }
 
