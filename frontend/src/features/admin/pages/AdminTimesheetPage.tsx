@@ -97,8 +97,40 @@ function formatDateOnly(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
-function isSicknessEntry(entry: AdminTimesheetDetail["timeEntries"][number]) {
-  return entry.projectName?.toLowerCase() === "sykdom";
+function getStatusLabel(status: string) {
+  switch (status) {
+    case "NOT_SENT":
+      return "Ikke sendt";
+    case "SENT":
+      return "Til behandling";
+    case "APPROVED":
+      return "Godkjent";
+    case "REJECTED":
+      return "Avvist";
+    default:
+      return status;
+  }
+}
+
+function getAbsenceTypeLabel(type: string) {
+  switch (type) {
+    case "VACATION":
+      return "Ferie";
+    case "SICKNESS":
+      return "Sykdom";
+    case "LEAVE":
+      return "Permisjon";
+    case "OTHER":
+      return "Annet";
+    default:
+      return type;
+  }
+}
+
+function isAbsenceEntry(entry: AdminTimesheetDetail["timeEntries"][number]) {
+  const projectName = entry.projectName?.toLowerCase();
+
+  return ["sykdom", "ferie", "permisjon", "annet"].includes(projectName!);
 }
 
 export default function AdminTimesheetPage() {
@@ -121,10 +153,12 @@ export default function AdminTimesheetPage() {
   const [rejectComment, setRejectComment] = useState("");
 
   const regularEntries =
-    detail?.timeEntries.filter((entry) => !isSicknessEntry(entry)) ?? [];
-  const sicknessEntries = detail?.timeEntries.filter(isSicknessEntry) ?? [];
+    detail?.timeEntries.filter((entry) => !isAbsenceEntry(entry)) ?? [];
+
+  const absenceEntries = detail?.timeEntries.filter(isAbsenceEntry) ?? [];
+
   const hasAbsence =
-    (detail?.absences.length ?? 0) > 0 || sicknessEntries.length > 0;
+    (detail?.absences.length ?? 0) > 0 || absenceEntries.length > 0;
 
   async function loadOverview() {
     try {
@@ -234,6 +268,7 @@ export default function AdminTimesheetPage() {
             >
               ← Oversikt
             </button>
+
             <div className="admin-intro-text">
               <h1>Godkjenn timer</h1>
               <p className="admin-subtitle">
@@ -242,6 +277,7 @@ export default function AdminTimesheetPage() {
             </div>
           </div>
         </div>
+
         <div className="admin-filter-card">
           <label>Uke</label>
 
@@ -295,7 +331,7 @@ export default function AdminTimesheetPage() {
                 detail.status,
               ).toLowerCase()}`}
             >
-              {detail.status}
+              {getStatusLabel(detail.status)}
             </span>
           </div>
 
@@ -304,10 +340,12 @@ export default function AdminTimesheetPage() {
               <span>Uke</span>
               <strong>{formatWeekRange(detail.weekStart)}</strong>
             </div>
+
             <div>
               <span>Totalt</span>
               <strong>{detail.totalHours.toFixed(1)} timer</strong>
             </div>
+
             <div>
               <span>Fravær</span>
               <strong>{hasAbsence ? "Ja" : "Nei"}</strong>
@@ -321,16 +359,15 @@ export default function AdminTimesheetPage() {
               <p className="admin-muted">Ingen førte timer.</p>
             ) : (
               <div className="admin-detail-table">
-                <div className="admin-detail-table-head">
+                <div className="admin-detail-table-head admin-detail-table-head--hours">
                   <span>Dato</span>
                   <span>Prosjekt / oppgave</span>
                   <span>Timer</span>
-                  <span>Beskrivelse</span>
                 </div>
 
                 {regularEntries.map((entry) => (
                   <div
-                    className="admin-detail-table-row"
+                    className="admin-detail-table-row admin-detail-table-row--hours"
                     key={entry.timeEntryId}
                   >
                     <span>{entry.entryDate}</span>
@@ -343,41 +380,38 @@ export default function AdminTimesheetPage() {
                     </div>
 
                     <span>{entry.hours}t</span>
-                    <span>{entry.description || "—"}</span>
                   </div>
                 ))}
               </div>
             )}
           </div>
 
-          {sicknessEntries.length > 0 && (
+          {absenceEntries.length > 0 && (
             <div className="admin-detail-section">
-              <h3>Sykdom / fravær</h3>
+              <h3>Fravær</h3>
 
               <div className="admin-detail-table">
-                <div className="admin-detail-table-head">
+                <div className="admin-detail-table-head admin-detail-table-head--hours">
                   <span>Dato</span>
-                  <span>Prosjekt / oppgave</span>
+                  <span>Type / oppgave</span>
                   <span>Timer</span>
-                  <span>Beskrivelse</span>
                 </div>
 
-                {sicknessEntries.map((entry) => (
+                {absenceEntries.map((entry) => (
                   <div
-                    className="admin-detail-table-row"
+                    className="admin-detail-table-row admin-detail-table-row--hours"
                     key={entry.timeEntryId}
                   >
                     <span>{entry.entryDate}</span>
 
                     <div>
-                      <strong>{entry.projectName || "Sykdom"}</strong>
+                      <strong>{entry.projectName || "Fravær"}</strong>
                       <div className="admin-subtext">
-                        {entry.workItemName || "Sykefravær"}
+                        {entry.workItemName || "Fravær"}
                       </div>
                     </div>
 
                     <span>{entry.hours}t</span>
-                    <span>{entry.description || "—"}</span>
                   </div>
                 ))}
               </div>
@@ -395,7 +429,6 @@ export default function AdminTimesheetPage() {
                   <span>Dato</span>
                   <span>Type</span>
                   <span>Timer</span>
-                  <span>Beskrivelse</span>
                 </div>
 
                 {detail.absences.map((absence) => (
@@ -404,9 +437,8 @@ export default function AdminTimesheetPage() {
                     key={absence.id}
                   >
                     <span>{absence.absenceDate}</span>
-                    <strong>{absence.type}</strong>
+                    <strong>{getAbsenceTypeLabel(absence.type)}</strong>
                     <span>{absence.hours}t</span>
-                    <span>{absence.description || "—"}</span>
                   </div>
                 ))}
               </div>
@@ -456,7 +488,7 @@ export default function AdminTimesheetPage() {
         >
           <div
             className="modal-content modal-content--calendar"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
           >
             <button
               className="close-btn"
