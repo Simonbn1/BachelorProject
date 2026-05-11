@@ -109,6 +109,7 @@ export default function AdminAbsencesPage() {
   const [absences, setAbsences] = useState<AdminAbsence[]>([]);
   const [loading, setLoading] = useState(false);
   const [commentByKey, setCommentByKey] = useState<Record<string, string>>({});
+  const [updatingKey, setUpdatingKey] = useState<string | null>(null);
 
   const groupedAbsences = useMemo(() => groupAbsences(absences), [absences]);
 
@@ -128,18 +129,35 @@ export default function AdminAbsencesPage() {
   }, []);
 
   async function handleApproveGroup(group: AbsenceGroup) {
-    await Promise.all(group.items.map((absence) => approveAbsence(absence.id)));
-    await loadAbsences();
+    if (group.first.status !== "PENDING") return;
+
+    setUpdatingKey(group.key);
+
+    try {
+      await Promise.all(
+        group.items.map((absence) => approveAbsence(absence.id)),
+      );
+      await loadAbsences();
+    } finally {
+      setUpdatingKey(null);
+    }
   }
 
   async function handleRejectGroup(group: AbsenceGroup) {
+    if (group.first.status !== "PENDING") return;
+
     const comment = commentByKey[group.key] ?? "";
 
-    await Promise.all(
-      group.items.map((absence) => rejectAbsence(absence.id, comment)),
-    );
+    setUpdatingKey(group.key);
 
-    await loadAbsences();
+    try {
+      await Promise.all(
+        group.items.map((absence) => rejectAbsence(absence.id, comment)),
+      );
+      await loadAbsences();
+    } finally {
+      setUpdatingKey(null);
+    }
   }
 
   return (
@@ -154,6 +172,7 @@ export default function AdminAbsencesPage() {
             >
               ← Oversikt
             </button>
+
             <div className="admin-intro-text">
               <h1>Godkjenn fravær</h1>
               <p className="admin-subtitle">
@@ -178,7 +197,7 @@ export default function AdminAbsencesPage() {
 
       {!loading && groupedAbsences.length > 0 && (
         <div className="admin-table-card">
-          <table className="admin-table">
+          <table className="admin-table admin-absence-table">
             <thead>
               <tr>
                 <th>Periode</th>
@@ -194,6 +213,8 @@ export default function AdminAbsencesPage() {
             <tbody>
               {groupedAbsences.map((group) => {
                 const { first, last, days } = group;
+                const isPending = first.status === "PENDING";
+                const isUpdating = updatingKey === group.key;
 
                 const dateLabel =
                   first.absenceDate === last.absenceDate
@@ -225,39 +246,49 @@ export default function AdminAbsencesPage() {
                     <td>{first.description || "—"}</td>
 
                     <td>
-                      <input
-                        className="admin-export-input"
-                        placeholder="Kommentar ved avslag"
-                        value={commentByKey[group.key] ?? ""}
-                        onChange={(e) =>
-                          setCommentByKey((prev) => ({
-                            ...prev,
-                            [group.key]: e.target.value,
-                          }))
-                        }
-                      />
+                      {isPending ? (
+                        <input
+                          className="admin-absence-comment-input"
+                          placeholder="Kommentar ved avslag"
+                          value={commentByKey[group.key] ?? ""}
+                          onChange={(e) =>
+                            setCommentByKey((prev) => ({
+                              ...prev,
+                              [group.key]: e.target.value,
+                            }))
+                          }
+                        />
+                      ) : (
+                        <span className="admin-muted">
+                          {first.managerComment || "—"}
+                        </span>
+                      )}
                     </td>
 
                     <td>
-                      <div className="admin-detail-actions">
-                        <button
-                          type="button"
-                          className="admin-approve-button"
-                          onClick={() => handleApproveGroup(group)}
-                          disabled={first.status === "APPROVED"}
-                        >
-                          Godkjenn
-                        </button>
+                      {isPending ? (
+                        <div className="admin-absence-actions">
+                          <button
+                            type="button"
+                            className="admin-approve-button"
+                            onClick={() => handleApproveGroup(group)}
+                            disabled={isUpdating}
+                          >
+                            Godkjenn
+                          </button>
 
-                        <button
-                          type="button"
-                          className="admin-reject-button"
-                          onClick={() => handleRejectGroup(group)}
-                          disabled={first.status === "REJECTED"}
-                        >
-                          Avslå
-                        </button>
-                      </div>
+                          <button
+                            type="button"
+                            className="admin-reject-button"
+                            onClick={() => handleRejectGroup(group)}
+                            disabled={isUpdating}
+                          >
+                            Avslå
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="admin-muted">Ferdig behandlet</span>
+                      )}
                     </td>
                   </tr>
                 );
