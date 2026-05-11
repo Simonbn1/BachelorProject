@@ -43,25 +43,24 @@ export function useAbsence() {
   useEffect(() => {
     const raw = sessionStorage.getItem("absencePayload");
 
-    if (raw) {
-      const payload: AbsencePayloadEntry[] = JSON.parse(raw);
-      sessionStorage.removeItem("absencePayload");
+    if (!raw) return;
 
-      const prefilled: Record<string, string> = {};
+    const payload: AbsencePayloadEntry[] = JSON.parse(raw);
+    sessionStorage.removeItem("absencePayload");
 
-      for (const entry of payload) {
-        for (const [day, missing] of Object.entries(entry.missingHours)) {
-          const existing = parseFloat(prefilled[day] ?? "0");
+    const prefilled: Record<string, string> = {};
 
-          prefilled[day] = String(parseFloat((existing + missing).toFixed(1)));
-        }
+    for (const entry of payload) {
+      for (const [day, missing] of Object.entries(entry.missingHours)) {
+        const existing = parseFloat(prefilled[day] ?? "0");
+        prefilled[day] = String(parseFloat((existing + missing).toFixed(1)));
       }
-
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setAbsencePayload(payload);
-      setAbsenceType("SICKNESS");
-      setHours(prefilled);
     }
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setAbsencePayload(payload);
+    setAbsenceType("SICKNESS");
+    setHours(prefilled);
   }, []);
 
   useEffect(() => {
@@ -96,10 +95,13 @@ export function useAbsence() {
   }, [projectId, absencePayload]);
 
   useEffect(() => {
-    if (hoursError) {
-      const timer = setTimeout(() => setHoursError(null), 3000);
-      return () => clearTimeout(timer);
-    }
+    if (!hoursError) return;
+
+    const timer = window.setTimeout(() => {
+      setHoursError(null);
+    }, 3000);
+
+    return () => window.clearTimeout(timer);
   }, [hoursError]);
 
   const handleProjectChange = useCallback((id: number) => {
@@ -120,7 +122,6 @@ export function useAbsence() {
     setAbsenceType("");
     setDescription("");
     setProjectId(null);
-    setProjects([]);
     setSelectedStartDate(null);
     setSelectedEndDate(null);
     setWorkItems([]);
@@ -128,6 +129,7 @@ export function useAbsence() {
     setSelectedWorkItemIds([]);
     setIsCalendarOpen(false);
     setHoursError(null);
+    sessionStorage.removeItem("absencePayload");
   }, []);
 
   const lockedDaysFromPayload: Record<string, number> = {};
@@ -146,10 +148,12 @@ export function useAbsence() {
     if (selectedWorkItemIds.length > 0) {
       return (
         sum +
-        selectedWorkItemIds.reduce((s, wId) => {
+        selectedWorkItemIds.reduce((s, workItemId) => {
           return (
             s +
-            (parseFloat((hours[`${wId}-${day}`] ?? "0").replace(",", ".")) || 0)
+            (parseFloat(
+              (hours[`${workItemId}-${day}`] ?? "0").replace(",", "."),
+            ) || 0)
           );
         }, 0)
       );
@@ -159,11 +163,9 @@ export function useAbsence() {
   }, 0);
 
   const weeklyTarget = 40;
-
   const progressPercent = Math.min((weekTotal / weeklyTarget) * 100, 100);
 
   return {
-    // State
     hours,
     setHours,
     absenceType,
@@ -182,7 +184,6 @@ export function useAbsence() {
     setIsCalendarOpen,
     hoursError,
 
-    // Week
     weekStart,
     weekLabel,
     weekNumber,
@@ -191,14 +192,12 @@ export function useAbsence() {
     goToPreviousWeek,
     goToNextWeek,
 
-    // Computed
     weekTotal,
     weeklyTarget,
     progressPercent,
     lockedDaysFromPayload,
     days,
 
-    // Handlers
     handleProjectChange,
     handleRangeChange,
     handleHoursChange,

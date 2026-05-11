@@ -104,9 +104,11 @@ function groupAbsences(absences: MyAbsence[]): AbsenceGroup[] {
 
 export default function AbsencePage() {
   const navigate = useNavigate();
+
   const [activeTab, setActiveTab] = useState<AbsenceTab>("form");
   const [myAbsences, setMyAbsences] = useState<MyAbsence[]>([]);
   const [myAbsencesLoading, setMyAbsencesLoading] = useState(false);
+  const [formVersion, setFormVersion] = useState(0);
 
   const groupedAbsences = useMemo(
     () => groupAbsences(myAbsences),
@@ -132,6 +134,7 @@ export default function AbsencePage() {
     handleProjectChange,
     handleRangeChange,
     handleHoursChange,
+    resetAbsenceForm,
   } = useAbsence();
 
   const { handleSave } = useAbsenceSave({
@@ -166,6 +169,8 @@ export default function AbsencePage() {
 
   async function handleSaveAndRefresh() {
     await handleSave();
+    resetAbsenceForm();
+    setFormVersion((prev) => prev + 1);
     await loadMyAbsences();
     setActiveTab("mine");
   }
@@ -186,9 +191,11 @@ export default function AbsencePage() {
         <div className="absence-content-wrap">
           <section className="timesheet-card absence-card">
             <h1 className="page-title">Fravær</h1>
+
             <p className="page-subtitle">
               Søk om ferie, permisjon eller annet planlagt fravær.
             </p>
+
             <div className="absence-tabs">
               <button
                 type="button"
@@ -217,6 +224,7 @@ export default function AbsencePage() {
 
             {activeTab === "form" && (
               <AbsenceForm
+                key={formVersion}
                 hours={hours}
                 absenceType={absenceType}
                 description={description}
@@ -237,7 +245,7 @@ export default function AbsencePage() {
                 onFillWeek={() => {}}
                 onRemoveWorkItem={(id) =>
                   setSelectedWorkItemIds((prev) =>
-                    prev.filter((wId) => wId !== id),
+                    prev.filter((workItemId) => workItemId !== id),
                   )
                 }
               />
@@ -266,8 +274,10 @@ export default function AbsencePage() {
                       <span>Status</span>
                       <span>Kommentar</span>
                     </div>
+
                     {groupedAbsences.map((group) => {
                       const { first, last, days } = group;
+
                       const dateLabel =
                         first.absenceDate === last.absenceDate
                           ? formatDate(first.absenceDate)
