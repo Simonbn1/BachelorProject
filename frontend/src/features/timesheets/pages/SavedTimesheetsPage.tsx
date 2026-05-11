@@ -92,6 +92,10 @@ export default function SavedTimesheetsPage() {
     useState<MyTimesheet | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
 
+  const visibleItems = items.filter(
+    (item) => item.totalHours > 0 || !item.hasAbsence,
+  );
+
   async function loadTimesheets() {
     try {
       setLoading(true);
@@ -243,7 +247,7 @@ export default function SavedTimesheetsPage() {
           <div className="saved-timesheets-error">{error}</div>
         )}
 
-        {!loading && !error && items.length === 0 && (
+        {!loading && !error && visibleItems.length === 0 && (
           <div className="saved-timesheets-empty">
             <div className="saved-timesheets-empty-icon">🕘</div>
             <div>
@@ -253,7 +257,7 @@ export default function SavedTimesheetsPage() {
           </div>
         )}
 
-        {!loading && !error && items.length > 0 && (
+        {!loading && !error && visibleItems.length > 0 && (
           <div className="saved-timesheets-table-card">
             <table className="saved-timesheets-table">
               <thead>
@@ -268,7 +272,7 @@ export default function SavedTimesheetsPage() {
               </thead>
 
               <tbody>
-                {items.map((item) => {
+                {visibleItems.map((item) => {
                   const isActionLoading = actionLoadingId === item.timesheetId;
 
                   return (
