@@ -245,7 +245,7 @@ textarea.dark-input:focus {
   color: #fde68a;
 }
 
-.absence-input {
+.project-row--absence .timesheet-absence-input {
   background: rgba(245, 158, 11, 0.1) !important;
   border-color: rgba(245, 158, 11, 0.22) !important;
 }

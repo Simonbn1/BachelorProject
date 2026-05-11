@@ -217,7 +217,7 @@ export function TimesheetPage({
               }}
               className={
                 isAbsence
-                  ? "absence-input"
+                  ? "timesheet-absence-input"
                   : excludedFromAbsence[`${project.workItemId}-${day}`]
                     ? "input-excluded"
                     : ""
