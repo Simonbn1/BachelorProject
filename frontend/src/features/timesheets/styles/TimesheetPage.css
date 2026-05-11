@@ -143,6 +143,18 @@
   font-size: 0.9rem;
 }
 
+.timesheet-columns > span {
+  text-align: center;
+}
+
+.timesheet-columns > span:first-child {
+  text-align: left;
+}
+
+.timesheet-columns > span:last-child {
+  text-align: center;
+}
+
 .project-row {
   padding: 14px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
