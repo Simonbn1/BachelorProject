@@ -16,12 +16,12 @@ function formatWeekRange(weekStart: string) {
   const end = new Date(start);
   end.setDate(start.getDate() + 4);
 
-  const formatOptions: Intl.DateTimeFormatOptions = {
+  const options: Intl.DateTimeFormatOptions = {
     day: "numeric",
     month: "long",
   };
 
-  return `${start.toLocaleDateString("nb-NO", formatOptions)} - ${end.toLocaleDateString("nb-NO", formatOptions)}`;
+  return `${start.toLocaleDateString("nb-NO", options)} - ${end.toLocaleDateString("nb-NO", options)}`;
 }
 
 function getWeekLabel(weekStart: string) {
@@ -64,8 +64,17 @@ type ConfirmDialogState = {
   title: string;
   message: string;
   confirmText: string;
-  variant?: "danger" | "secondary";
+  variant: "danger" | "secondary";
   onConfirm: (() => Promise<void>) | null;
+};
+
+const initialConfirmDialog: ConfirmDialogState = {
+  open: false,
+  title: "",
+  message: "",
+  confirmText: "",
+  variant: "secondary",
+  onConfirm: null,
 };
 
 export default function SavedTimesheetsPage() {
@@ -74,17 +83,10 @@ export default function SavedTimesheetsPage() {
   const [items, setItems] = useState<MyTimesheet[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [actionMessage, setActionMessage] = useState("");
+  const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
-
-  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>({
-    open: false,
-    title: "",
-    message: "",
-    confirmText: "",
-    variant: "secondary",
-    onConfirm: null,
-  });
+  const [confirmDialog, setConfirmDialog] =
+    useState<ConfirmDialogState>(initialConfirmDialog);
 
   const [selectedTimesheet, setSelectedTimesheet] =
     useState<MyTimesheet | null>(null);
@@ -109,17 +111,16 @@ export default function SavedTimesheetsPage() {
     loadTimesheets();
   }, []);
 
+  function openConfirmDialog(config: Omit<ConfirmDialogState, "open">) {
+    setConfirmDialog({
+      open: true,
+      ...config,
+    });
+  }
+
   function closeConfirmDialog() {
     if (confirmLoading) return;
-
-    setConfirmDialog({
-      open: false,
-      title: "",
-      message: "",
-      confirmText: "",
-      variant: "secondary",
-      onConfirm: null,
-    });
+    setConfirmDialog(initialConfirmDialog);
   }
 
   async function runConfirmAction() {
@@ -128,29 +129,29 @@ export default function SavedTimesheetsPage() {
     try {
       setConfirmLoading(true);
       await confirmDialog.onConfirm();
-      closeConfirmDialog();
+      setConfirmDialog(initialConfirmDialog);
     } finally {
       setConfirmLoading(false);
     }
   }
 
-  async function handleSubmit(weekStart: string) {
+  async function handleSubmit(item: MyTimesheet) {
     try {
       setError("");
-      setActionMessage("");
+      setActionLoadingId(item.timesheetId);
 
-      await submitTimesheet({ weekStart });
-      setActionMessage("Timesheet sendt til godkjenning.");
+      await submitTimesheet({ weekStart: item.weekStart });
       await loadTimesheets();
     } catch (err) {
       console.error(err);
       setError("Kunne ikke sende inn timesheet.");
+    } finally {
+      setActionLoadingId(null);
     }
   }
 
-  function handleWithdraw(timesheetId: number) {
-    setConfirmDialog({
-      open: true,
+  function handleWithdraw(item: MyTimesheet) {
+    openConfirmDialog({
       title: "Trekk tilbake innsending",
       message:
         "Vil du trekke tilbake denne innsendingen? Da kan du redigere eller slette den igjen.",
@@ -159,37 +160,40 @@ export default function SavedTimesheetsPage() {
       onConfirm: async () => {
         try {
           setError("");
-          setActionMessage("");
+          setActionLoadingId(item.timesheetId);
 
-          await withdrawTimesheet(timesheetId);
-          setActionMessage("Timesheet ble trukket tilbake.");
+          await withdrawTimesheet(item.timesheetId);
           await loadTimesheets();
         } catch (err) {
           console.error(err);
           setError("Kunne ikke trekke tilbake timesheet.");
+        } finally {
+          setActionLoadingId(null);
         }
       },
     });
   }
 
-  function handleDelete(timesheetId: number) {
-    setConfirmDialog({
-      open: true,
+  function handleDelete(item: MyTimesheet) {
+    openConfirmDialog({
       title: "Slett utkast",
-      message: "Er du sikker på at du vil slette dette lagrede utkastet?",
+      message: `Er du sikker på at du vil slette ${getWeekLabel(
+        item.weekStart,
+      ).toLowerCase()}?`,
       confirmText: "Slett",
       variant: "danger",
       onConfirm: async () => {
         try {
           setError("");
-          setActionMessage("");
+          setActionLoadingId(item.timesheetId);
 
-          await deleteTimesheet(timesheetId);
-          setActionMessage("Timesheet ble slettet.");
+          await deleteTimesheet(item.timesheetId);
           await loadTimesheets();
         } catch (err) {
           console.error(err);
           setError("Kunne ikke slette timesheet.");
+        } finally {
+          setActionLoadingId(null);
         }
       },
     });
@@ -206,7 +210,6 @@ export default function SavedTimesheetsPage() {
   }
 
   async function handleModalResubmitted() {
-    setActionMessage("Timesheet ble sendt inn på nytt.");
     await loadTimesheets();
   }
 
@@ -222,6 +225,7 @@ export default function SavedTimesheetsPage() {
             >
               ← Oversikt
             </button>
+
             <div className="page-intro-text">
               <h1 className="page-title">Mine timer</h1>
               <p className="page-subtitle">
@@ -237,10 +241,6 @@ export default function SavedTimesheetsPage() {
 
         {!loading && error && (
           <div className="saved-timesheets-error">{error}</div>
-        )}
-
-        {!loading && !error && actionMessage && (
-          <div className="saved-timesheets-info">{actionMessage}</div>
         )}
 
         {!loading && !error && items.length === 0 && (
@@ -268,83 +268,92 @@ export default function SavedTimesheetsPage() {
               </thead>
 
               <tbody>
-                {items.map((item) => (
-                  <tr key={item.timesheetId}>
-                    <td>{getWeekLabel(item.weekStart)}</td>
-                    <td>{formatWeekRange(item.weekStart)}</td>
-                    <td>{item.totalHours.toFixed(1)}</td>
-                    <td>{item.hasAbsence ? "Ja" : "Nei"}</td>
+                {items.map((item) => {
+                  const isActionLoading = actionLoadingId === item.timesheetId;
 
-                    <td>
-                      <span
-                        className={`saved-timesheets-status saved-timesheets-status--${item.status.toLowerCase()}`}
-                      >
-                        {getStatusLabel(item.status)}
-                      </span>
+                  return (
+                    <tr key={item.timesheetId}>
+                      <td>{getWeekLabel(item.weekStart)}</td>
+                      <td>{formatWeekRange(item.weekStart)}</td>
+                      <td>{item.totalHours.toFixed(1)}</td>
+                      <td>{item.hasAbsence ? "Ja" : "Nei"}</td>
 
-                      {item.managerComment && (
-                        <div className="saved-timesheets-comment">
-                          Kommentar: {item.managerComment}
-                        </div>
-                      )}
-                    </td>
-
-                    <td>
-                      <div className="saved-timesheets-actions">
-                        <button
-                          type="button"
-                          className="saved-timesheets-action"
-                          onClick={() => handleOpen(item)}
+                      <td>
+                        <span
+                          className={`saved-timesheets-status saved-timesheets-status--${item.status.toLowerCase()}`}
                         >
-                          {item.status === "NOT_SENT" ||
-                          item.status === "REJECTED"
-                            ? "Åpne"
-                            : "Vis"}
-                        </button>
+                          {getStatusLabel(item.status)}
+                        </span>
 
-                        {item.status === "NOT_SENT" && (
-                          <>
+                        {item.managerComment && (
+                          <div className="saved-timesheets-comment">
+                            Kommentar: {item.managerComment}
+                          </div>
+                        )}
+                      </td>
+
+                      <td>
+                        <div className="saved-timesheets-actions">
+                          <button
+                            type="button"
+                            className="saved-timesheets-action"
+                            onClick={() => handleOpen(item)}
+                            disabled={isActionLoading}
+                          >
+                            {item.status === "NOT_SENT" ||
+                            item.status === "REJECTED"
+                              ? "Åpne"
+                              : "Vis"}
+                          </button>
+
+                          {item.status === "NOT_SENT" && (
+                            <>
+                              <button
+                                type="button"
+                                className="saved-timesheets-action saved-timesheets-action--primary"
+                                onClick={() => handleSubmit(item)}
+                                disabled={isActionLoading}
+                              >
+                                {isActionLoading ? "Sender..." : "Send inn"}
+                              </button>
+
+                              <button
+                                type="button"
+                                className="saved-timesheets-action saved-timesheets-action--danger"
+                                onClick={() => handleDelete(item)}
+                                disabled={isActionLoading}
+                              >
+                                Slett
+                              </button>
+                            </>
+                          )}
+
+                          {item.status === "SENT" && (
+                            <button
+                              type="button"
+                              className="saved-timesheets-action saved-timesheets-action--secondary"
+                              onClick={() => handleWithdraw(item)}
+                              disabled={isActionLoading}
+                            >
+                              Trekk tilbake
+                            </button>
+                          )}
+
+                          {item.status === "REJECTED" && (
                             <button
                               type="button"
                               className="saved-timesheets-action saved-timesheets-action--primary"
-                              onClick={() => handleSubmit(item.weekStart)}
+                              onClick={() => handleOpen(item)}
+                              disabled={isActionLoading}
                             >
-                              Send inn
+                              Rediger og send på nytt
                             </button>
-
-                            <button
-                              type="button"
-                              className="saved-timesheets-action saved-timesheets-action--danger"
-                              onClick={() => handleDelete(item.timesheetId)}
-                            >
-                              Slett
-                            </button>
-                          </>
-                        )}
-
-                        {item.status === "SENT" && (
-                          <button
-                            type="button"
-                            className="saved-timesheets-action saved-timesheets-action--secondary"
-                            onClick={() => handleWithdraw(item.timesheetId)}
-                          >
-                            Trekk tilbake
-                          </button>
-                        )}
-
-                        {item.status === "REJECTED" && (
-                          <button
-                            type="button"
-                            className="saved-timesheets-action saved-timesheets-action--primary"
-                            onClick={() => handleOpen(item)}
-                          >
-                            Rediger og send på nytt
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
