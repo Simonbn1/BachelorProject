@@ -103,7 +103,6 @@ export default function AdminExportPage() {
         "success",
         "Eksport fullført",
         "Fakturagrunnlag ble eksportert.",
-        true,
       );
     } catch (error) {
       console.error("Eksport av fakturagrunnlag feilet:", error);
@@ -112,7 +111,6 @@ export default function AdminExportPage() {
         "error",
         "Eksport feilet",
         "Kunne ikke eksportere fakturagrunnlag.",
-        true,
       );
     } finally {
       setLoading(false);
