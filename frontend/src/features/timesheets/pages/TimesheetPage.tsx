@@ -93,12 +93,17 @@ export function TimesheetPage({
     getRowTotal,
   } = useTimesheet(effectiveWeekStart);
 
+  const absenceProjectNames = ["sykdom", "ferie", "permisjon", "annet"];
+
+  const isAbsenceProject = (projectName: string) =>
+    absenceProjectNames.includes(projectName.toLowerCase());
+
   const normalProjects = visibleProjects.filter(
-    (project) => project.name.toLowerCase() !== "sykdom",
+    (project) => !isAbsenceProject(project.name),
   );
 
-  const absenceProjects = visibleProjects.filter(
-    (project) => project.name.toLowerCase() === "sykdom",
+  const absenceProjects = visibleProjects.filter((project) =>
+    isAbsenceProject(project.name),
   );
 
   const { navigateToAbsence } = useAbsenceNavigation({
