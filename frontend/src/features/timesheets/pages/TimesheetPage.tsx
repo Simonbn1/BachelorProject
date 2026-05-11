@@ -48,6 +48,7 @@ export function TimesheetPage({
 }: TimesheetPageProps) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
   const weekStartFromUrl = searchParams.get("weekStart");
   const effectiveWeekStart = weekStartOverride ?? weekStartFromUrl;
 
@@ -91,6 +92,14 @@ export function TimesheetPage({
     getNumericValue,
     getRowTotal,
   } = useTimesheet(effectiveWeekStart);
+
+  const normalProjects = visibleProjects.filter(
+    (project) => project.name.toLowerCase() !== "sykdom",
+  );
+
+  const absenceProjects = visibleProjects.filter(
+    (project) => project.name.toLowerCase() === "sykdom",
+  );
 
   const { navigateToAbsence } = useAbsenceNavigation({
     visibleProjects,
@@ -155,11 +164,85 @@ export function TimesheetPage({
   const showDraftButton = !isLocked;
   const showAddProjectButton = !isLocked;
   const showDeleteButton = !isLocked;
+
   const statusLabel = getStatusLabel(timesheetStatus);
+
   const earliestAllowed = new Date();
   earliestAllowed.setDate(earliestAllowed.getDate() - 7);
   earliestAllowed.setHours(0, 0, 0, 0);
+
   const isPastLimit = new Date(weekStart) < earliestAllowed;
+
+  function renderProjectRow(
+    project: (typeof visibleProjects)[number],
+    isAbsence = false,
+  ) {
+    return (
+      <div
+        key={project.workItemId}
+        className={
+          isAbsence ? "project-row project-row--absence" : "project-row"
+        }
+      >
+        <div className="project-name">
+          <strong>{project.name}</strong>
+          <span>
+            Oppgave: {project.workItemTitle ?? `Prosjekt #${project.id}`}
+          </span>
+        </div>
+
+        {(["mon", "tue", "wed", "thu", "fri"] as const).map((day) => (
+          <div key={day} className="day-input-wrapper">
+            {!isAbsence && isOvertime(project.workItemId, day) && (
+              <span className="overtime-indicator">
+                +
+                {(getNumericValue(project.workItemId, day) - 8)
+                  .toFixed(1)
+                  .replace(".", ",")}
+                t
+              </span>
+            )}
+
+            <input
+              value={hours[`${project.workItemId}-${day}`] ?? ""}
+              placeholder="0,0"
+              disabled={isLocked}
+              onChange={(e) =>
+                handleChange(project.workItemId, day, e.target.value)
+              }
+              onContextMenu={(e) => {
+                if (isLocked || isAbsence) return;
+                e.preventDefault();
+                toggleExcludedFromAbsence(project.workItemId, day);
+              }}
+              className={
+                isAbsence
+                  ? "absence-input"
+                  : excludedFromAbsence[`${project.workItemId}-${day}`]
+                    ? "input-excluded"
+                    : ""
+              }
+            />
+          </div>
+        ))}
+
+        <div className={isAbsence ? "total total--absence" : "total"}>
+          {getRowTotal(project.workItemId).toFixed(1).replace(".", ",")}
+        </div>
+
+        {showDeleteButton && (
+          <button
+            className="delete-btn"
+            type="button"
+            aria-label="Slett rad"
+            onClick={() => removeProject(project.workItemId)}
+          >
+            <Trash2 size={22} />
+          </button>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className={embedded ? "page page--embedded" : "page"}>
@@ -277,65 +360,19 @@ export function TimesheetPage({
               <span></span>
             </div>
 
-            {visibleProjects.map((project) => (
-              <div key={project.workItemId} className="project-row">
-                <div className="project-name">
-                  <strong>{project.name}</strong>
-                  <span>
-                    Oppgave:{" "}
-                    {project.workItemTitle ?? `Prosjekt #${project.id}`}
-                  </span>
+            {normalProjects.map((project) => renderProjectRow(project))}
+
+            {absenceProjects.length > 0 && (
+              <>
+                <div className="timesheet-section-divider">
+                  <span>Fravær</span>
                 </div>
 
-                {(["mon", "tue", "wed", "thu", "fri"] as const).map((day) => (
-                  <div key={day} className="day-input-wrapper">
-                    {isOvertime(project.workItemId, day) && (
-                      <span className="overtime-indicator">
-                        +
-                        {(getNumericValue(project.workItemId, day) - 8)
-                          .toFixed(1)
-                          .replace(".", ",")}
-                        t
-                      </span>
-                    )}
-
-                    <input
-                      value={hours[`${project.workItemId}-${day}`] ?? ""}
-                      placeholder="0,0"
-                      disabled={isLocked}
-                      onChange={(e) =>
-                        handleChange(project.workItemId, day, e.target.value)
-                      }
-                      onContextMenu={(e) => {
-                        if (isLocked) return;
-                        e.preventDefault();
-                        toggleExcludedFromAbsence(project.workItemId, day);
-                      }}
-                      className={
-                        excludedFromAbsence[`${project.workItemId}-${day}`]
-                          ? "input-excluded"
-                          : ""
-                      }
-                    />
-                  </div>
-                ))}
-
-                <div className="total">
-                  {getRowTotal(project.workItemId).toFixed(1).replace(".", ",")}
-                </div>
-
-                {showDeleteButton && (
-                  <button
-                    className="delete-btn"
-                    type="button"
-                    aria-label="Slett rad"
-                    onClick={() => removeProject(project.workItemId)}
-                  >
-                    <Trash2 size={22} />
-                  </button>
+                {absenceProjects.map((project) =>
+                  renderProjectRow(project, true),
                 )}
-              </div>
-            ))}
+              </>
+            )}
           </div>
 
           {hoursError && <p className="hours-error">{hoursError}</p>}

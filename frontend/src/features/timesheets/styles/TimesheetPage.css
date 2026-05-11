@@ -217,6 +217,45 @@ textarea.dark-input:focus {
   color: #ff4444;
 }
 
+.timesheet-section-divider {
+  margin: 18px 0 4px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.timesheet-section-divider span {
+  display: inline-flex;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: #fcd34d;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.project-row--absence {
+  border-radius: 14px;
+  background: rgba(245, 158, 11, 0.035);
+}
+
+.project-row--absence .project-name strong {
+  color: #fde68a;
+}
+
+.absence-input {
+  background: rgba(245, 158, 11, 0.1) !important;
+  border-color: rgba(245, 158, 11, 0.22) !important;
+}
+
+.total--absence {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.22);
+  color: #fde68a;
+}
+
 .timesheet-actions {
   justify-content: space-between;
   margin-top: 22px;
@@ -296,66 +335,6 @@ textarea.dark-input:focus {
   margin: 0 0 16px;
 }
 
-@media (max-width: 1200px) {
-  .timesheet-columns,
-  .project-row {
-    grid-template-columns: 200px repeat(5, minmax(68px, 1fr)) 120px 40px;
-  }
-}
-
-@media (max-width: 980px) {
-  .timesheet-header {
-    flex-direction: column;
-  }
-
-  .timesheet-progress {
-    text-align: left;
-  }
-
-  .week-subtitle {
-    margin-left: 0;
-  }
-
-  .timesheet-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .timesheet-actions-right {
-    justify-content: flex-start;
-  }
-
-  .timesheet-card {
-    overflow-x: auto;
-  }
-
-  .timesheet-columns,
-  .project-row {
-    min-width: 920px;
-  }
-}
-
-@media (max-width: 640px) {
-  .page-title {
-    font-size: 2rem;
-  }
-
-  .input-group-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-  }
-
-  .input-group-row label,
-  .dark-input {
-    width: 100%;
-  }
-
-  .modal-content {
-    padding: 22px 18px;
-  }
-}
-
 .wireframe-modal {
   position: fixed;
   inset: 0;
@@ -416,4 +395,64 @@ textarea.dark-input:focus {
   transform: none;
   filter: none;
   background: linear-gradient(90deg, #c600ff, #6a5cff);
+}
+
+@media (max-width: 1200px) {
+  .timesheet-columns,
+  .project-row {
+    grid-template-columns: 200px repeat(5, minmax(68px, 1fr)) 120px 40px;
+  }
+}
+
+@media (max-width: 980px) {
+  .timesheet-header {
+    flex-direction: column;
+  }
+
+  .timesheet-progress {
+    text-align: left;
+  }
+
+  .week-subtitle {
+    margin-left: 0;
+  }
+
+  .timesheet-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .timesheet-actions-right {
+    justify-content: flex-start;
+  }
+
+  .timesheet-card {
+    overflow-x: auto;
+  }
+
+  .timesheet-columns,
+  .project-row {
+    min-width: 920px;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .input-group-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .input-group-row label,
+  .dark-input {
+    width: 100%;
+  }
+
+  .modal-content {
+    padding: 22px 18px;
+  }
 }
