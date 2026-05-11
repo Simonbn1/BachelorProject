@@ -112,25 +112,10 @@ function getStatusLabel(status: string) {
   }
 }
 
-function getAbsenceTypeLabel(type: string) {
-  switch (type) {
-    case "VACATION":
-      return "Ferie";
-    case "SICKNESS":
-      return "Sykdom";
-    case "LEAVE":
-      return "Permisjon";
-    case "OTHER":
-      return "Annet";
-    default:
-      return type;
-  }
-}
-
 function isAbsenceEntry(entry: AdminTimesheetDetail["timeEntries"][number]) {
   const projectName = entry.projectName?.toLowerCase();
 
-  return ["sykdom", "ferie", "permisjon", "annet"].includes(projectName!);
+  return ["sykdom", "ferie", "permisjon", "annet"].includes(projectName ?? "");
 }
 
 export default function AdminTimesheetPage() {
@@ -157,8 +142,7 @@ export default function AdminTimesheetPage() {
 
   const absenceEntries = detail?.timeEntries.filter(isAbsenceEntry) ?? [];
 
-  const hasAbsence =
-    (detail?.absences.length ?? 0) > 0 || absenceEntries.length > 0;
+  const hasAbsence = absenceEntries.length > 0;
 
   async function loadOverview() {
     try {
@@ -326,13 +310,23 @@ export default function AdminTimesheetPage() {
               {detail.userEmail && <p>{detail.userEmail}</p>}
             </div>
 
-            <span
-              className={`admin-status-pill status-${String(
-                detail.status,
-              ).toLowerCase()}`}
-            >
-              {getStatusLabel(detail.status)}
-            </span>
+            <div className="admin-detail-header-actions">
+              <span
+                className={`admin-status-pill status-${String(
+                  detail.status,
+                ).toLowerCase()}`}
+              >
+                {getStatusLabel(detail.status)}
+              </span>
+
+              <button
+                type="button"
+                className="admin-close-detail-button"
+                onClick={() => setSelectedTimesheetId(null)}
+              >
+                Lukk
+              </button>
+            </div>
           </div>
 
           <div className="admin-detail-stats">
@@ -417,33 +411,6 @@ export default function AdminTimesheetPage() {
               </div>
             </div>
           )}
-
-          <div className="admin-detail-section">
-            <h3>Fraværssøknader</h3>
-
-            {detail.absences.length === 0 ? (
-              <p className="admin-muted">Ingen registrerte fraværssøknader.</p>
-            ) : (
-              <div className="admin-detail-table">
-                <div className="admin-detail-table-head absence">
-                  <span>Dato</span>
-                  <span>Type</span>
-                  <span>Timer</span>
-                </div>
-
-                {detail.absences.map((absence) => (
-                  <div
-                    className="admin-detail-table-row absence"
-                    key={absence.id}
-                  >
-                    <span>{absence.absenceDate}</span>
-                    <strong>{getAbsenceTypeLabel(absence.type)}</strong>
-                    <span>{absence.hours}t</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
 
           <div className="admin-decision-box">
             <label htmlFor="rejectComment">Tilbakemelding ved avslag</label>

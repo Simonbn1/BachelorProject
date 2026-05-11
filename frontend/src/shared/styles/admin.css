@@ -646,3 +646,23 @@
 .admin-intro-text {
   margin-top: -0.5rem;
 }
+
+.admin-detail-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-close-detail-button {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: #f8fafc;
+  border-radius: 12px;
+  padding: 9px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-close-detail-button:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
