@@ -272,7 +272,7 @@ export default function AbsencePage() {
                       <span>Type</span>
                       <span>Dager</span>
                       <span>Status</span>
-                      <span>Kommentar</span>
+                      <span>Beskrivelse / svar</span>
                     </div>
 
                     {groupedAbsences.map((group) => {
