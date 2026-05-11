@@ -167,6 +167,7 @@ export default function AbsencePage() {
   async function handleSaveAndRefresh() {
     await handleSave();
     await loadMyAbsences();
+    setActiveTab("mine");
   }
 
   return (

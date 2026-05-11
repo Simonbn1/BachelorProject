@@ -42,18 +42,22 @@ export function useAbsence() {
 
   useEffect(() => {
     const raw = sessionStorage.getItem("absencePayload");
+
     if (raw) {
       const payload: AbsencePayloadEntry[] = JSON.parse(raw);
       sessionStorage.removeItem("absencePayload");
 
       const prefilled: Record<string, string> = {};
+
       for (const entry of payload) {
         for (const [day, missing] of Object.entries(entry.missingHours)) {
           const existing = parseFloat(prefilled[day] ?? "0");
+
           prefilled[day] = String(parseFloat((existing + missing).toFixed(1)));
         }
       }
-      //eslint-disable-next-line react-hooks/set-state-in-effect
+
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAbsencePayload(payload);
       setAbsenceType("SICKNESS");
       setHours(prefilled);
@@ -62,6 +66,7 @@ export function useAbsence() {
 
   useEffect(() => {
     if (absencePayload) return;
+
     async function loadProjects() {
       try {
         const data = await fetchProjects();
@@ -70,11 +75,13 @@ export function useAbsence() {
         console.error("Kunne ikke hente prosjekter:", error);
       }
     }
+
     loadProjects();
   }, [absencePayload]);
 
   useEffect(() => {
     if (!projectId || absencePayload) return;
+
     async function loadWorkItems() {
       try {
         const items = await fetchWorkItems(projectId!);
@@ -84,6 +91,7 @@ export function useAbsence() {
         console.error("Kunne ikke hente arbeidsoppgaver:", error);
       }
     }
+
     loadWorkItems();
   }, [projectId, absencePayload]);
 
@@ -107,7 +115,23 @@ export function useAbsence() {
     setHours(updated);
   }, []);
 
+  const resetAbsenceForm = useCallback(() => {
+    setHours({});
+    setAbsenceType("");
+    setDescription("");
+    setProjectId(null);
+    setProjects([]);
+    setSelectedStartDate(null);
+    setSelectedEndDate(null);
+    setWorkItems([]);
+    setAbsencePayload(null);
+    setSelectedWorkItemIds([]);
+    setIsCalendarOpen(false);
+    setHoursError(null);
+  }, []);
+
   const lockedDaysFromPayload: Record<string, number> = {};
+
   if (absencePayload) {
     for (const entry of absencePayload) {
       for (const [day, missing] of Object.entries(entry.missingHours)) {
@@ -117,6 +141,7 @@ export function useAbsence() {
   }
 
   const days = ["mon", "tue", "wed", "thu", "fri"];
+
   const weekTotal = days.reduce((sum, day) => {
     if (selectedWorkItemIds.length > 0) {
       return (
@@ -129,9 +154,12 @@ export function useAbsence() {
         }, 0)
       );
     }
+
     return sum + (parseFloat((hours[day] ?? "0").replace(",", ".")) || 0);
   }, 0);
+
   const weeklyTarget = 40;
+
   const progressPercent = Math.min((weekTotal / weeklyTarget) * 100, 100);
 
   return {
@@ -153,6 +181,7 @@ export function useAbsence() {
     isCalendarOpen,
     setIsCalendarOpen,
     hoursError,
+
     // Week
     weekStart,
     weekLabel,
@@ -161,15 +190,18 @@ export function useAbsence() {
     endDate,
     goToPreviousWeek,
     goToNextWeek,
+
     // Computed
     weekTotal,
     weeklyTarget,
     progressPercent,
     lockedDaysFromPayload,
     days,
+
     // Handlers
     handleProjectChange,
     handleRangeChange,
     handleHoursChange,
+    resetAbsenceForm,
   };
 }
