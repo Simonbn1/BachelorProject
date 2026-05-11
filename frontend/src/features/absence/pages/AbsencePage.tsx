@@ -303,7 +303,9 @@ export default function AbsencePage() {
                           </span>
 
                           <div className="absence-comment">
-                            {first.managerComment || first.description || "—"}
+                            {first.status === "REJECTED"
+                              ? first.managerComment || "Ingen tilbakemelding"
+                              : first.description || "—"}
                           </div>
                         </div>
                       );
