@@ -59,6 +59,15 @@ function getStatusLabel(status: MyTimesheet["status"]) {
   }
 }
 
+type ConfirmDialogState = {
+  open: boolean;
+  title: string;
+  message: string;
+  confirmText: string;
+  variant?: "danger" | "secondary";
+  onConfirm: (() => Promise<void>) | null;
+};
+
 export default function SavedTimesheetsPage() {
   const navigate = useNavigate();
 
@@ -66,6 +75,16 @@ export default function SavedTimesheetsPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [actionMessage, setActionMessage] = useState("");
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>({
+    open: false,
+    title: "",
+    message: "",
+    confirmText: "",
+    variant: "secondary",
+    onConfirm: null,
+  });
 
   const [selectedTimesheet, setSelectedTimesheet] =
     useState<MyTimesheet | null>(null);
@@ -90,6 +109,31 @@ export default function SavedTimesheetsPage() {
     loadTimesheets();
   }, []);
 
+  function closeConfirmDialog() {
+    if (confirmLoading) return;
+
+    setConfirmDialog({
+      open: false,
+      title: "",
+      message: "",
+      confirmText: "",
+      variant: "secondary",
+      onConfirm: null,
+    });
+  }
+
+  async function runConfirmAction() {
+    if (!confirmDialog.onConfirm) return;
+
+    try {
+      setConfirmLoading(true);
+      await confirmDialog.onConfirm();
+      closeConfirmDialog();
+    } finally {
+      setConfirmLoading(false);
+    }
+  }
+
   async function handleSubmit(weekStart: string) {
     try {
       setError("");
@@ -104,44 +148,51 @@ export default function SavedTimesheetsPage() {
     }
   }
 
-  async function handleWithdraw(timesheetId: number) {
-    const confirmed = window.confirm(
-      "Vil du trekke tilbake denne innsendingen? Da kan du redigere eller slette den igjen.",
-    );
+  function handleWithdraw(timesheetId: number) {
+    setConfirmDialog({
+      open: true,
+      title: "Trekk tilbake innsending",
+      message:
+        "Vil du trekke tilbake denne innsendingen? Da kan du redigere eller slette den igjen.",
+      confirmText: "Trekk tilbake",
+      variant: "secondary",
+      onConfirm: async () => {
+        try {
+          setError("");
+          setActionMessage("");
 
-    if (!confirmed) return;
-
-    try {
-      setError("");
-      setActionMessage("");
-
-      await withdrawTimesheet(timesheetId);
-      setActionMessage("Timesheet ble trukket tilbake.");
-      await loadTimesheets();
-    } catch (err) {
-      console.error(err);
-      setError("Kunne ikke trekke tilbake timesheet.");
-    }
+          await withdrawTimesheet(timesheetId);
+          setActionMessage("Timesheet ble trukket tilbake.");
+          await loadTimesheets();
+        } catch (err) {
+          console.error(err);
+          setError("Kunne ikke trekke tilbake timesheet.");
+        }
+      },
+    });
   }
 
-  async function handleDelete(timesheetId: number) {
-    const confirmed = window.confirm(
-      "Er du sikker på at du vil slette dette lagrede utkastet?",
-    );
+  function handleDelete(timesheetId: number) {
+    setConfirmDialog({
+      open: true,
+      title: "Slett utkast",
+      message: "Er du sikker på at du vil slette dette lagrede utkastet?",
+      confirmText: "Slett",
+      variant: "danger",
+      onConfirm: async () => {
+        try {
+          setError("");
+          setActionMessage("");
 
-    if (!confirmed) return;
-
-    try {
-      setError("");
-      setActionMessage("");
-
-      await deleteTimesheet(timesheetId);
-      setActionMessage("Timesheet ble slettet.");
-      await loadTimesheets();
-    } catch (err) {
-      console.error(err);
-      setError("Kunne ikke slette timesheet.");
-    }
+          await deleteTimesheet(timesheetId);
+          setActionMessage("Timesheet ble slettet.");
+          await loadTimesheets();
+        } catch (err) {
+          console.error(err);
+          setError("Kunne ikke slette timesheet.");
+        }
+      },
+    });
   }
 
   function handleOpen(timesheet: MyTimesheet) {
@@ -299,6 +350,50 @@ export default function SavedTimesheetsPage() {
           </div>
         )}
       </div>
+
+      {confirmDialog.open && (
+        <div className="confirm-overlay" role="presentation">
+          <div
+            className="confirm-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirm-dialog-title"
+          >
+            <div className="confirm-icon">
+              {confirmDialog.variant === "danger" ? "!" : "↩"}
+            </div>
+
+            <div>
+              <h2 id="confirm-dialog-title">{confirmDialog.title}</h2>
+              <p>{confirmDialog.message}</p>
+            </div>
+
+            <div className="confirm-actions">
+              <button
+                type="button"
+                className="confirm-button confirm-button--ghost"
+                onClick={closeConfirmDialog}
+                disabled={confirmLoading}
+              >
+                Avbryt
+              </button>
+
+              <button
+                type="button"
+                className={`confirm-button ${
+                  confirmDialog.variant === "danger"
+                    ? "confirm-button--danger"
+                    : "confirm-button--primary"
+                }`}
+                onClick={runConfirmAction}
+                disabled={confirmLoading}
+              >
+                {confirmLoading ? "Jobber..." : confirmDialog.confirmText}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <TimesheetEditModal
         opened={editModalOpen}
