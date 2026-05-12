@@ -18,8 +18,8 @@ VALUES
 ON CONFLICT (external_id) DO NOTHING;
 
 INSERT INTO projects (customer, name)
-VALUES (NULL, 'Sykdom');
-
+VALUES ('', 'Sykdom')
+ON CONFLICT (customer, name) DO NOTHING;
 
 INSERT INTO work_items (external_id, title, project_id)
 SELECT 'SYK-001', 'Sykefravær', id FROM projects WHERE name = 'Sykdom'
