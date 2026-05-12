@@ -34,6 +34,7 @@ export default function SettingsPage() {
     <div className="page settings-page">
       <div className="page-intro">
         <button
+          type="button"
           className="page-back-button"
           onClick={() => navigate("/dashboard")}
         >
