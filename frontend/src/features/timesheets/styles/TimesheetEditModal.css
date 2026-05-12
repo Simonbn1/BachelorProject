@@ -101,6 +101,10 @@
   background: rgba(255, 255, 255, 0.03);
 }
 
+.timesheet-footer-button--ghost:hover {
+  transform: translateY(-1px);
+}
+
 .timesheet-footer-button--primary {
   background: linear-gradient(135deg, #7b61ff, #5378ff);
   border-color: rgba(140, 160, 255, 0.4);
