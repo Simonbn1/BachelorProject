@@ -7,9 +7,6 @@ import "../../../shared/styles/globals.css";
 export default function SettingsPage() {
   const navigate = useNavigate();
   const {
-    fileInputRef,
-    avatarUrl,
-    pendingAvatarUrl,
     activeSection,
     setActiveSection,
     name,
@@ -29,7 +26,6 @@ export default function SettingsPage() {
     setShowRepeat,
     passwordError,
     initials,
-    handleAvatarChange,
     cancelSection,
     handleSave,
   } = useSettings();
@@ -56,35 +52,12 @@ export default function SettingsPage() {
           </div>
           <div className="settings-card">
             <div className="settings-avatar-section">
-              <div
-                className="settings-avatar-wrap"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                {(pendingAvatarUrl ?? avatarUrl) ? (
-                  <img
-                    src={pendingAvatarUrl ?? avatarUrl!}
-                    alt="Profilbilde"
-                    className="settings-avatar-img"
-                  />
-                ) : (
-                  <div className="settings-avatar-placeholder">{initials}</div>
-                )}
-                <div className="settings-avatar-overlay">
-                  <Camera size={20} />
-                </div>
+              <div className="settings-avatar-placeholder">{initials}</div>
+              <div className="settings-avatar-overlay">
+                <Camera size={20} />
               </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                style={{ display: "none" }}
-                onChange={handleAvatarChange}
-              />
               <div className="settings-avatar-info">
                 <span className="settings-avatar-name">{name}</span>
-                <span className="settings-avatar-hint">
-                  Klikk på bildet for å endre
-                </span>
               </div>
             </div>
 

@@ -190,16 +190,27 @@ export default function AdminExportPage() {
             <h5 className="modal-week-title">{formatWeekLabel(weekStart)}</h5>
 
             <DatePicker
-              value={weekStart}
-              onChange={(value) => {
-                if (!value) return;
+              value={null}
+              getDayProps={(date) => {
+                const monday = getMondayFromDate(
+                  new Date(`${weekStart}T12:00:00`),
+                );
+                const friday = new Date(monday);
+                friday.setDate(monday.getDate() + 4);
 
-                const selectedDate = new Date(`${value}T12:00:00`);
-                const monday = getMondayFromDate(selectedDate);
-                const mondayString = formatLocalDate(monday);
+                const dateOnly = new Date(date);
+                dateOnly.setHours(0, 0, 0, 0);
 
-                setWeekStart(mondayString);
-                setIsCalendarOpen(false);
+                const isInWeek = dateOnly >= monday && dateOnly <= friday;
+
+                return {
+                  selected: isInWeek,
+                  onClick: () => {
+                    const selectedMonday = getMondayFromDate(new Date(date));
+                    setWeekStart(formatLocalDate(selectedMonday));
+                    setIsCalendarOpen(false);
+                  },
+                };
               }}
               locale="nb"
               firstDayOfWeek={1}

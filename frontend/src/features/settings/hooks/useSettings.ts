@@ -1,11 +1,8 @@
-import React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useToasts } from "../../../shared/hooks/useToasts.ts";
 import { getAccessToken } from "../../auth/hooks/useAuth.ts";
 
 export function useSettings() {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   const [activeSection, setActiveSection] = useState<
     "name" | "password" | null
   >(null);
@@ -24,21 +21,7 @@ export function useSettings() {
 
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(() =>
-    localStorage.getItem("avatarUrl"),
-  );
-  const [pendingAvatarUrl, setPendingAvatarUrl] = useState<string | null>(null);
-
   const { showToast } = useToasts();
-
-  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) {
-      showToast("warning", "The avatar has not been changed");
-      return;
-    }
-    setPendingAvatarUrl(URL.createObjectURL(file));
-  }
 
   async function handleNameSave() {
     const nameError = validateName(nameInput);
@@ -141,15 +124,6 @@ export function useSettings() {
     .slice(0, 2);
 
   async function handleSave() {
-    if (pendingAvatarUrl) {
-      setAvatarUrl(pendingAvatarUrl);
-      setPendingAvatarUrl(null);
-
-      localStorage.setItem("avatarUrl", pendingAvatarUrl);
-      window.dispatchEvent(new Event("storageChange"));
-
-      showToast("success", "Profilbilde oppdatert!");
-    }
     if (activeSection === "name") await handleNameSave();
     else if (activeSection === "password") await handlePasswordSave();
   }
@@ -193,9 +167,6 @@ export function useSettings() {
   }, []);
 
   return {
-    fileInputRef,
-    avatarUrl,
-    pendingAvatarUrl,
     activeSection,
     setActiveSection,
     name,
@@ -215,7 +186,6 @@ export function useSettings() {
     setShowRepeat,
     passwordError,
     initials,
-    handleAvatarChange,
     cancelSection,
     handleSave,
   };
