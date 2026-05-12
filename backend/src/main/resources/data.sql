@@ -3,7 +3,7 @@ VALUES
    ('Accenture', 'Intern Utvikling'),
    ('Telenor', 'Systemintegrasjon'),
    ('DNB', 'Digital transformasjon')
-ON CONFLICT DO NOTHING;
+ON CONFLICT (customer, name) DO NOTHING;
 
 INSERT INTO work_items (external_id, title, project_id)
 VALUES
@@ -15,7 +15,15 @@ VALUES
     ('DNB-001', 'Sikkerhetsrevisjon', 3),
     ('DNB-002', 'UI design', 3),
     ('DNB-003', 'Dataanlyse', 3)
-ON CONFLICT DO NOTHING;
+ON CONFLICT (external_id) DO NOTHING;
+
+INSERT INTO projects (customer, name)
+VALUES (NULL, 'Sykdom');
+
+
+INSERT INTO work_items (external_id, title, project_id)
+SELECT 'SYK-001', 'Sykefravær', id FROM projects WHERE name = 'Sykdom'
+ON CONFLICT (external_id) DO NOTHING;
 
 
 

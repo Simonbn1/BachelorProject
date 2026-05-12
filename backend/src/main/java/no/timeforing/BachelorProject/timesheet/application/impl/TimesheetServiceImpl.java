@@ -9,7 +9,6 @@ import no.timeforing.BachelorProject.timesheet.domain.TimeEntry;
 import no.timeforing.BachelorProject.timesheet.domain.Timesheet;
 import no.timeforing.BachelorProject.timesheet.domain.enums.TimesheetStatus;
 import no.timeforing.BachelorProject.timesheet.dto.MyTimesheetResponse;
-import no.timeforing.BachelorProject.timesheet.dto.SavedTimesheetResponse;
 import no.timeforing.BachelorProject.timesheet.repository.TimeEntryRepository;
 import no.timeforing.BachelorProject.timesheet.repository.TimesheetRepository;
 import no.timeforing.BachelorProject.user.domain.User;
@@ -101,7 +100,10 @@ public class TimesheetServiceImpl implements TimesheetService {
                                     .sum() * 10.0
                     ) / 10.0;
 
-                    boolean hasAbsence = !absences.isEmpty();
+                    boolean hasAbsence = !absences.isEmpty() ||
+                            entries.stream()
+                                    .anyMatch(e -> e.getWorkItem().getProject().getName().equalsIgnoreCase("sykdom"));
+
 
                     return new MyTimesheetResponse(
                             timesheet.getId(),

@@ -246,11 +246,13 @@ textarea.dark-input:focus {
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+
 }
 
 .project-row--absence {
   border-radius: 14px;
   background: rgba(245, 158, 11, 0.035);
+  padding-left: 12px;
 }
 
 .project-row--absence .project-name strong {
